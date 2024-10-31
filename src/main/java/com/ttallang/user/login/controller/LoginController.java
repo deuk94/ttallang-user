@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class LoginController {
-    @GetMapping(value = "/user/userMain")
+    @GetMapping(value = "/map/main")
     public String userMainPage(@AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
         model.addAttribute("customerId", principalDetails.getCustomerID());
-        return "test/loginSuccess";
+        return "map/mymap";
     }
 }
