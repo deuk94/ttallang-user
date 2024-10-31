@@ -48,7 +48,8 @@ function handleLoginForm(event) {
         if (data.role === "admin") {
             window.location.href = "/admin/adminMain";
         } else if (data.role === "user") {
-            window.location.href = "/user/userMain";
+            // window.location.href = "/user/userMain";
+            window.location.href = "/map/main";
         } else {
             throw new Error("로그인 실패.");
         }
