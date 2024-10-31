@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
-<!-- 헤더 -->
+
 <header>
     <div>
         <img src="/images/자전거.png" alt="따릉이 로고" />
@@ -91,6 +91,9 @@
   var selectedBranchLatitude = 0; // 선택된 대여소 위도
   var selectedBranchLongitude = 0; // 선택된 대여소 경도
 
+
+  // 모델에서 customerId 가져오기
+  var customerId = ${customerId};
   // 팝업 닫기 함수
   function closePopup(popupId) {
     var popup = document.getElementById(popupId);
@@ -158,7 +161,11 @@
 
         // 대여소 클릭 시 정보 표시 팝업
         kakao.maps.event.addListener(marker, 'click', function() {
-          document.getElementById("branchName").innerText = branch.branchName;
+          selectedBranchName = branch.branchName;
+          selectedBranchLatitude = branch.latitude;
+          selectedBranchLongitude = branch.longitude;
+
+          document.getElementById("branchName").innerText = selectedBranchName;
           getAvailableBikesAtLocation(branch.latitude, branch.longitude); // 자전거 개수 조회
           showAvailableBicycles(branch.latitude, branch.longitude); // 자전거 리스트 조회
           document.getElementById("branchInfoPopup").style.display = 'block';
@@ -206,7 +213,7 @@
           var rentButton = document.createElement("button");
           rentButton.textContent = "대여";
           rentButton.onclick = function() {
-            rentBike(bike.bicycleId, 1, '서울지점'); // 예시로 customerId를 1, rentalBranch를 "서울지점"으로 설정
+            rentBike(bike.bicycleId, customerId, selectedBranchName);
           };
           bikeElement.appendChild(rentButton);
 
