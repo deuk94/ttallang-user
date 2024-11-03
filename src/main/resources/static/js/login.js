@@ -31,7 +31,7 @@ function handleLoginForm(event) {
     formData.append("password", userPassword.value);
 
     // 비공디 처리.
-    fetch("/login", {
+    fetch("/api/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded" // application/json 으로 보내면 안됨.

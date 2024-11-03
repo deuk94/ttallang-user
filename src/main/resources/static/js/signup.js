@@ -20,7 +20,7 @@ function handleCheckButton(){
     const data = {
         username: userName.value
     }
-    fetch("/signupForm/checkExisting", {
+    fetch("/api/signupForm/checkExisting", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -62,7 +62,7 @@ function handleSignupForm (event) {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
 
-        fetch("/signup", {
+        fetch("/api/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -91,7 +91,12 @@ function handleSignupForm (event) {
 }
 
 function validateForm() {
-    return validateUserName() && exist && validateUserPassword() && validateConfirmPassword() && validateUserEmail();
+    const complete = validateUserName() && exist && validateUserPassword() && validateConfirmPassword() && validateUserEmail();
+    if (complete) {
+        return true;
+    }
+    alert("아이디 중복 검사를 해주세요!");
+    return false;
 }
 
 function validateUserName() {
