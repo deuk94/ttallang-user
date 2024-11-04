@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-	<title>Signup</title>
+	<title>회원가입</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
@@ -17,7 +17,7 @@
 	<div class="mb-3">
 		<label for="userName" class="form-label">아이디</label>
 		<input type="text" id="userName" name="userName" class="form-control" required>
-		<button id="checkExist">중복 검사</button>
+		<button type="button" id="checkExist">중복 검사</button>
 		<div class="invalid-feedback">
 			아이디는 영문/숫자 조합으로 6자 이상이어야 합니다.
 		</div>
@@ -44,22 +44,22 @@
 	</div>
 	<div class="mb-3">
 		<label for="customerName" class="form-label">이름</label>
-		<input type="text" id="customerName" name="customerName" class="form-control" required>
+		<input type="text" id="customerName" name="customerName" class="form-control" value="${customerName}" required>
 		<div class="invalid-feedback">
 			이름은 필수 항목입니다.
 		</div>
 	</div>
 	<div class="mb-3">
 		<label for="email" class="form-label">이메일 주소</label>
-		<input type="email" id="email" name="email" class="form-control" required>
+		<input type="email" id="email" name="email" class="form-control" value="${email}" required>
 		<div class="invalid-feedback">
 			유효한 이메일 주소를 입력해주세요.
 		</div>
 	</div>
 	<button type="submit" class="btn btn-primary">가입하기</button>
 	<button type="reset" class="btn btn-danger">초기화</button>
-	<a href="/intro" type="button" class="btn btn-warning">취소</a>
+	<a href="${pageContext.request.contextPath}/login/form" type="button" class="btn btn-warning">취소</a>
 </form>
 </body>
-<script src="js/signup.js"></script>
+<script src="${pageContext.request.contextPath}/js/signup.js"></script>
 </html>

@@ -18,21 +18,29 @@ public class PrincipalDetails implements UserDetails {
     private final Roles roles;
     private final User user;
 
+    // 유저의 경우.
     public PrincipalDetails(Roles roles, User user) {
         this.roles = roles;
         this.user = user;
+    }
+
+    // 관리자의 경우.
+    public PrincipalDetails(Roles roles) {
+        this.roles = roles;
+        this.user = null;
     }
 
     //해당 유저의 권한 리턴 하는 곳
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collect = new ArrayList<>();
-        collect.add((GrantedAuthority) () -> roles.getUserRole());
+        collect.add((GrantedAuthority) roles::getUserRole);
         return collect;
     }
 
     // 유저의 실제 PK.
     public int getCustomerID() {
+        assert user != null;
         return user.getCustomerId();
     }
 
@@ -64,5 +72,9 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return !roles.getUserStatus().equals("0"); // "2"인경우 블랙리스트로 취급할까?
+    }
+
+    public int getUserId() {
+        return roles.getUserId();
     }
 }

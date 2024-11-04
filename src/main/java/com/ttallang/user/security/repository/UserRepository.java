@@ -1,4 +1,4 @@
-package com.ttallang.user.common.repository;
+package com.ttallang.user.security.repository;
 
 import com.ttallang.user.commonModel.User;
 import org.springframework.data.jpa.repository.JpaRepository;

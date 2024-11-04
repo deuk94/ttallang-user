@@ -154,7 +154,21 @@
   // branchInfoPopup 및 reportPopup 닫기 함수
   function closeBranchAndReportPopups() {
     closePopup('branchInfoPopup');
+    document.getElementById('reportPopup').style.display = 'block';
+  }
+
+  // 위치 신고 팝업 열기 함수
+  function openNoBikePopup(event) {
+    event.preventDefault();
     closePopup('reportPopup');
+    document.getElementById('noBikeReportPopup').style.display = 'block';
+  }
+
+  // 고장 신고 팝업 열기 함수
+  function openBrokenBikePopup(event) {
+    event.preventDefault();
+    closePopup('reportPopup');
+    document.getElementById('brokenBikeReportPopup').style.display = 'block';
   }
 
   // 대여소가 아닌 위치에 반납 팝업 표시 함수
@@ -277,6 +291,7 @@
     });
   }
 
+  // 대여소 위치 근처의 대여 가능한 자전거 목록 조회 및 표시
   function showAvailableBicycles(latitude, longitude) {
     $.ajax({
       url: "/map/available/bikes",
@@ -288,15 +303,18 @@
         bicycles.forEach(function(bike) {
           var bikeElement = document.createElement("div");
           bikeElement.className = "bicycle-item";
+
           var bikeInfo = document.createElement("span");
           bikeInfo.textContent = bike.bicycleName;
           bikeElement.appendChild(bikeInfo);
+
           var rentButton = document.createElement("button");
           rentButton.textContent = "대여";
           rentButton.onclick = function() {
             rentBike(bike.bicycleId, customerId, selectedBranchName);
           };
           bikeElement.appendChild(rentButton);
+
           container.appendChild(bikeElement);
         });
       },
@@ -306,6 +324,7 @@
     });
   }
 
+  // 대여 기능 함수
   function rentBike(bicycleId, customerId, rentalBranch) {
     $.ajax({
       url: '/map/rent/bicycle',

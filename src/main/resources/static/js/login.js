@@ -31,7 +31,7 @@ function handleLoginForm(event) {
     formData.append("password", userPassword.value);
 
     // 비공디 처리.
-    fetch("/login", {
+    fetch("/api/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded" // application/json 으로 보내면 안됨.
@@ -46,10 +46,10 @@ function handleLoginForm(event) {
     .then(data => { // 이 data는 response.json()의 실제값.
         console.log(data)
         if (data.role === "admin") {
-            window.location.href = "/admin/adminMain";
+            window.location.href = "/admin/branch/main";
         } else if (data.role === "user") {
-            // window.location.href = "/user/userMain";
-            window.location.href = "/map/main";
+            // window.location.href = "/user/main";
+            window.location.href = "/map/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
         } else {
             throw new Error("로그인 실패.");
         }

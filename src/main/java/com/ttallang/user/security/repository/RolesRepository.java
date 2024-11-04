@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface RolesRepository extends JpaRepository<Roles, Integer> {
 
 //    @Query("")
-//    User findByUserId
     Roles findByUserName(String userName);
-    void deleteByUserName(String userName);
+//    void deleteByUserName(String userName);
 }
