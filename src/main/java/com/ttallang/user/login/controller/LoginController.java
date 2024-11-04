@@ -11,6 +11,7 @@ public class LoginController {
     @GetMapping(value = "/map/main")
     public String userMainPage(@AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
         model.addAttribute("customerId", principalDetails.getCustomerID());
+        model.addAttribute("username", principalDetails.getUsername());
         return "map/mymap";
     }
 }
