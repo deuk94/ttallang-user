@@ -6,58 +6,61 @@ const userEmail = document.querySelector("#email");
 
 const form = document.querySelector("#signupForm");
 
-// 폼 처리 관련.
+// 폼 처리 관련
 form.addEventListener("submit", handleSignupForm);
 
-// 아이디 중복 검사 버튼.
+// 아이디 중복 검사 버튼
 checkExistButton.addEventListener("click", handleCheckButton);
 
 let exist = false;
 
-function handleCheckButton(){
+function handleCheckButton() {
     const existId = document.querySelector("#existId");
     const notExistId = document.querySelector("#notExistId");
     const data = {
         username: userName.value
-    }
+    };
     fetch("/api/signup/form/checkExisting", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-    }).then(response => {
+    })
+    .then(response => {
         if (response.ok) {
             return response.json();
         } else {
             throw new Error("확인 실패.");
         }
-    }).then(data => {
-        if (data.code === 204) { // 가능 (204는 성공적으로 실행됐는데 반환된 값이 없는 경우.)
+    })
+    .then(data => {
+        if (data.code === 204) { // 아이디 사용 가능
             existId.classList.add("d-none");
             notExistId.classList.remove("d-none");
             exist = true;
-        } else if (data.code === 200) { // 불가능. (성공적으로 실행되었고 반환값도 있음.)
+        } else if (data.code === 200) { // 아이디 사용 불가능
             notExistId.classList.add("d-none");
             existId.classList.remove("d-none");
             exist = false;
         }
-    }).catch((error) => {
+    })
+    .catch(error => {
         console.error('Error:', error);
         exist = false;
     });
 }
 
-// 유효성 검사 관련.
+// 유효성 검사 이벤트 등록
 userName.addEventListener("input", validateUserName);
 userPassword.addEventListener("input", validateUserPassword);
 confirmPassword.addEventListener("input", validateConfirmPassword);
 userEmail.addEventListener("input", validateUserEmail);
 
-function handleSignupForm (event) {
+function handleSignupForm(event) {
     event.preventDefault();
 
-    // 유효한 경우.
+    // 폼 유효성 확인
     if (validateForm()) {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
@@ -68,7 +71,8 @@ function handleSignupForm (event) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data)
-        }).then(response => {
+        })
+        .then(response => {
             if (response.ok) {
                 return response.json();
             } else {
@@ -77,15 +81,13 @@ function handleSignupForm (event) {
         })
         .then(data => {
             if (data.status === "success") {
-                console.log(data.status);
-                alert("회원가입 성공.")
+                alert("회원가입 성공.");
                 window.location.href = "/login/form";
             } else {
-                console.log(data.status)
                 console.log(data.message);
             }
         })
-        .catch((error) => {
+        .catch(error => {
             console.error('Error:', error);
         });
     }

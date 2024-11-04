@@ -25,7 +25,7 @@
     </nav>
     <div>
         <span>환영합니다 ${username}님!</span>
-        | <a href="${pageContext.request.contextPath}/logout">로그아웃</a>
+        | <a href="${pageContext.request.contextPath}/api/logout">로그아웃</a>
         | <a href="${pageContext.request.contextPath}/mypage">마이페이지</a>
         | <a href="${pageContext.request.contextPath}/info">이용안내</a>
     </div>
@@ -118,7 +118,7 @@
         method: "GET",
         data: { customerId: customerId }
       });
-      return response && response.rentalStatus === "1"; // 1: 대여 중
+      return response && response.rentalStatus === "1"; // 1일 때만 대여 중
     } catch (error) {
       console.error("Error checking rental status:", error);
       return false;
@@ -151,27 +151,17 @@
     }
   }
 
-  // branchInfoPopup 및 reportPopup 닫기 함수
-  function closeBranchAndReportPopups() {
+  // 모든 팝업 닫기 함수
+  function closeAllPopups() {
     closePopup('branchInfoPopup');
-    document.getElementById('reportPopup').style.display = 'block';
-  }
-
-  // 위치 신고 팝업 열기 함수
-  function openNoBikePopup(event) {
-    event.preventDefault();
     closePopup('reportPopup');
-    document.getElementById('noBikeReportPopup').style.display = 'block';
+    closePopup('locationReportPopup');
+    closePopup('brokenReportPopup');
+    closePopup('customReturnPopup');
+    closePopup('returnPopup');
   }
 
-  // 고장 신고 팝업 열기 함수
-  function openBrokenBikePopup(event) {
-    event.preventDefault();
-    closePopup('reportPopup');
-    document.getElementById('brokenBikeReportPopup').style.display = 'block';
-  }
-
-  // 대여소가 아닌 위치에 반납 팝업 표시 함수
+  // 대여소 외 지역 반납 팝업 표시 함수
   function showCustomReturnPopup() {
     document.getElementById("customReturnPopup").style.display = 'block';
   }
@@ -203,15 +193,12 @@
       success: function(response) {
         alert("반납이 완료되었습니다.");
 
-        // 반납 완료 후 대여 상태를 초기화
+        // 반납 완료 후 대여 상태 초기화
         selectedBranchName = '';
         selectedBranchLatitude = 0;
         selectedBranchLongitude = 0;
 
-        // 대여 상태 초기화 함수 호출
-        checkRentalStatus();
-
-        closePopup(isCustomLocation ? 'customReturnPopup' : 'returnPopup');
+        closeAllPopups();
         loadBranches();
       },
       error: function(xhr) {
@@ -345,14 +332,18 @@
     });
   }
 
-  // 지도 빈 공간 클릭 시 branchInfoPopup 및 reportPopup 닫기 + 대여 상태 확인 후 대여소 외 반납 팝업 표시
+  // 지도 빈 공간 클릭 시 모든 팝업 닫기 및 대여 상태 확인 후 대여소 외 반납 팝업 표시
   kakao.maps.event.addListener(map, 'click', async function() {
-    closeBranchAndReportPopups();
+    closeAllPopups();
 
-    // 대여 상태 확인 후 대여 중이라면 대여소 외 반납 팝업 표시
-    const isRented = await checkRentalStatus();
-    if (isRented) {
-      showCustomReturnPopup();
+    // 대여 상태를 확인하여 대여 중인 경우에만 대여소 외 반납 팝업을 표시
+    try {
+      const isRented = await checkRentalStatus();
+      if (isRented) {
+        showCustomReturnPopup();
+      }
+    } catch (error) {
+      console.error("대여 상태 확인 중 오류 발생:", error);
     }
   });
 </script>
