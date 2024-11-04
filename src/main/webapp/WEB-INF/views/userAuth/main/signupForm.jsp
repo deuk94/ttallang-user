@@ -58,7 +58,7 @@
 	</div>
 	<button type="submit" class="btn btn-primary">가입하기</button>
 	<button type="reset" class="btn btn-danger">초기화</button>
-	<a href="${pageContext.request.contextPath}/loginForm" type="button" class="btn btn-warning">취소</a>
+	<a href="${pageContext.request.contextPath}/login/form" type="button" class="btn btn-warning">취소</a>
 </form>
 </body>
 <script src="${pageContext.request.contextPath}/js/signup.js"></script>

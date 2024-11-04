@@ -20,7 +20,7 @@ function handleCheckButton(){
     const data = {
         username: userName.value
     }
-    fetch("/api/signupForm/checkExisting", {
+    fetch("/api/signup/form/checkExisting", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -33,11 +33,11 @@ function handleCheckButton(){
             throw new Error("확인 실패.");
         }
     }).then(data => {
-        if (data.code === 204) { // 가능.
+        if (data.code === 204) { // 가능 (204는 성공적으로 실행됐는데 반환된 값이 없는 경우.)
             existId.classList.add("d-none");
             notExistId.classList.remove("d-none");
             exist = true;
-        } else if (data.code === 200) { // 불가능.
+        } else if (data.code === 200) { // 불가능. (성공적으로 실행되었고 반환값도 있음.)
             notExistId.classList.add("d-none");
             existId.classList.remove("d-none");
             exist = false;
@@ -78,7 +78,8 @@ function handleSignupForm (event) {
         .then(data => {
             if (data.status === "success") {
                 console.log(data.status);
-                window.location.href = "/loginForm";
+                alert("회원가입 성공.")
+                window.location.href = "/login/form";
             } else {
                 console.log(data.status)
                 console.log(data.message);

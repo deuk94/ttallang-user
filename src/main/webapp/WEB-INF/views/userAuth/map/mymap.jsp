@@ -25,9 +25,8 @@
     </nav>
     <div>
         <span>환영합니다 ${username}님!</span>
-        <span>customerId : ${customerId}</span>
         | <a href="${pageContext.request.contextPath}/api/logout">로그아웃</a>
-        | <a href="${pageContext.request.contextPath}/mypage">마이페이지</a>
+        | <a href="${pageContext.request.contextPath}/myPage">마이페이지</a>
         | <a href="${pageContext.request.contextPath}/info">이용안내</a>
     </div>
 </header>

@@ -50,7 +50,7 @@ public class BranchService {
         Optional<Bicycle> bicycleOptional = bicycleRepository.findById(bicycleId);
         if (bicycleOptional.isPresent()) {
             Bicycle bicycle = bicycleOptional.get();
-            bicycle.setBicycleStatus("1"); // 1: 대여중
+            bicycle.setRentalStatus("1"); // 1: 렌탈 완료
             bicycleRepository.save(bicycle);
         } else {
             return "Bicycle not found";
@@ -61,7 +61,6 @@ public class BranchService {
         rental.setBicycleId(bicycleId);
         rental.setCustomerId(customerId);
         rental.setRentalBranch(rentalBranch);
-        rental.setRentalStatus("1"); // 1: 렌탈 완료
         rental.setRentalStartDate(LocalDateTime.now());
 
         rentalRepository.save(rental);

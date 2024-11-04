@@ -11,8 +11,8 @@
   <title>Title</title>
 </head>
 <body>
-  <button onclick="startPaycoAuth()">페이코 가입</button>
-  <a href="/signupForm" type="button">일반 가입</a>
+  <button onclick="startPaycoAuth()">페이코 인증</button>
+  <a href="/signup/form" type="button">일반 가입</a>
 </body>
 <script>
     async function startPaycoAuth() {

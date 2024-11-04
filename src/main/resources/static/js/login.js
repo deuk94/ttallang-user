@@ -46,10 +46,10 @@ function handleLoginForm(event) {
     .then(data => { // 이 data는 response.json()의 실제값.
         console.log(data)
         if (data.role === "admin") {
-            window.location.href = "/admin/adminMain";
+            window.location.href = "/admin/branch/main";
         } else if (data.role === "user") {
-            // window.location.href = "/user/userMain";
-            window.location.href = "/map/main";
+            // window.location.href = "/user/main";
+            window.location.href = "/map/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
         } else {
             throw new Error("로그인 실패.");
         }

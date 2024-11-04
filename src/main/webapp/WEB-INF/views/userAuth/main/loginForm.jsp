@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>로그인</title>
-  <link href="css/loginForm.css" rel="stylesheet">
+  <link href="${pageContext.request.contextPath}/css/loginForm.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
@@ -44,7 +44,7 @@
     </div>
     <div id="errorMessage" class="alert alert-danger d-none" role="alert"></div>
     <button type="submit" class="btn btn-primary">로그인</button>
-    <a href="/signupSelect" type="button" class="btn btn-primary">회원가입</a>
+    <a href="${pageContext.request.contextPath}/signup/select" type="button" class="btn btn-primary">회원가입</a>
   </form>
   <div class="text-center mt-3">
     <a href="#">아이디/비밀번호 찾기</a>
