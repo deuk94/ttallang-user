@@ -2,6 +2,7 @@ package com.ttallang.user.security.config.auth;
 
 import com.ttallang.user.commonModel.Roles;
 import com.ttallang.user.commonModel.User;
+import com.ttallang.user.security.model.PaymentUser;
 import com.ttallang.user.security.repository.UserRepository;
 import com.ttallang.user.security.repository.RolesRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,10 +30,11 @@ public class PrincipalDetailsService implements UserDetailsService {
         System.out.println("userName="+userName);
         Roles roles = rolesRepository.findByUserName(userName);
         int userId = roles.getUserId();
-        if (roles.getUserRole().equals("ROLE_ADMIN")) { // 관리자의 경우는 user(DB 상으로는 customer)를 받지 않음.
-            return new PrincipalDetails(roles);
-        }
         User user = userRepository.findByUserId(userId);
-        return new PrincipalDetails(roles, user);
+        PaymentUser paymentUser = userRepository.findNoPaymentUser(user.getCustomerId());
+        if (paymentUser == null) { //
+            return new PrincipalDetails(roles, user);
+        }
+        return new PrincipalDetails(roles, user, paymentUser);
     }
 }

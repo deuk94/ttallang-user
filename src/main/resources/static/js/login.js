@@ -46,12 +46,18 @@ function handleLoginForm(event) {
     .then(data => { // 이 data는 response.json()의 실제값.
         console.log(data)
         if (data.role === "admin") {
-            window.location.href = "/admin/branch/main";
+            window.location.href = "/admin/branch/main"; // 어드민과 통신하는 부분.
         } else if (data.role === "user") {
             // window.location.href = "/user/main";
-            window.location.href = "/map/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
+            if (data.code === 400) {
+                alert("결제를 먼저 진행해주세요!!!");
+                window.location.href = "/pay/userPayment";
+            } else {
+                window.location.href = "/map/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
+            }
         } else {
-            throw new Error("로그인 실패.");
+            alert(data.message);
+            throw new Error("로그인 실패 (권한 정보를 확인할 수 없습니다.)");
         }
     })
     .catch(error => {

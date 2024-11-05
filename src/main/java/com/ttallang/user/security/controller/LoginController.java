@@ -31,17 +31,4 @@ public class LoginController {
         }
         return "userAuth/map/mymap";
     }
-
-    @GetMapping(value = "/admin/branch/main")
-    public String adminMainPage(Model model) {
-        try {
-            PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            model.addAttribute("userId", pds.getUserId());
-            model.addAttribute("username", pds.getUsername());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return "redirect:/login/form";
-        }
-        return "userAuth/test/adminPage";
-    }
 }
