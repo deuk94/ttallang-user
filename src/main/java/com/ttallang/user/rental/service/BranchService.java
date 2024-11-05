@@ -1,13 +1,13 @@
 package com.ttallang.user.rental.service;
 
+import com.ttallang.user.commomRepository.PaymentRepository;
+import com.ttallang.user.commomRepository.RentalRepository;
 import com.ttallang.user.commonModel.Branch;
 import com.ttallang.user.commonModel.Bicycle;
 import com.ttallang.user.commonModel.Payment;
 import com.ttallang.user.commonModel.Rental;
-import com.ttallang.user.rental.repository.BicycleRepository;
-import com.ttallang.user.rental.repository.BranchRepository;
-import com.ttallang.user.rental.repository.PaymentRepository;
-import com.ttallang.user.rental.repository.RentalRepository;
+import com.ttallang.user.commomRepository.BicycleRepository;
+import com.ttallang.user.commomRepository.BranchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

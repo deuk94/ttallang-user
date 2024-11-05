@@ -26,7 +26,7 @@
     <div>
         <span>환영합니다 ${username}님!</span>
         | <a href="${pageContext.request.contextPath}/api/logout">로그아웃</a>
-        | <a href="${pageContext.request.contextPath}/mypage">마이페이지</a>
+        | <a href="${pageContext.request.contextPath}/myPage/userModify">마이페이지</a>
         | <a href="${pageContext.request.contextPath}/info">이용안내</a>
     </div>
 </header>
@@ -193,7 +193,7 @@
       success: function(response) {
         alert(response);  // 반납 성공 메시지 출력
         // 결제 페이지로 이동
-        window.location.href = "/userPayment.jsp";
+        window.location.href = "/pay/user";
       },
       error: function(xhr) {
         alert("반납에 실패했습니다: " + xhr.responseText);  // 실패 메시지 출력

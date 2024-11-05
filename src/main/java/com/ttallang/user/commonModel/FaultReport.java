@@ -40,4 +40,7 @@ public class FaultReport {
 
     @Column(name = "report_status")
     private String reportStatus;
+
+    @Column(name = "fault_status")
+    private String faultStatus;
 }
