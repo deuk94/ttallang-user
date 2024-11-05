@@ -53,6 +53,12 @@ public class BranchService {
     // 자전거 대여 로직을 처리하는 메서드
     public String rentBicycle(int bicycleId, int customerId, String rentalBranch) {
 
+        // 고객의 최신 결제 상태 확인
+        Optional<Payment> latestPayment = paymentRepository.findLatestPaymentByCustomerId(customerId);
+        if (latestPayment.isPresent() && "0".equals(latestPayment.get().getPaymentStatus())) {
+            return "결제가 완료되지 않았습니다. 결제를 완료한 후 대여할 수 있습니다.";
+        }
+
         // 고객이 이미 대여 중인지 확인
         List<Rental> activeRentals = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId);
         if (!activeRentals.isEmpty()) {

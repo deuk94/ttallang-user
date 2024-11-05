@@ -191,9 +191,9 @@
         isCustomLocation: isCustomLocation
       },
       success: function(response) {
-        alert(response);  // 반납 성공 메시지 출력
-        // 결제 페이지로 이동
-        window.location.href = "/userPayment.jsp";
+        alert("반납이 성공적으로 완료되었습니다.");
+        // 결제 페이지로 리다이렉트
+        window.location.href = response;  // 서버에서 반환된 URL로 리다이렉트
       },
       error: function(xhr) {
         alert("반납에 실패했습니다: " + xhr.responseText);  // 실패 메시지 출력

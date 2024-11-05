@@ -67,7 +67,8 @@ public class BranchController {
         @RequestParam boolean isCustomLocation) {
         String result = branchService.returnBicycle(customerId, returnLatitude, returnLongitude, isCustomLocation);
         if ("반납이 성공적으로 완료되었습니다.".equals(result)) {
-            return ResponseEntity.ok(result);  // 성공 시 200 OK
+            // 반납 성공 시 결제 페이지로 이동할 URL을 응답에 포함
+            return ResponseEntity.ok("/userPayment");  // userPayment로 이동하는 URL을 클라이언트에 반환
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);  // 실패 시 400 Bad Request
         }
