@@ -30,12 +30,9 @@ public class PrincipalDetailsService implements UserDetailsService {
         System.out.println("userName="+userName);
         Roles roles = rolesRepository.findByUserName(userName);
         int userId = roles.getUserId();
-        if (roles.getUserRole().equals("ROLE_ADMIN")) { // 관리자의 경우는 user(DB 상으로는 customer)를 받지 않음.
-            return new PrincipalDetails(roles);
-        }
         User user = userRepository.findByUserId(userId);
         PaymentUser paymentUser = userRepository.findNoPaymentUser(user.getCustomerId());
-        if (paymentUser == null) { //
+        if (paymentUser == null) { // 결제를 잘 한 유저.
             return new PrincipalDetails(roles, user);
         }
         return new PrincipalDetails(roles, user, paymentUser);
