@@ -26,7 +26,7 @@
     <div>
         <span>환영합니다 ${username}님!</span>
         | <a href="${pageContext.request.contextPath}/api/logout">로그아웃</a>
-        | <a href="${pageContext.request.contextPath}/mypage">마이페이지</a>
+        | <a href="${pageContext.request.contextPath}/myPage/userModify">마이페이지</a>
         | <a href="${pageContext.request.contextPath}/info">이용안내</a>
     </div>
 </header>
@@ -44,7 +44,6 @@
         <div class="popup-content">
             <p class="bike-info">
                 현재 사용 가능한 자전거: <span id="availableBikes">0</span>대
-                <a href="javascript:void(0);" onclick="openReportPopup()" class="report-link">신고하기</a>
             </p>
             <p class="pricing-info">잠금해제 500원, 분당 150원</p>
             <div class="bicycle-list" id="bicycleListContainer"></div>
@@ -65,7 +64,7 @@
     <div class="report-popup" id="locationReportPopup" style="display: none;">
         <button class="close-btn" onclick="closePopup('locationReportPopup')">X</button>
         <h3 class="report-title">위치 신고</h3>
-        <textarea placeholder="문제가 발생한 위치를 입력해주세요..."></textarea>
+        <textarea id="locationReportDetails" placeholder="문제가 발생한 위치를 입력해주세요..."></textarea>
         <button class="report-submit" onclick="submitLocationReport()">신고하기</button>
     </div>
 
@@ -73,7 +72,7 @@
     <div class="report-popup" id="brokenReportPopup" style="display: none;">
         <button class="close-btn" onclick="closePopup('brokenReportPopup')">X</button>
         <h3 class="report-title">고장 신고</h3>
-        <textarea placeholder="고장 내용을 입력해주세요..."></textarea>
+        <textarea id="brokenReportDetails" placeholder="고장 내용을 입력해주세요..."></textarea>
         <button class="report-submit" onclick="submitBrokenReport()">신고하기</button>
     </div>
 
@@ -109,6 +108,7 @@
   var selectedBranchLatitude = 0;
   var selectedBranchLongitude = 0;
   var customerId = ${customerId};
+  var selectedBicycleId = 0; // 선택된 자전거 ID 저장
 
   // 대여 상태 확인 함수
   async function checkRentalStatus() {
@@ -118,7 +118,7 @@
         method: "GET",
         data: { customerId: customerId }
       });
-      return response && response.rentalStatus === "1"; // 1일 때만 대여 중
+      return response && response.rentalStatus === "0"; // 대여 중 상태
     } catch (error) {
       console.error("Error checking rental status:", error);
       return false;
@@ -141,6 +141,40 @@
   function openBrokenReportPopup() {
     closePopup('reportPopup');
     document.getElementById("brokenReportPopup").style.display = 'block';
+  }
+
+  // 위치 신고 전송 함수
+  function submitLocationReport() {
+    const details = document.getElementById("locationReportDetails").value;
+    submitReport(1, details); // categoryId = 1
+  }
+
+  // 고장 신고 전송 함수
+  function submitBrokenReport() {
+    const details = document.getElementById("brokenReportDetails").value;
+    submitReport(2, details); // categoryId = 2
+  }
+
+  // 신고 전송 공통 함수
+  function submitReport(categoryId, details) {
+    $.ajax({
+      url: "/map/report-issue",
+      type: "POST",
+      data: {
+        customerId: customerId,
+        bicycleId: selectedBicycleId,
+        categoryId: categoryId,
+        reportDetails: details
+      },
+      success: function(response) {
+        alert("신고가 접수되었습니다.");
+        closeAllPopups();
+      },
+      error: function(xhr, status, error) {
+        alert("신고 접수 중 오류가 발생했습니다.");
+        console.error("Error:", error);
+      }
+    });
   }
 
   // 특정 팝업 닫기 함수
@@ -176,7 +210,7 @@
     }
   }
 
-  // 반납 기능 함수
+  // 대여 기능 함수 (반납 성공 시 결제 페이지로 이동)
   function returnBike(isCustomLocation) {
     var returnLatitude = selectedBranchLatitude;
     var returnLongitude = selectedBranchLongitude;
@@ -191,15 +225,8 @@
         isCustomLocation: isCustomLocation
       },
       success: function(response) {
-        alert("반납이 완료되었습니다.");
-
-        // 반납 완료 후 대여 상태 초기화
-        selectedBranchName = '';
-        selectedBranchLatitude = 0;
-        selectedBranchLongitude = 0;
-
-        closeAllPopups();
-        loadBranches();
+        alert(response);
+        window.location.href = "/pay/userPayment";
       },
       error: function(xhr) {
         alert("반납에 실패했습니다: " + xhr.responseText);
@@ -209,6 +236,8 @@
 
   // 대여소 클릭 시 대여 상태 확인 후 반납 팝업 표시
   async function handleBranchClick(latitude, longitude) {
+    closePopup('customReturnPopup');
+
     const isRented = await checkRentalStatus();
     if (isRented) {
       selectedBranchLatitude = latitude;
@@ -221,19 +250,7 @@
     }
   }
 
-  var imageSrc = '/images/자전거.png',
-      imageSize = new kakao.maps.Size(40, 40),
-      imageOption = {offset: new kakao.maps.Point(20, 20)};
-  var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
-  var container = document.getElementById('map');
-  var options = {
-    center: new kakao.maps.LatLng(37.583883601891, 126.9999880311),
-    level: 3
-  };
-  var map = new kakao.maps.Map(container, options);
-  map.setDraggable(true);
-
-  // 대여소 불러오기
+  // 지도 상 자전거 대여소 표시 및 이벤트 설정
   function loadBranches() {
     $.ajax({
       url: "/map/branches",
@@ -261,8 +278,6 @@
     });
   }
 
-  loadBranches();
-
   // 자전거 대여 가능 수 조회
   function getAvailableBikesAtLocation(latitude, longitude) {
     $.ajax({
@@ -287,6 +302,7 @@
       success: function(bicycles) {
         var container = document.getElementById("bicycleListContainer");
         container.innerHTML = '';
+
         bicycles.forEach(function(bike) {
           var bikeElement = document.createElement("div");
           bikeElement.className = "bicycle-item";
@@ -295,12 +311,24 @@
           bikeInfo.textContent = bike.bicycleName;
           bikeElement.appendChild(bikeInfo);
 
+          // 대여 버튼 추가 (왼쪽 정렬)
           var rentButton = document.createElement("button");
           rentButton.textContent = "대여";
+          rentButton.style.marginRight = "10px";
           rentButton.onclick = function() {
+            selectedBicycleId = bike.bicycleId;
             rentBike(bike.bicycleId, customerId, selectedBranchName);
           };
           bikeElement.appendChild(rentButton);
+
+          // 신고 버튼 추가 (오른쪽 정렬)
+          var reportButton = document.createElement("button");
+          reportButton.textContent = "신고";
+          reportButton.onclick = function() {
+            selectedBicycleId = bike.bicycleId;
+            openReportPopup(); // 신고 팝업 열기
+          };
+          bikeElement.appendChild(reportButton);
 
           container.appendChild(bikeElement);
         });
@@ -311,32 +339,24 @@
     });
   }
 
-  // 대여 기능 함수
-  function rentBike(bicycleId, customerId, rentalBranch) {
-    $.ajax({
-      url: '/map/rent/bicycle',
-      type: 'POST',
-      data: {
-        bicycleId: bicycleId,
-        customerId: customerId,
-        rentalBranch: rentalBranch
-      },
-      success: function(response) {
-        alert(response);
-        document.getElementById("availableBikes").innerText = parseInt(document.getElementById("availableBikes").innerText) - 1;
-        closePopup('branchInfoPopup');
-      },
-      error: function(xhr) {
-        alert("대여에 실패했습니다: " + xhr.responseText);
-      }
-    });
-  }
+  var imageSrc = '/images/자전거.png',
+      imageSize = new kakao.maps.Size(40, 40),
+      imageOption = {offset: new kakao.maps.Point(20, 20)};
+  var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+  var container = document.getElementById('map');
+  var options = {
+    center: new kakao.maps.LatLng(37.583883601891, 126.9999880311),
+    level: 3
+  };
+  var map = new kakao.maps.Map(container, options);
+  map.setDraggable(true);
+
+  loadBranches();
 
   // 지도 빈 공간 클릭 시 모든 팝업 닫기 및 대여 상태 확인 후 대여소 외 반납 팝업 표시
   kakao.maps.event.addListener(map, 'click', async function() {
     closeAllPopups();
 
-    // 대여 상태를 확인하여 대여 중인 경우에만 대여소 외 반납 팝업을 표시
     try {
       const isRented = await checkRentalStatus();
       if (isRented) {

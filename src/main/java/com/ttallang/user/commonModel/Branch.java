@@ -29,4 +29,7 @@ public class Branch {
     private double latitude;
     private double longitude;
 
+    @Column(name = "branch_status")
+    private String branchStatus;
+
 }

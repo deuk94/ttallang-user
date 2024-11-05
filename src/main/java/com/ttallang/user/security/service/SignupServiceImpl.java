@@ -2,10 +2,9 @@ package com.ttallang.user.security.service;
 
 import com.ttallang.user.commonModel.Roles;
 import com.ttallang.user.commonModel.User;
-import com.ttallang.user.security.repository.RolesRepository;
-import com.ttallang.user.security.repository.UserRepository;
+import com.ttallang.user.commomRepository.RolesRepository;
+import com.ttallang.user.commomRepository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;

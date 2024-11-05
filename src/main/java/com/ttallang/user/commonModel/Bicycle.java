@@ -34,4 +34,7 @@ public class Bicycle {
 
     @Column(name = "rental_status")
     private String rentalStatus;
+
+    @Column(name = "report_status")
+    private String reportStatus;
 }
