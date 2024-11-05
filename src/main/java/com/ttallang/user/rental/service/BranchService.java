@@ -88,13 +88,14 @@ public class BranchService {
 
         Rental rental = activeRentals.get(0);
         String returnBranchName = isCustomLocation ? "기타" : determineReturnBranch(returnLatitude, returnLongitude);
+
         rental.setReturnBranch(returnBranchName);
         rental.setRentalEndDate(LocalDateTime.now());
 
         Optional<Bicycle> bicycleOptional = bicycleRepository.findById(rental.getBicycleId());
         if (bicycleOptional.isPresent()) {
             Bicycle bicycle = bicycleOptional.get();
-            bicycle.setRentalStatus("1");
+            bicycle.setRentalStatus("1"); // 반납 상태로 변경
             bicycle.setLatitude(returnLatitude);
             bicycle.setLongitude(returnLongitude);
             bicycleRepository.save(bicycle);
@@ -102,6 +103,7 @@ public class BranchService {
             return "자전거를 찾을 수 없습니다.";
         }
         rentalRepository.save(rental);
+
         calculateAndSavePayment(rental, customerId);
 
         return "반납이 성공적으로 완료되었습니다.";
@@ -131,22 +133,34 @@ public class BranchService {
         return Optional.empty();
     }
 
+    @Transactional
     public String reportIssue(int customerId, int bicycleId, int categoryId, String reportDetails) {
-        // categoryId를 사용하여 신고 타입을 구분
+        // categoryId 검증
         if (categoryId != 1 && categoryId != 2) {
             return "잘못된 카테고리 ID입니다.";
         }
 
+        // 신고 테이블에 새로운 신고 저장
         FaultReport faultReport = new FaultReport();
         faultReport.setCustomerId(customerId);
         faultReport.setBicycleId(bicycleId);
-        faultReport.setCategoryId(categoryId); // 1: 위치 신고, 2: 고장 신고
+        faultReport.setCategoryId(categoryId);
         faultReport.setReportDate(LocalDateTime.now());
         faultReport.setReportDetails(reportDetails);
-        faultReport.setReportStatus("0"); // 신고 접수 중
+        faultReport.setReportStatus("0"); // 신고 상태를 0으로 설정
         faultReport.setFaultStatus("1"); // 고장 상태로 설정
-
         faultReportRepository.save(faultReport);
+
+        // 자전거 테이블에서 해당 자전거의 reportStatus를 0으로 업데이트
+        Optional<Bicycle> bicycleOptional = bicycleRepository.findById(bicycleId);
+        if (bicycleOptional.isPresent()) {
+            Bicycle bicycle = bicycleOptional.get();
+            bicycle.setReportStatus("0"); // 자전거의 신고 상태를 0으로 설정
+            bicycleRepository.saveAndFlush(bicycle); // 명시적으로 저장 후 즉시 DB 반영
+        } else {
+            return "자전거를 찾을 수 없습니다.";
+        }
+
         return "신고가 접수되었습니다.";
     }
 }
