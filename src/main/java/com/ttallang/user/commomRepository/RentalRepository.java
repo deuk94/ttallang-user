@@ -17,7 +17,5 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
         + "ORDER BY r.rentalStartDate DESC ")
     List<JoinBicycle> getByRentalId(@Param("customerId") int customerId);
 
-    List<Rental> findByCustomerId(int customerId);
-
     List<Rental> findByCustomerIdAndRentalEndDateIsNull(int customerId);
 }
