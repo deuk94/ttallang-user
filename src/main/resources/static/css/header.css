@@ -1,0 +1,29 @@
+header {
+    position: sticky;
+    top: 0;
+}
+
+.logo-p {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+}
+
+.navbar {
+    padding: 1rem;
+}
+
+.navbar-nav .nav-link {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.navbar-brand {
+    display: flex;
+    flex-flow: row;
+}
+
+.navbar-brand img {
+    height: 50px;
+    width: auto;
+    vertical-align: middle;
+}

@@ -1,5 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<head>
+	<title></title>
+	<link href="${pageContext.request.contextPath}/css/footer.css" rel="stylesheet">
+	<link href="${pageContext.request.contextPath}/css/base.css" rel="stylesheet">
+</head>
 <body>
 <footer class="bg-light text-center py-4">
 	<p>서울특별시 종로구 창경궁로 254 동원빌딩 5층, 우편번호 03077</p>

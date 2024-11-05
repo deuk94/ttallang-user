@@ -1,8 +1,3 @@
-/* 배경 색상 */
-body {
-  background-color: #f8f9fa;
-}
-
 /* 카드 스타일 */
 .card {
   border-radius: 10px;
@@ -36,4 +31,12 @@ body {
 
 #notExistId {
   color: #28a745; /* 초록색 */
+}
+
+/* disabled 처럼 보이게 하는 스타일. */
+.readonly-input {
+  background-color: #e9ecef;
+  color: #6c757d;
+  border: 1px solid #ced4da;
+  cursor: not-allowed;
 }

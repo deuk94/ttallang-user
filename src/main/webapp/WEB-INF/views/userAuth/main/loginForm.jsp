@@ -33,10 +33,6 @@
   </form>
   <div class="text-center mt-3">
     <a href="#">아이디/비밀번호 찾기</a>
-    <div class="social-login text-center">
-      <button type="button" class="btn btn-outline-secondary">N</button>
-      <button type="button" class="btn btn-outline-secondary">K</button>
-    </div>
   </div>
 </div>
 <!-- 하단 푸터 -->

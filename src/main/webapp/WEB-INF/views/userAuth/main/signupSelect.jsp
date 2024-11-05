@@ -12,17 +12,25 @@
 <jsp:include page="../header/header.jsp" flush="true"/>
 <!-- 회원가입 안내 카드 -->
 <div class="container mt-5 d-flex justify-content-center">
-  <div class="card text-center p-4" style="width: 600px;">
-    <h3>회원가입</h3>
-    <p class="info-text">딜랑이는 만 14세 이상(일반회원)만 회원가입이 가능합니다.<br>만 13세는 별도로 문의해 주시기 바랍니다.<br>위의 사항에 동의할 경우 아래 가입하기 버튼을 눌러 진행해 주세요.</p>
-    <div class="d-flex justify-content-around">
-      <a href="/signup/auth" class="btn btn-custom btn-general">만 14세 이상 회원가입하기</a>
-      <a id="kakaoCert" class="btn btn-custom btn-kakao">
-        <img class="icon" src="${pageContext.request.contextPath}/images/kakaoLogin.png" alt="카카오 아이콘">
+  <div class="card text-center p-4">
+    <h3 class="mb-3">회원가입</h3>
+    <div class="info-text">
+      <p class="mb-2">딸랑이는 <span class="over14">만 14세 이상</span>만 회원가입이 가능합니다.</p>
+      <p class="mb-2">만 13세는 별도로 문의해 주시기 바랍니다.</p>
+      <p class="mb-2">위의 사항에 동의할 경우 아래 가입하기 버튼을 눌러 진행해 주세요.</p>
+    </div>
+    <div class="d-flex justify-content-center m-0">
+      <a href="/signup/auth">
+        <div class="btn-normal">
+          일반 회원가입
+        </div>
       </a>
-      <a id="naverCert" class="btn btn-custom btn-naver">
-        <img class="icon" src="${pageContext.request.contextPath}/images/naverLogin.png" alt="네이버 아이콘">
-      </a>
+      <div id="kakaoCert">
+        <img class="btn-kakao" src="${pageContext.request.contextPath}/images/kakaoLogin.png" alt="카카오 아이콘">
+      </div>
+      <div id="naverCert">
+        <img class="btn-naver" src="${pageContext.request.contextPath}/images/naverLogin.png" alt="네이버 아이콘">
+      </div>
     </div>
   </div>
 </div>

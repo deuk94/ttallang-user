@@ -4,6 +4,7 @@ import com.ttallang.user.commonModel.Roles;
 import com.ttallang.user.commonModel.User;
 import com.ttallang.user.commomRepository.RolesRepository;
 import com.ttallang.user.commomRepository.UserRepository;
+import com.ttallang.user.security.config.RandomStateToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -53,6 +54,12 @@ public class SignupServiceImpl implements SignupService {
 
     @Value("${kakao.clientSecret}")
     private String kakaoClientSecret;
+
+    @Value("${naver.clientId}")
+    private String naverClientId;
+
+    @Value("${naver.clientSecret}")
+    private String naverClientSecret;
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
@@ -63,41 +70,60 @@ public class SignupServiceImpl implements SignupService {
     // 페이코 로그인 창 띄우기.
     @Override
     public String getAuthorizationUrl(String SNSType) {
-        String authUri = null;
-        String clientId = null;
-        String scope = null;
         String authorizationUrl = null;
+        String responseType = "code";
+        String clientId = null;
+        String authUri = null;
+        String scope = null;
         switch (SNSType) {
             case "payco" -> { // 페이코 인증.
+                RandomStateToken randomStateToken = new RandomStateToken("payco");
+                String state = randomStateToken.getRandomStateToken();
                 authUri = "https://id.payco.com/oauth2.0/authorize";
                 clientId = paycoClientId;
                 scope = "email,mobile,name,birthdayMMdd";
                 authorizationUrl = UriComponentsBuilder
                         .fromHttpUrl(authUri)
-                        .queryParam("response_type", "code")
+                        .queryParam("response_type", responseType)
                         .queryParam("client_id", clientId)
                         .queryParam("serviceProviderCode", "FRIENDS")
                         .queryParam("redirect_uri", redirectUri)
                         .queryParam("userLocale", "ko_KR")
                         .queryParam("scope", scope)
+                        .queryParam("state", state)
                         .encode()
                         .toUriString();
             }
             case "kakao" -> { // 카카오 로그인.
+                RandomStateToken randomStateToken = new RandomStateToken("kakao");
+                String state = randomStateToken.getRandomStateToken();
                 authUri = "https://kauth.kakao.com/oauth/authorize";
                 clientId = kakaoClientId;
                 scope = "account_email,name,birthday,birthyear,phone_number";
                 authorizationUrl = UriComponentsBuilder
                         .fromHttpUrl(authUri)
-                        .queryParam("response_type", "code")
+                        .queryParam("response_type", responseType)
                         .queryParam("client_id", clientId)
                         .queryParam("redirect_uri", redirectUri)
                         .queryParam("scope", scope)
+                        .queryParam("state", state)
                         .encode()
                         .toUriString();
             }
             case "naver" -> {
-                // 네이버 로그인...
+                RandomStateToken randomStateToken = new RandomStateToken("naver");
+                String state = randomStateToken.getRandomStateToken();
+                authUri = "https://nid.naver.com/oauth2.0/authorize";
+                clientId = naverClientId;
+                scope = "account_email,name,birthday,birthyear,phone_number";
+                authorizationUrl = UriComponentsBuilder
+                        .fromHttpUrl(authUri)
+                        .queryParam("response_type", responseType)
+                        .queryParam("client_id", clientId)
+                        .queryParam("redirect_uri", redirectUri)
+                        .queryParam("state", state)
+                        .encode()
+                        .toUriString();
             }
             default -> throw new RuntimeException("인증 주소가 올바르지 않습니다.");
         }
@@ -109,6 +135,7 @@ public class SignupServiceImpl implements SignupService {
     public ResponseEntity<Map<String, String>> getAccessToken(String code, String SNSType) {
         RestTemplate restTemplate = new RestTemplate();
         String grantType = "authorization_code";
+        String state = null;
         String tokenUri = null;
         String clientId = null;
         String clientSecret = null;
@@ -116,6 +143,8 @@ public class SignupServiceImpl implements SignupService {
         HttpHeaders headers = new HttpHeaders();
         switch (SNSType) {
             case "payco" -> {
+                RandomStateToken randomStateToken = new RandomStateToken("payco");
+                state = randomStateToken.getRandomStateToken();
                 tokenUri = "https://id.payco.com/oauth2.0/token";
                 httpMethod = HttpMethod.GET;
                 clientId = paycoClientId;
@@ -123,13 +152,20 @@ public class SignupServiceImpl implements SignupService {
             }
             case "kakao" -> {
                 headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-                httpMethod = HttpMethod.POST;
+                RandomStateToken randomStateToken = new RandomStateToken("kakao");
+                state = randomStateToken.getRandomStateToken();
                 tokenUri = "https://kauth.kakao.com/oauth/token";
+                httpMethod = HttpMethod.POST;
                 clientId = kakaoClientId;
                 clientSecret = kakaoClientSecret;
             }
             case "naver" -> {
-                // 네이버 설정...
+                RandomStateToken randomStateToken = new RandomStateToken("naver");
+                state = randomStateToken.getRandomStateToken();
+                tokenUri = "https://nid.naver.com/oauth2.0/token";
+                httpMethod = HttpMethod.POST;
+                clientId = naverClientId;
+                clientSecret = naverClientSecret;
             }
             default -> throw new RuntimeException("토큰 요청 정보가 올바르지 않습니다.");
         }
@@ -144,6 +180,7 @@ public class SignupServiceImpl implements SignupService {
                     .queryParam("client_id", clientId)
                     .queryParam("client_secret", clientSecret)
                     .queryParam("code", code)
+                    .queryParam("state", state)
                     .encode()
                     .toUriString();
 
@@ -161,11 +198,13 @@ public class SignupServiceImpl implements SignupService {
                 return response;
             } else {
                 log.error("액세스 토큰 얻어오기 실패: {}", response.getStatusCode());
-                throw new RuntimeException("페이코 액세스 토큰 얻어오기 실패...");
+                //throw new RuntimeException("액세스 토큰 얻어오기 실패...");
+                return null;
             }
         } catch (RestClientException e) {
             log.error("토큰 서버 연결 실패", e);
-            throw new RuntimeException("토큰 서버 연결 실패...");
+            //throw new RuntimeException("토큰 서버 연결 실패...");
+            return null;
         }
     }
 
@@ -190,6 +229,9 @@ public class SignupServiceImpl implements SignupService {
                 userInfoUri = "https://kapi.kakao.com/v2/user/me";
             }
             case "naver" -> {
+                headers = new HttpHeaders();
+                headers.add("Authorization", "Bearer " + accessToken);
+                userInfoUri = "https://openapi.naver.com/v1/nid/me";
             }
         }
 
@@ -209,11 +251,13 @@ public class SignupServiceImpl implements SignupService {
                 return response;
             } else {
                 log.error("유저 정보 얻어오기 실패: {}", response.getStatusCode());
-                throw new RuntimeException("유저 정보 얻어오기 실패...");
+                //throw new RuntimeException("유저 정보 얻어오기 실패...");
+                return null;
             }
         } catch (RestClientException e) {
-            log.error("유저 정보 서버 연결 실패", e);
-            throw new RuntimeException("유저 정보 서버 연결 실패...");
+            log.error("유저 정보 서버 연결 실패: ", e);
+            //throw new RuntimeException("유저 정보 서버 연결 실패...");
+            return null;
         }
     }
 
@@ -230,6 +274,7 @@ public class SignupServiceImpl implements SignupService {
     @Override
     public void signupCustomer(Map<String, String> userData) {
         // 유저 권한 테이블 기록.
+        log.info("userData={}", userData);
         Roles roles = new Roles();
 
         String userName = userData.get("userName");
@@ -246,19 +291,20 @@ public class SignupServiceImpl implements SignupService {
         rolesRepository.save(roles);
         // 유저 상세 데이터 기록.
         User user = new User();
+
         int userId = roles.getUserId();
         user.setUserId(userId);
 
         String customerName = userData.get("customerName");
         user.setCustomerName(customerName);
 
+        String customerPhone = userData.get("customerPhone");
+        user.setCustomerPhone(customerPhone);
+
         String email = userData.get("email");
         user.setEmail(email);
 
-        String customerPhone = "01012345678"; // 임시
-        user.setCustomerPhone(customerPhone);
-
-        String birthday = "20000101"; // 임시
+        String birthday = userData.get("birthday");
         user.setBirthday(birthday);
 
         userRepository.save(user);

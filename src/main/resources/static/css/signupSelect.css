@@ -1,51 +1,66 @@
-/* 전체 배경 스타일 */
-body {
-    background-color: #f8f9fa;
-    margin: 0;
-}
-
 /* 카드 스타일 */
 .card {
     border: none;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
 
-/* 버튼 스타일 */
-.btn-custom {
-    width: 180px;
-    padding: 10px;
-    font-size: 16px;
+.over14 {
+    color: red;
     font-weight: bold;
+}
+
+.btn-normal,
+.btn-normal > a:link,
+.btn-normal > a:visited,
+.btn-normal > a:hover {
+    background-color: #28a745;
+    height: 45px;
+    width: 180px;
+    padding: 8px;
+    font-size: 16px;
     border-radius: 5px;
-    margin: 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    color: white;
+    text-wrap: pretty;
+    word-break: keep-all;
 }
 
-/* 각 서비스 색상 */
-.btn-general {
-    background-color: #28a745;
-    color: white;
+a {
+    color: black;
+    text-decoration: none;
+}
+
+a:link {
+    color: black;
+    text-decoration: none;
+}
+
+a:hover {
+    color: black;
+    text-decoration: none;
+}
+
+#kakaoCert {
+    cursor: pointer;
+}
+
+#naverCert {
+    cursor: pointer;
 }
 
 .btn-kakao {
-    background-color: #fee500;
-    color: black;
+    height: 45px;
+    width: 180px;
+    margin: 0 2rem;
 }
 
 .btn-naver {
-    background-color: #03c75a;
-    color: white;
-}
-
-/* 아이콘 스타일 */
-.icon {
-    height: 20px;
-    width: auto;
-    margin-right: 8px;
+    height: 45px;
+    width: 180px;
 }
 
 /* 안내 텍스트 */
@@ -53,39 +68,4 @@ body {
     font-size: 14px;
     color: #6c757d;
     margin-bottom: 20px;
-}
-
-/* 하단 푸터 스타일 */
-footer {
-    background-color: #f8f9fa;
-    color: #6c757d;
-}
-
-footer p {
-    margin: 0;
-    font-size: 14px;
-}
-
-.social-icons {
-    margin-top: 10px;
-}
-
-.social-icon {
-    width: 24px;
-    height: auto;
-    margin: 0 8px;
-}
-
-/* 상단 메뉴 스타일 */
-.navbar {
-    padding: 1rem;
-}
-
-.navbar-nav .nav-link {
-    color: #6c757d;
-    font-weight: 500;
-}
-
-.navbar-brand img {
-    height: 30px;
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Base64;
 
 @Slf4j
 @Controller
@@ -38,60 +39,96 @@ public class SignupController {
     @GetMapping("/signup/form")
     public String signupForm(Model model) {
         model.addAttribute("customerName", "");
-        model.addAttribute("email", "");
+        model.addAttribute("customerPhone", "");
+        model.addAttribute("email", (String) "");
+        model.addAttribute("birthday", "");
         return "userAuth/main/signupForm";
     }
 
     @GetMapping("/api/oauth2/callback")
-    public String paycoCallback(
+    public String callback(
             @RequestParam("code") String code,
-            HttpServletRequest request,
+            @RequestParam("state") String state,
             Model model
     ) {
-        log.info("코드 받기 성공={}", code);
+        // 디코딩 작업.
+        log.info("code 받기 성공={}", code);
+        log.info("state 받기 성공={}", state);
+        String[] stateParts = state.split(":");
+        String stateTextPart = stateParts[1];
+        byte[] decodedBytes = Base64.getUrlDecoder().decode(stateTextPart);
+        String decodedState = new String(decodedBytes);
+
         String SNSType = null;
-        String refererDomain = request.getHeader("Referer");
-        log.info("refererDomain={}", refererDomain);
-        ResponseEntity<Map<String, String>> responseEntity;
-        if (refererDomain.contains("payco")) {
+        if (decodedState.contains("payco")) {
             SNSType = "payco";
-        } else if (refererDomain.contains("kakao")) {
+        } else if (decodedState.contains("kakao")) {
             SNSType = "kakao";
-        } else if (refererDomain.contains("naver")) {
+        } else if (decodedState.contains("naver")) {
             SNSType = "naver";
         } else {
             throw new RuntimeException("SNS 타입이 지정되지 않았습니다.");
         }
-        // 인증 코드로 토큰 받기
-        ResponseEntity<Map<String, String>> accessTokenResponse = signupService.getAccessToken(code, SNSType);
-        log.info("토큰 응답 받기 성공={}", accessTokenResponse);
-        Map<String, String> responseBody = accessTokenResponse.getBody();
 
-        assert responseBody != null;
+        Map<String, String> responseBody;
+        try {
+            // 인증 코드로 토큰 받기
+            ResponseEntity<Map<String, String>> accessTokenResponse = signupService.getAccessToken(code, SNSType);
+            log.info("토큰 응답 받기 성공={}", accessTokenResponse);
+            responseBody = accessTokenResponse.getBody();
+            assert responseBody != null;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return "redirect:/login/form";
+        }
 
         String accessToken = responseBody.get("access_token");
         log.info("토큰 받기 성공={}", accessToken);
-        // 토큰으로 사용자 정보 조회.
-        ResponseEntity<Map<String, Object>> result = signupService.getUserInfo(accessToken, SNSType);
-        log.info("result={}", result);
-        Map<String, Object> resultBody = result.getBody();
-        if (SNSType.equals("payco")) {
-            Map<String, Map<String, String>> data = (Map<String, Map<String, String>>) resultBody.get("data");
-            Map<String, String> member = (Map<String, String>) data.get("member");
-            model.addAttribute("customerName", (String) member.get("name"));
-            model.addAttribute("email", (String) member.get("email"));
-            model.addAttribute("birthday", (String) member.get("name"));
-            model.addAttribute("customerPhone", (String) member.get("email"));
-        } else if (SNSType.equals("kakao")) {
-            Map<String, Map<String, String>> kakaoAccount = (Map<String, Map<String, String>>) resultBody.get("kakao_account");
-            log.info("kakaoAccount={}", kakaoAccount);
-            Map<String, String> member = (Map<String, String>) kakaoAccount.get("member");
-            model.addAttribute("customerName", (String) member.get("name"));
-            model.addAttribute("email", (String) member.get("email"));
-            model.addAttribute("birthday", (String) member.get("name"));
-            model.addAttribute("customerPhone", (String) member.get("email"));
-        } else if (SNSType.equals("naver")) {
 
+        Map<String, Object> resultBody;
+        try {
+            // 토큰으로 사용자 정보 조회.
+            ResponseEntity<Map<String, Object>> result = signupService.getUserInfo(accessToken, SNSType);
+            log.info("result={}", result);
+            resultBody = result.getBody();
+            assert resultBody != null;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return "redirect:/login/form";
+        }
+
+        switch (SNSType) {
+            case "payco" -> {
+                Map<String, Map<String, String>> data = (Map<String, Map<String, String>>) resultBody.get("data");
+                Map<String, String> member = data.get("member");
+                model.addAttribute("customerName", member.get("name"));
+                model.addAttribute("customerPhone", member.get("mobile"));
+                model.addAttribute("email", member.get("email"));
+                model.addAttribute("birthday", member.get("birthday"));
+            }
+            case "kakao" -> {
+                Map<String, String> kakaoAccount = (Map<String, String>) resultBody.get("kakao_account");
+                model.addAttribute("customerName", kakaoAccount.get("name"));
+                String phoneNumber = kakaoAccount.get("phone_number");
+                String replacedPhoneNumber1 = phoneNumber.replace("+82 ", "0");
+                String replacedPhoneNumber2 = replacedPhoneNumber1.replace("-", "");
+                model.addAttribute("customerPhone", replacedPhoneNumber2);
+                model.addAttribute("email", kakaoAccount.get("email"));
+                model.addAttribute("birthday", kakaoAccount.get("birthyear") + kakaoAccount.get("birthday"));
+            }
+            case "naver" -> {
+                log.info("data={}", resultBody);
+                Map<String, String> response = (Map<String, String>) resultBody.get("response");
+                model.addAttribute("customerName", response.get("name"));
+                String mobile = response.get("mobile");
+                String replacedMobile = mobile.replace("-", "");
+                model.addAttribute("customerPhone", replacedMobile);
+                model.addAttribute("email", response.get("email"));
+                String birthday = response.get("birthday");
+                String replacedBirthday = birthday.replace("-", "");
+                model.addAttribute("birthday", response.get("birthyear") + replacedBirthday);
+            }
+            default -> throw new RuntimeException("SNS 타입이 지정되지 않았습니다.");
         }
 
         return "userAuth/main/signupForm";
