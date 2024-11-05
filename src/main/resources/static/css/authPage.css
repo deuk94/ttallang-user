@@ -1,0 +1,129 @@
+/* 기본적인 레이아웃 설정 */
+body {
+  background-color: #f0f2f5;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* 화면 전체 높이를 차지하게 설정 */
+}
+
+.container {
+  flex-grow: 1; /* 남는 공간을 채우기 위해 설정 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 수직 가운데 정렬 */
+  align-items: center; /* 수평 가운데 정렬 */
+  text-align: center;
+}
+
+/* 로고 스타일 */
+.logo {
+  height: 80px;
+  width: auto;
+  transition: transform 0.2s;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* 버튼 스타일 */
+.btn-danger {
+  font-size: 18px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  box-shadow: 0 4px 12px rgba(200, 35, 51, 0.4);
+}
+
+.btn-outline-secondary {
+  font-size: 16px;
+  padding: 10px 24px;
+  margin-top: 15px;
+  border-radius: 8px;
+  color: #6c757d;
+  transition: color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-outline-secondary:hover {
+  color: #0056b3;
+  border-color: #0056b3;
+  box-shadow: 0 4px 12px rgba(0, 86, 179, 0.2);
+}
+
+/* 하단 푸터 스타일 */
+footer {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  padding: 20px 0;
+  border-top: 1px solid #ddd;
+  text-align: center;
+}
+
+footer p {
+  margin: 0;
+  font-size: 14px;
+  color: #343a40;
+}
+
+.social-icons {
+  margin-top: 15px;
+}
+
+.social-icon {
+  width: 30px;
+  height: auto;
+  margin: 0 10px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.social-icon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+/* 상단 메뉴 스타일 */
+.navbar {
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center; /* 수직 중앙 정렬 */
+  justify-content: space-between; /* 좌우 배치 */
+}
+
+/* 브랜드 로고 및 텍스트 - 왼쪽 정렬 */
+.navbar .navbar-brand {
+  font-weight: bold;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  color: #007bff;
+  margin-right: auto; /* 좌측 정렬 유지 */
+}
+
+.navbar .navbar-brand img {
+  height: 30px;
+  margin-right: 8px; /* 로고와 텍스트 간격 */
+}
+
+/* 네비게이션 메뉴 - 오른쪽 정렬 */
+.navbar-nav {
+  display: flex;
+  gap: 15px; /* 메뉴 항목 간 간격 */
+  margin-left: auto; /* 우측에 고정 */
+}
+
+.navbar-nav .nav-link {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #007bff;
+}

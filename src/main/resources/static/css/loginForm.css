@@ -1,0 +1,148 @@
+/* 기본 설정 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5; /* 더 밝고 모던한 배경 색상 */
+}
+
+.navbar {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.navbar .navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.navbar .navbar-brand img {
+    margin-right: 8px;
+}
+
+.navbar-nav .nav-link {
+    color: #333;
+    font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff; /* 메뉴 항목 호버 시 색상 */
+}
+
+/* 로그인 컨테이너 */
+.login-container {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* 더 부드러운 그림자 */
+    text-align: center;
+    animation: fadeIn 0.5s ease; /* 페이드 인 효과 */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.login-title {
+    font-size: 1.7rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+/* 입력 필드 스타일 */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    box-shadow: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+}
+
+/* 버튼 스타일 */
+#loginForm button,
+#loginForm a {
+    width: 100%;
+    margin-bottom: 12px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#loginForm .btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+#loginForm .btn-primary:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+#loginForm .btn-primary:focus {
+    background-color: #0056b3;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+#loginForm .btn-outline-secondary {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+#loginForm .btn-outline-secondary:hover {
+    background-color: #f0f8ff;
+    border-color: #0056b3;
+}
+
+/* 소셜 로그인 버튼 */
+.social-login button {
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+    margin: 0 10px;
+    transition: transform 0.2s;
+}
+
+.social-login button:hover {
+    transform: scale(1.1); /* 버튼 확대 효과 */
+}
+
+/* 하단 푸터 */
+.footer {
+    background-color: #f1f1f1;
+    padding: 15px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    border-top: 1px solid #ddd;
+}
+
+.footer a {
+    margin: 0 10px;
+    color: #333;
+    transition: color 0.2s;
+}
+
+.footer a:hover {
+    color: #007bff;
+}
+
+.footer .social-icons i {
+    font-size: 1.2rem;
+    margin: 0 5px;
+    color: #333;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.footer .social-icons i:hover {
+    color: #007bff;
+    transform: scale(1.1); /* 소셜 아이콘 확대 효과 */
+}

@@ -1,0 +1,39 @@
+/* 배경 색상 */
+body {
+  background-color: #f8f9fa;
+}
+
+/* 카드 스타일 */
+.card {
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 입력 필드 스타일 */
+.form-control:focus {
+  box-shadow: none;
+  border-color: #007bff;
+}
+
+/* 버튼 스타일 */
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+.btn-outline-secondary, .btn-outline-danger {
+  border-width: 2px;
+}
+
+/* 유효성 검사 메시지 */
+#existId, #notExistId {
+  font-size: 0.9em;
+}
+
+#existId {
+  color: #dc3545; /* 빨간색 */
+}
+
+#notExistId {
+  color: #28a745; /* 초록색 */
+}
