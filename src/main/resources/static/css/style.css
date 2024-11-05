@@ -103,6 +103,10 @@ header nav a {
   margin-bottom: 8px;
 }
 
+.bicycle-item span {
+  flex-grow: 1;
+}
+
 .bicycle-item button {
   padding: 8px 12px;
   background-color: #333;
@@ -111,6 +115,11 @@ header nav a {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+}
+
+.bicycle-item .button-group {
+  display: flex;
+  gap: 5px;
 }
 
 /* 신고 팝업 스타일 */
