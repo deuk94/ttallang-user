@@ -66,11 +66,10 @@ public class BranchController {
         @RequestParam double returnLongitude,
         @RequestParam boolean isCustomLocation) {
         String result = branchService.returnBicycle(customerId, returnLatitude, returnLongitude, isCustomLocation);
-        if ("반납이 성공적으로 완료되었습니다.".equals(result)) {
-            // 반납 성공 시 결제 페이지로 이동할 URL을 응답에 포함
-            return ResponseEntity.ok("/userPayment");  // userPayment로 이동하는 URL을 클라이언트에 반환
+        if (result.equals("/userPayment")) { // 결제 페이지로 리다이렉트
+            return ResponseEntity.ok(result);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);  // 실패 시 400 Bad Request
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         }
     }
 
@@ -78,7 +77,7 @@ public class BranchController {
     @ResponseBody
     public ResponseEntity<Bicycle> checkRentalStatus(@RequestParam("customerId") int customerId) {
         Optional<Bicycle> bicycle = branchService.getCurrentRentalByCustomerId(customerId);
-        if (bicycle.isPresent() && "1".equals(bicycle.get().getRentalStatus())) { // Only return if rented
+        if (bicycle.isPresent() && "0".equals(bicycle.get().getRentalStatus())) {
             return new ResponseEntity<>(bicycle.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

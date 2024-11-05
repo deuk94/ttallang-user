@@ -50,14 +50,7 @@ public class BranchService {
         return bicycleRepository.findAvailableBike(latitude, longitude, distance);
     }
 
-    // 자전거 대여 로직을 처리하는 메서드
     public String rentBicycle(int bicycleId, int customerId, String rentalBranch) {
-
-        // 고객의 최신 결제 상태 확인
-        Optional<Payment> latestPayment = paymentRepository.findLatestPaymentByCustomerId(customerId);
-        if (latestPayment.isPresent() && "0".equals(latestPayment.get().getPaymentStatus())) {
-            return "결제가 완료되지 않았습니다. 결제를 완료한 후 대여할 수 있습니다.";
-        }
 
         // 고객이 이미 대여 중인지 확인
         List<Rental> activeRentals = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId);
@@ -69,10 +62,10 @@ public class BranchService {
         Optional<Bicycle> bicycleOptional = bicycleRepository.findById(bicycleId);
         if (bicycleOptional.isPresent()) {
             Bicycle bicycle = bicycleOptional.get();
-            if (!"0".equals(bicycle.getRentalStatus())) {
+            if (!"1".equals(bicycle.getRentalStatus())) {
                 return "이 자전거는 이미 대여 중입니다.";
             }
-            bicycle.setRentalStatus("1"); // 대여 상태로 변경
+            bicycle.setRentalStatus("0"); // 대여 상태로 변경
             bicycleRepository.save(bicycle);
         } else {
             return "자전거를 찾을 수 없습니다.";
@@ -108,7 +101,7 @@ public class BranchService {
         Optional<Bicycle> bicycleOptional = bicycleRepository.findById(rental.getBicycleId());
         if (bicycleOptional.isPresent()) {
             Bicycle bicycle = bicycleOptional.get();
-            bicycle.setRentalStatus("0"); // 반납 상태로 변경
+            bicycle.setRentalStatus("1"); // 반납 상태로 변경
             bicycle.setLatitude(returnLatitude);
             bicycle.setLongitude(returnLongitude);
             bicycleRepository.save(bicycle);
@@ -119,7 +112,8 @@ public class BranchService {
 
         // 결제 정보 계산 및 저장
         calculateAndSavePayment(rental, customerId);
-        return "반납이 성공적으로 완료되었습니다.";
+        // 성공 시 결제 페이지로 이동하는 URL을 반환
+        return "/userPayment";
     }
 
     // 반납 지점 결정 메서드

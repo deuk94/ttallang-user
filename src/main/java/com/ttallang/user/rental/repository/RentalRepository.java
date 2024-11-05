@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
-    List<Rental> findByCustomerId(int customerId);
 
     List<Rental> findByCustomerIdAndRentalEndDateIsNull(int customerId);
 }

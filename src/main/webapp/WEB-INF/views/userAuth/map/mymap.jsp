@@ -118,7 +118,7 @@
         method: "GET",
         data: { customerId: customerId }
       });
-      return response && response.rentalStatus === "1"; // 1일 때만 대여 중
+      return response && response.rentalStatus === "0"; // 0일 때 대여 중 상태로 간주
     } catch (error) {
       console.error("Error checking rental status:", error);
       return false;
@@ -203,7 +203,6 @@
 
   // 대여소 클릭 시 대여 상태 확인 후 반납 팝업 표시
   async function handleBranchClick(latitude, longitude) {
-    // "대여소 외 반납" 팝업이 열린 상태에서 대여소를 클릭할 때, 먼저 "대여소 외 반납" 팝업을 닫음
     closePopup('customReturnPopup'); // 대여소 외 반납 팝업 닫기
 
     const isRented = await checkRentalStatus();
