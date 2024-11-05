@@ -23,7 +23,7 @@ public class FaultReport {
     @Column(name = "report_id")
     private int reportId;
 
-    @Column(name = "category_Id")
+    @Column(name = "category_id")
     private int categoryId;
 
     @Column(name = "bicycle_id")

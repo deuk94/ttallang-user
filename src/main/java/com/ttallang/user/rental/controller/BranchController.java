@@ -27,7 +27,6 @@ public class BranchController {
     @GetMapping("/branches")
     @ResponseBody
     public List<Branch> getBranches() {
-        // branch_status가 1인 대여소들만 가져오는 메서드 호출
         return branchService.getActiveBranches();
     }
 
@@ -53,9 +52,9 @@ public class BranchController {
         @RequestParam String rentalBranch) {
         String result = branchService.rentBicycle(bicycleId, customerId, rentalBranch);
         if ("대여가 성공적으로 완료되었습니다.".equals(result)) {
-            return ResponseEntity.ok(result);  // 성공 시 200 OK
+            return ResponseEntity.ok(result);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);  // 실패 시 400 Bad Request
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         }
     }
 
@@ -66,7 +65,7 @@ public class BranchController {
         @RequestParam double returnLongitude,
         @RequestParam boolean isCustomLocation) {
         String result = branchService.returnBicycle(customerId, returnLatitude, returnLongitude, isCustomLocation);
-        if (result.equals("/userPayment")) { // 결제 페이지로 리다이렉트
+        if ("반납이 성공적으로 완료되었습니다.".equals(result)) {
             return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
@@ -82,5 +81,18 @@ public class BranchController {
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+    }
+
+    // 위치 신고 및 고장 신고 처리
+    @PostMapping("/report-issue")
+    @ResponseBody
+    public ResponseEntity<String> reportIssue(
+        @RequestParam int customerId,
+        @RequestParam int bicycleId,
+        @RequestParam int categoryId,  // categoryId가 필요합니다.
+        @RequestParam String reportDetails) {
+
+        String result = branchService.reportIssue(customerId, bicycleId, categoryId, reportDetails);
+        return ResponseEntity.ok(result);
     }
 }

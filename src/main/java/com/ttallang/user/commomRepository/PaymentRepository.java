@@ -35,5 +35,4 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     JoinPortOne getByJoinPortOneId(@Param("customerId") int customerId);
 
 
-    Optional<Payment> findByCustomerId(int customerId);
 }
