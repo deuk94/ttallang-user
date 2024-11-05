@@ -176,7 +176,7 @@
     }
   }
 
-  // 반납 기능 함수
+  // 반납 기능 함수 (반납 성공 시 결제 페이지로 이동)
   function returnBike(isCustomLocation) {
     var returnLatitude = selectedBranchLatitude;
     var returnLongitude = selectedBranchLongitude;
@@ -191,24 +191,21 @@
         isCustomLocation: isCustomLocation
       },
       success: function(response) {
-        alert("반납이 완료되었습니다.");
-
-        // 반납 완료 후 대여 상태 초기화
-        selectedBranchName = '';
-        selectedBranchLatitude = 0;
-        selectedBranchLongitude = 0;
-
-        closeAllPopups();
-        loadBranches();
+        alert(response);  // 반납 성공 메시지 출력
+        // 결제 페이지로 이동
+        window.location.href = "/userPayment.jsp";
       },
       error: function(xhr) {
-        alert("반납에 실패했습니다: " + xhr.responseText);
+        alert("반납에 실패했습니다: " + xhr.responseText);  // 실패 메시지 출력
       }
     });
   }
 
   // 대여소 클릭 시 대여 상태 확인 후 반납 팝업 표시
   async function handleBranchClick(latitude, longitude) {
+    // "대여소 외 반납" 팝업이 열린 상태에서 대여소를 클릭할 때, 먼저 "대여소 외 반납" 팝업을 닫음
+    closePopup('customReturnPopup'); // 대여소 외 반납 팝업 닫기
+
     const isRented = await checkRentalStatus();
     if (isRented) {
       selectedBranchLatitude = latitude;
@@ -236,7 +233,7 @@
   // 대여소 불러오기
   function loadBranches() {
     $.ajax({
-      url: "/map/branches",
+      url: "/map/branches",  // 필터링된 엔드포인트 호출
       method: "GET",
       success: function(data) {
         data.forEach(function(branch) {
@@ -322,9 +319,9 @@
         rentalBranch: rentalBranch
       },
       success: function(response) {
-        alert(response);
+        alert(response);  // 대여 성공 메시지 출력
+        closePopup('branchInfoPopup');  // 대여 성공 후 팝업 닫기
         document.getElementById("availableBikes").innerText = parseInt(document.getElementById("availableBikes").innerText) - 1;
-        closePopup('branchInfoPopup');
       },
       error: function(xhr) {
         alert("대여에 실패했습니다: " + xhr.responseText);

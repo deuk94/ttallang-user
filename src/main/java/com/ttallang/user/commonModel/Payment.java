@@ -27,7 +27,7 @@ public class Payment {
     private int rentalId;
 
     @Column(name = "payment_amount")
-    private int paymentAmount;
+    private Integer paymentAmount;
 
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
