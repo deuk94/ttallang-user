@@ -23,13 +23,13 @@ public class Rental {
     @Column(name = "rental_id")
     private int rentalId;
 
-    @Column(name = "customer_id")
-    private int customerId;
-
     @Column(name = "bicycle_id")
     private int bicycleId;
 
-    @Column(name = "rental_Startdate")
+    @Column(name = "customer_id")
+    private int customerId;
+
+    @Column(name = "rental_startdate")
     private LocalDateTime rentalStartDate;
 
     @Column(name = "rental_enddate")

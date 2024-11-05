@@ -1,4 +1,4 @@
-package com.ttallang.user.rental.repository;
+package com.ttallang.user.commomRepository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

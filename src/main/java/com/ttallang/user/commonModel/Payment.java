@@ -26,14 +26,14 @@ public class Payment {
     @Column(name = "rental_id")
     private int rentalId;
 
-    @Column(name = "payment_amount")
-    private Integer paymentAmount;
-
-    @Column(name = "payment_date")
-    private LocalDateTime paymentDate;
-
     @Column(name = "customer_id")
     private int customerId;
+
+    @Column(name = "payment_amount", nullable = true)
+    private Integer paymentAmount;
+
+    @Column(name = "payment_date", nullable = true)
+    private LocalDateTime paymentDate;
 
     @Column(name = "payment_status")
     private String paymentStatus;
