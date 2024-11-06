@@ -1,5 +1,6 @@
 package com.ttallang.user.security.controller;
 
+import com.ttallang.user.security.model.CertInfo;
 import com.ttallang.user.security.service.SignupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -47,11 +48,17 @@ public class SignupController {
 
     @GetMapping("/api/oauth2/callback")
     public String callback(
-            @RequestParam("code") String code,
-            @RequestParam("state") String state,
+            @RequestParam Map<String, String> params,
             Model model
     ) {
         // 디코딩 작업.
+        String code = params.get("code");
+        String state = params.get("state");
+        if (code == null || state == null) {
+            // 로그인 도중 취소버튼을 누르는 경우.
+            return "redirect:/login/form";
+        }
+        System.out.println(params.toString());
         log.info("code 받기 성공={}", code);
         log.info("state 받기 성공={}", state);
         String[] stateParts = state.split(":");
@@ -97,8 +104,10 @@ public class SignupController {
             return "redirect:/login/form";
         }
 
+        CertInfo certInfo = CertInfo.sharedCertInfoMap.get(accessToken);
         switch (SNSType) {
             case "payco" -> {
+                ResponseEntity<Map<String, Object>> unlinkUserCertResult = signupService.unlinkUserCert(certInfo);
                 Map<String, Map<String, String>> data = (Map<String, Map<String, String>>) resultBody.get("data");
                 Map<String, String> member = data.get("member");
                 model.addAttribute("customerName", member.get("name"));
@@ -107,6 +116,10 @@ public class SignupController {
                 model.addAttribute("birthday", member.get("birthday"));
             }
             case "kakao" -> {
+                certInfo.setTargetIdType("user_id");
+                Long userId = (Long) resultBody.get("id");
+                certInfo.setTargetId(userId);
+                ResponseEntity<Map<String, Object>> unlinkUserCertResult = signupService.unlinkUserCert(certInfo);
                 Map<String, String> kakaoAccount = (Map<String, String>) resultBody.get("kakao_account");
                 model.addAttribute("customerName", kakaoAccount.get("name"));
                 String phoneNumber = kakaoAccount.get("phone_number");
@@ -117,7 +130,7 @@ public class SignupController {
                 model.addAttribute("birthday", kakaoAccount.get("birthyear") + kakaoAccount.get("birthday"));
             }
             case "naver" -> {
-                log.info("data={}", resultBody);
+                ResponseEntity<Map<String, Object>> unlinkUserCertResult = signupService.unlinkUserCert(certInfo);
                 Map<String, String> response = (Map<String, String>) resultBody.get("response");
                 model.addAttribute("customerName", response.get("name"));
                 String mobile = response.get("mobile");
@@ -130,7 +143,6 @@ public class SignupController {
             }
             default -> throw new RuntimeException("SNS 타입이 지정되지 않았습니다.");
         }
-
         return "userAuth/main/signupForm";
     }
 

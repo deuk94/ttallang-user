@@ -117,8 +117,8 @@ function validateForm() {
         validateCustomerPhone();
     if (complete) {
         return true;
-    } else{
-        if (!isExist) {
+    } else {
+        if (isExist) {
             alert("아이디 중복 검사를 해주세요!");
         } else {
             alert("올바른 정보를 입력해주세요!");

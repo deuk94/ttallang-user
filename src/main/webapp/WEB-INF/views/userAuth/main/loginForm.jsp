@@ -31,7 +31,7 @@
     <button type="submit" class="btn btn-primary">로그인</button>
     <a href="${pageContext.request.contextPath}/signup/select" type="button" class="btn btn-primary">회원가입</a>
   </form>
-  <div class="text-center mt-3">
+  <div class="find-auth text-center mt-3">
     <a href="#">아이디/비밀번호 찾기</a>
   </div>
 </div>
