@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/myPage")
+@RequestMapping("/api/myPage")
 public class MyPageRestController {
 
     private final UserService userService;

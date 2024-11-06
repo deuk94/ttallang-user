@@ -1,18 +1,18 @@
 $(document).ready(function () {
   // 신고 내역 조회
   $.ajax({
-    url: "/myPage/faultReport",
+    url: "/api/myPage/faultReport",
     type: "GET",
     success: function (data) {
-      var rows = "";
+      let rows = "";
       $.each(data, function (index, faultReport) {
         rows += "<tr id='row-" + faultReport.reportId + "'>";
         rows += "<td>" + faultReport.categoryName + "</td>";
         rows += "<td>" + faultReport.reportDetails + "</td>";
-        var formattedDate = faultReport.reportDate.replace("T", " ");
+        let formattedDate = faultReport.reportDate.replace("T", " ");
         rows += "<td>" + formattedDate + "</td>";
 
-        var statusText = faultReport.reportStatus === '0' ? "처리 중" : "처리 완료";
+        let statusText = faultReport.reportStatus === '0' ? "처리 중" : "처리 완료";
         rows += "<td>" + statusText + "</td>";
         rows += "<td><button class='delete-btn' onclick='deleteReport(" + faultReport.reportId + ")'>삭제</button></td>";
         rows += "</tr>";
@@ -29,7 +29,7 @@ $(document).ready(function () {
 function deleteReport(reportId) {
   if (confirm("정말 삭제하시겠습니까?")) {
     $.ajax({
-      url: "/myPage/faultReport/" + reportId,
+      url: "/api/myPage/faultReport/" + reportId,
       type: "PATCH",
       cache: false,
       success: function () {

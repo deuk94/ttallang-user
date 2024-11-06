@@ -9,6 +9,7 @@
     <script src="/myPage/js/rental.js"></script>
 </head>
 <body>
+<jsp:include page="head/head.jsp" />
 <h1>이용 내역</h1>
 <div class="menu">
     <div><a href="/myPage/userModify">정보수정</a></div>
@@ -28,5 +29,6 @@
     <tbody>
     </tbody>
 </table>
+<jsp:include page="footer/footer.jsp" />
 </body>
 </html>

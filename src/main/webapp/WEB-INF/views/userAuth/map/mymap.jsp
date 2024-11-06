@@ -241,7 +241,7 @@
       success: function(response) {
         alert(response);  // 반납 성공 메시지 출력
         // 결제 페이지로 리다이렉트
-        window.location.href = "/pay/userPayment";
+        window.location.href = "/pay/payment";
       },
       error: function(xhr) {
         alert("반납에 실패했습니다: " + xhr.responseText);  // 실패 메시지 출력
