@@ -107,7 +107,8 @@ public class SignupController {
         CertInfo certInfo = CertInfo.sharedCertInfoMap.get(accessToken);
         switch (SNSType) {
             case "payco" -> {
-                ResponseEntity<Map<String, Object>> unlinkUserCertResult = signupService.unlinkUserCert(certInfo);
+                // 페이코는 연동 해제 주소가 따로 없음.
+                // ResponseEntity<Map<String, Object>> unlinkUserCertResult = signupService.unlinkUserCert(certInfo);
                 Map<String, Map<String, String>> data = (Map<String, Map<String, String>>) resultBody.get("data");
                 Map<String, String> member = data.get("member");
                 model.addAttribute("customerName", member.get("name"));
