@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.ttallang.user.commonModel.User;
+import com.ttallang.user.security.model.PaymentUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -17,17 +18,19 @@ public class PrincipalDetails implements UserDetails {
 
     private final Roles roles;
     private final User user;
+    private final PaymentUser paymentUser;
 
     // 유저의 경우.
+    public PrincipalDetails(Roles roles, User user, PaymentUser paymentUser) {
+        this.roles = roles;
+        this.user = user;
+        this.paymentUser = paymentUser;
+    }
+
     public PrincipalDetails(Roles roles, User user) {
         this.roles = roles;
         this.user = user;
-    }
-
-    // 관리자의 경우.
-    public PrincipalDetails(Roles roles) {
-        this.roles = roles;
-        this.user = null;
+        this.paymentUser = null;
     }
 
     //해당 유저의 권한 리턴 하는 곳
@@ -40,7 +43,6 @@ public class PrincipalDetails implements UserDetails {
 
     // 유저의 실제 PK.
     public int getCustomerID() {
-        assert user != null;
         return user.getCustomerId();
     }
 
@@ -76,5 +78,14 @@ public class PrincipalDetails implements UserDetails {
 
     public int getUserId() {
         return roles.getUserId();
+    }
+
+    // 이 속성의 경우 로그인할 때 인증객체를 만들면서 오직 한 번만 검사하는 속성임.
+    public String getPaymentStatus() {
+        String paymentStatus = "0";
+        if (paymentUser == null) {
+            paymentStatus = "1";
+        }
+        return paymentStatus;
     }
 }
