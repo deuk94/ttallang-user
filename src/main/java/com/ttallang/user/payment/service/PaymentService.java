@@ -1,13 +1,11 @@
 package com.ttallang.user.payment.service;
 
-import com.siot.IamportRestClient.IamportClient;
 import com.ttallang.user.commonModel.Payment;
 import com.ttallang.user.commonModel.Rental;
 import com.ttallang.user.commomRepository.RentalRepository;
 import com.ttallang.user.payment.model.JoinPayment;
 import com.ttallang.user.payment.model.JoinPortOne;
 import com.ttallang.user.commomRepository.PaymentRepository;
-import java.io.Console;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
