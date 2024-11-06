@@ -1,7 +1,7 @@
 $(document).ready(function () {
   // 회원 정보 조회
   $.ajax({
-    url: "/myPage/modify",
+    url: "/api/myPage/modify",
     type: "GET",
     dataType: "json",
     success: function (data) {
@@ -27,7 +27,7 @@ $(document).ready(function () {
 
     // 회원 정보 수정
     $.ajax({
-      url: "/myPage/modify",
+      url: "/api/myPage/modify",
       type: "PUT",
       contentType: "application/json",
       data: JSON.stringify(updatedUser),
@@ -48,11 +48,11 @@ $(document).ready(function () {
   $('#deleteButton').click(function () {
     if (confirm("정말로 탈퇴하시겠습니까?")) {
       $.ajax({
-        url: "/myPage/modify",
+        url: "/api/myPage/modify",
         type: "patch",
         success: function () {
           alert("회원탈퇴가 완료되었습니다.");
-          window.location.href = "/map/myMap.jsp";
+          window.location.href = "/";
         },
         error: function () {
           alert("회원탈퇴에 실패했습니다.");

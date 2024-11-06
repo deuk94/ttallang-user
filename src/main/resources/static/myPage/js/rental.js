@@ -1,7 +1,7 @@
 // 렌탈 내역 조회
 $(document).ready(function () {
   $.ajax({
-    url: "/myPage/rental",
+    url: "/api/myPage/rental",
     type: "GET",
     success: function (data) {
       let rows = "";

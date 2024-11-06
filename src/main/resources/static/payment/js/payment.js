@@ -2,11 +2,12 @@ let name = "자전거 대여 요금"
 let amount, email, userName, phoneNumber;
 
 $(document).ready(function () {
-  updatePaymentAmount();
+  updatePaymentAmount()
+  selectUser()
 
   // 결제 내역 조회
   $.ajax({
-    url: '/pay/payment',
+    url: '/api/pay/payment',
     method: 'GET',
     success: function (data) {
       $('#customerId').text(data.customerId);
@@ -22,18 +23,6 @@ $(document).ready(function () {
     }
   });
 });
-
-// 결제 금액 수정
-function updatePaymentAmount() {
-  $.ajax({
-    url: '/pay/updateAmount',
-    method: 'PATCH',
-    success: function (data) {
-      amount = data.paymentAmount; // 업데이트된 금액 저장
-      $('#paymentAmount').text(formatCurrency(amount));
-    }
-  });
-}
 
 function requestPay() {
   let IMP = window.IMP;
@@ -52,17 +41,15 @@ function requestPay() {
     buyer_tel: phoneNumber,
   }, function (rsp) {
     if (rsp.success) {
-      let paymentId = $('#paymentId').val();
       $.ajax({
-        url: '/pay/payment',
+        url: '/api/pay/payment',
         method: 'PATCH',
         contentType: 'application/json',
         data: JSON.stringify({
           imp_uid: rsp.imp_uid,
           name: name,
-          paymentId : paymentId,
           merchant_uid: merchant_uid,
-          paymentAmount: rsp.amount,
+          paymentAmount: amount,
           customerName: userName,
           customerPhone: phoneNumber,
           email: email,
@@ -77,6 +64,31 @@ function requestPay() {
       });
     } else {
       alert("결제에 실패하였습니다. \n" + rsp.error_msg);
+    }
+  });
+}
+
+// 결제 금액 수정
+function updatePaymentAmount() {
+  $.ajax({
+    url: '/api/pay/updateAmount',
+    method: 'PATCH',
+    success: function (data) {
+      amount = data.paymentAmount; // 업데이트된 금액 저장
+      $('#paymentAmount').text(formatCurrency(amount));
+    }
+  });
+}
+
+// 결제 정보 조회
+function selectUser() {
+  $.ajax({
+    url: '/api/pay/paymentInfo',
+    method: 'GET',
+    success: function (data) {
+      email = data.email;
+      userName = data.customerName;
+      phoneNumber = data.customerPhone;
     }
   });
 }

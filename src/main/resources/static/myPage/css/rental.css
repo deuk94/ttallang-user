@@ -3,10 +3,18 @@ h1 {
   margin-bottom: 20px;
 }
 
+a {
+  text-decoration: none;
+  color: black;
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: #f5f5f5;
-  margin: 20px;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  padding-top: 60px;
 }
 
 /* 메뉴 스타일 */
@@ -46,6 +54,8 @@ table {
   border-collapse: collapse;
   background-color: white;
   border: 1px solid #ddd;
+  overflow-y: auto; /* 세로 스크롤 활성화 */
+  height: calc(100vh - 60px); /* 푸터 공간을 제외한 높이 */
 }
 
 th, td {

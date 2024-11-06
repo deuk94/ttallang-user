@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class JoinPortOne {
 
-    private int customerId;
-    private int paymentId;
     private String customerName;
     private String customerPhone;
-    private int paymentAmount;
     private String email;
 }

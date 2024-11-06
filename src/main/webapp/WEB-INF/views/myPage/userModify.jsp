@@ -10,6 +10,7 @@
     <script src="/myPage/js/modify.js"></script>
 </head>
 <body>
+<jsp:include page="head/head.jsp" />
 <h1>회원 정보 수정</h1>
 <div class="menu">
     <div class="active"><a href="/myPage/userModify">정보수정</a></div>
@@ -47,5 +48,6 @@
     <button id="saveButton">수정</button>
     <button id="deleteButton">회원탈퇴</button>
 </div>
+<jsp:include page="footer/footer.jsp" />
 </body>
 </html>

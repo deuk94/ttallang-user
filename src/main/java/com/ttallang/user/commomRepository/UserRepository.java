@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
+
+
+    // 회원 정보 조회
     @Query("SELECT new com.ttallang.user.mypage.model.JoinUser(" +
         "r.userName, u.customerName, r.userPassword, " +
         "u.customerPhone, u.birthday, u.email) " +
