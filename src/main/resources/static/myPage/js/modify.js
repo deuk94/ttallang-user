@@ -7,7 +7,7 @@ $(document).ready(function () {
     success: function (data) {
       $('#userName').val(data.userName);
       $('#customerName').val(data.customerName);
-      $('#userPassword').val('');
+      $('#userPassword').val('********************');
       $('#customerPhone').val(data.customerPhone);
       $('#birthday').val(data.birthday);
       $('#email').val(data.email);
