@@ -303,22 +303,21 @@
 
           // 대여 중인 자전거 정보 가져오기
           $.ajax({
-            url: '/map/current-rentals', // 수정된 URL
+            url: '/map/current-rentals',
             type: 'GET',
             data: { customerId: customerId },
             success: function(response) {
-              if (response && response.length > 0) {
-                const currentRental = response[0];
-                document.getElementById("bicycleid").innerText = currentRental.bicycleId; // 자전거 ID 표시
-                document.getElementById("bicycleName").innerText = currentRental.bicycleName;
-                document.getElementById("rentalBranch").innerText = currentRental.rentalBranch;
-                document.getElementById("rentalStartDate").innerText = currentRental.rentalStartDate.replace("T", " ");
+              console.log("Response data:", response); // 응답 데이터 전체 확인
+
+              $('#bicycleid').text(response.bicycleId);
+              $('#bicycleName').text(response.bicycleName);
+              $('#rentalBranch').text(response.rentalBranch);
+              $('#rentalStartDate').text(response.rentalStartDate.replace("T", " "));
+
 
                 // 대여 중인 자전거 ID를 selectedBicycleId에 설정
-                selectedBicycleId = currentRental.bicycleId;
-              } else {
+                selectedBicycleId = response.bicycleId;
                 console.error("대여 중인 자전거 정보가 없습니다.");
-              }
             },
             error: function(xhr) {
               console.error("대여 중인 자전거 정보 가져오기 실패:", xhr);
@@ -353,9 +352,10 @@
             isCustomLocation: isCustomLocation,
             returnBranchName: returnBranchName,
             reportDetails: reportDetails,
-            categoryId: categoryId
+            categoryId: categoryId,
+            bicycleId: selectedBicycleId // 자전거 ID 추가
           },
-          success: function(response) {
+          success: function() {
             alert("반납이 성공적으로 완료되었습니다.");
             closeAllPopups();
             window.location.href = "/pay/userPayment";
@@ -365,6 +365,7 @@
           }
         });
       }
+
 
 
       async function handleBranchClick(latitude, longitude) {

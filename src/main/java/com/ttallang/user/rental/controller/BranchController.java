@@ -2,7 +2,7 @@ package com.ttallang.user.rental.controller;
 
 import com.ttallang.user.commonModel.Bicycle;
 import com.ttallang.user.commonModel.Branch;
-import com.ttallang.user.rental.model.JoinRental; // 추가된 임포트
+import com.ttallang.user.rental.model.UseRental; // 추가된 임포트
 import com.ttallang.user.rental.service.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -88,9 +88,9 @@ public class BranchController {
     // 고객의 현재 대여 중인 자전거 정보 가져오기
     @GetMapping("/current-rentals")
     @ResponseBody
-    public ResponseEntity<List<JoinRental>> getCurrentRentals(@RequestParam int customerId) {
-        List<JoinRental> joinRentals = branchService.getCurrentRentalsByCustomerId(customerId);
-        if (joinRentals.isEmpty()) {
+    public ResponseEntity<UseRental> getCurrentRentals(@RequestParam int customerId) {
+        UseRental joinRentals = branchService.getCurrentRentalsByCustomerId(customerId);
+        if (joinRentals == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(joinRentals, HttpStatus.OK);
