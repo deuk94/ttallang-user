@@ -65,3 +65,18 @@ function handleLoginForm(event) {
         errorMessage.classList.remove("d-none");
     });
 }
+
+// "error" 파라미터가 존재하는지 확인하여 alert 표시.
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+const alertMessage = getQueryParam("error");
+const cancelMessage = getQueryParam("cancel");
+if (alertMessage) {
+    alert(alertMessage);
+}
+if (cancelMessage) {
+    alert(cancelMessage);
+}

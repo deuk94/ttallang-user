@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -32,7 +33,7 @@
     <a href="${pageContext.request.contextPath}/signup/select" type="button" class="btn btn-primary">회원가입</a>
   </form>
   <div class="find-auth text-center mt-3">
-    <a href="#">아이디/비밀번호 찾기</a>
+    <a href="${pageContext.request.contextPath}/find/select">아이디/비밀번호 찾기</a>
   </div>
 </div>
 <!-- 하단 푸터 -->

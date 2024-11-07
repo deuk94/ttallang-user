@@ -3,9 +3,12 @@ package com.ttallang.user.commomRepository;
 import com.ttallang.user.commonModel.User;
 import com.ttallang.user.mypage.model.JoinUser;
 import com.ttallang.user.security.model.PaymentUser;
+import com.ttallang.user.security.model.RolesUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
@@ -26,5 +29,14 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "on u.customerId = p.customerId " +
             "where p.customerId = :customerId AND p.paymentStatus = '0' ")
     PaymentUser findNoPaymentUser(@Param("customerId") int customerId);
+
+    List<User> findByCustomerPhoneOrEmail(String customerPhone, String email);
+
+    @Query("select new com.ttallang.user.security.model.RolesUser(r.userName, u.customerPhone) " +
+            "from Roles r " +
+            "join User u " +
+            "on r.userId = u.userId " +
+            "where u.customerPhone = :customerPhone")
+    RolesUser findUserNameByCustomerPhone(@Param("customerPhone") String customerPhone);
 }
 
