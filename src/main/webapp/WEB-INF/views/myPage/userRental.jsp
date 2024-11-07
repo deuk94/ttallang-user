@@ -10,25 +10,30 @@
 </head>
 <body>
 <jsp:include page="head/head.jsp" />
-<h1>이용 내역</h1>
-<div class="menu">
-    <div><a href="/myPage/userModify">정보수정</a></div>
-    <div class="active"> <a href="/myPage/userRental">이용내역</a></div>
-    <div> <a href="/myPage/userFaultReport">신고내역</a></div>
+<div>
+    <h1>이용 내역</h1>
+    <div class="menu">
+        <div><a href="/myPage/userModify">정보수정</a></div>
+        <div class="active"><a href="/myPage/userRental">이용내역</a></div>
+        <div><a href="/myPage/userFaultReport">신고내역</a></div>
+    </div>
+    <div id="tableContainer">
+        <table id="rentalTable">
+            <thead>
+            <tr>
+                <th>자전거</th>
+                <th>대여소</th>
+                <th>대여일시</th>
+                <th>반납대여소</th>
+                <th>반납일시</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 동적으로 데이터를 여기에 추가 -->
+            </tbody>
+        </table>
+    </div>
 </div>
-<table id="rentalTable">
-    <thead>
-    <tr>
-        <th>자전거</th>
-        <th>대여소</th>
-        <th>대여일시</th>
-        <th>반납대여소</th>
-        <th>반납일시</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
 <jsp:include page="footer/footer.jsp" />
 </body>
 </html>

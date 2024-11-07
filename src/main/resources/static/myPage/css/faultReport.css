@@ -18,10 +18,11 @@ body {
 .menu {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
   border: 1px solid #ddd;
   border-radius: 5px;
   overflow: hidden;
+  width: 83%; /* 테이블과 동일한 폭으로 설정 */
+  margin: 0 auto 30px auto; /* 중앙 정렬 */
 }
 
 .menu div {

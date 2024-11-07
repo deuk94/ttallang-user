@@ -21,10 +21,11 @@ body {
 .menu {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
   border: 1px solid #ddd;
   border-radius: 5px;
   overflow: hidden;
+  width: 83%; /* 테이블과 동일한 폭으로 설정 */
+  margin: 0 auto 30px auto; /* 중앙 정렬 */
 }
 
 .menu div {
@@ -47,24 +48,31 @@ body {
   color: white;
 }
 
-/* 테이블 스타일 */
-table {
+/* 테이블 컨테이너 스타일 */
+#tableContainer {
   width: 80%;
   margin: 0 auto;
-  border-collapse: collapse;
+  max-height: 420px; /* 테이블 전체 높이 제한 */
+  overflow-y: auto; /* 세로 스크롤 활성화 */
   background-color: white;
   border: 1px solid #ddd;
-  overflow-y: auto; /* 세로 스크롤 활성화 */
-  height: calc(100vh - 60px); /* 푸터 공간을 제외한 높이 */
 }
 
-th, td {
+#rentalTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#rentalTable thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f0f0f0;
+  font-weight: bold;
+  z-index: 1; /* 헤더가 본문보다 위에 표시되도록 */
+}
+
+#rentalTable th, #rentalTable td {
   border: 1px solid #ddd;
   padding: 10px;
   text-align: center;
-}
-
-th {
-  background-color: #f0f0f0;
-  font-weight: bold;
 }

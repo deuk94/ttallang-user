@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <style>
   footer {
-    padding: 20px;
+    padding: 5px;
     background-color: #f7f7f7;
     text-align: center;
     border-top: 1px solid #ddd;
@@ -13,8 +13,8 @@
   }
 </style>
 <footer>
-    <p>이용약관 | 위치정보관련 약관 | 개인정보처리방침 | 보험안내 | 도움주신 분</p>
-    <p>서울특별시 코사 딸랑이 대표 김영윤</p>
-    <p>COPYRIGHT ⓒ 2024 bike코사 ALL RIGHTS RESERVED.</p>
+    <p> 이용약관 | 위치정보관련 약관 | 개인정보처리방침 </p>
+    <p>서울 종로구 창경궁로 254 7층 딸랑컴퍼니 대표 김영윤</p>
+    <p>COPYRIGHT ⓒ 2024 ttallang ALL RIGHTS RESERVED.</p>
 </footer>
 
