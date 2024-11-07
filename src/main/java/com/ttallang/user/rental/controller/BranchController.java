@@ -2,6 +2,7 @@ package com.ttallang.user.rental.controller;
 
 import com.ttallang.user.commonModel.Bicycle;
 import com.ttallang.user.commonModel.Branch;
+import com.ttallang.user.rental.model.JoinRental; // 추가된 임포트
 import com.ttallang.user.rental.service.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,10 +52,10 @@ public class BranchController {
         @RequestParam int customerId,
         @RequestParam String rentalBranch) {
         String result = branchService.rentBicycle(bicycleId, customerId, rentalBranch);
-        if ("대여가 성공적으로 완료되었습니다.".equals(result)) {
-            return ResponseEntity.ok(result);
-        } else {
+        if (result.contains("결제 되지 않은 자전거가 있습니다.")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        } else {
+            return ResponseEntity.ok(result);
         }
     }
 
@@ -63,8 +64,9 @@ public class BranchController {
     public ResponseEntity<String> returnBicycle(@RequestParam int customerId,
         @RequestParam double returnLatitude,
         @RequestParam double returnLongitude,
-        @RequestParam boolean isCustomLocation) {
-        String result = branchService.returnBicycle(customerId, returnLatitude, returnLongitude, isCustomLocation);
+        @RequestParam boolean isCustomLocation,
+        @RequestParam String returnBranchName) {
+        String result = branchService.returnBicycle(customerId, returnLatitude, returnLongitude, isCustomLocation, returnBranchName);
         if ("반납이 성공적으로 완료되었습니다.".equals(result)) {
             return ResponseEntity.ok(result);  // 성공 시 200 OK
         } else {
@@ -81,6 +83,17 @@ public class BranchController {
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+    }
+
+    // 고객의 현재 대여 중인 자전거 정보 가져오기
+    @GetMapping("/current-rentals")
+    @ResponseBody
+    public ResponseEntity<List<JoinRental>> getCurrentRentals(@RequestParam int customerId) {
+        List<JoinRental> joinRentals = branchService.getCurrentRentalsByCustomerId(customerId);
+        if (joinRentals.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(joinRentals, HttpStatus.OK);
     }
 
     // 위치 신고 및 고장 신고 처리
