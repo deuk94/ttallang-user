@@ -8,22 +8,7 @@
 </head>
 <body>
 <!-- 상단 네비게이션 바 -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container">
-    <a class="navbar-brand" href="#">
-      <img src="${pageContext.request.contextPath}/images/자전거.png" alt="따릉이 KOSA BIKE" style="width: 50px; vertical-align: middle;">
-      따릉이 KOSA BIKE
-    </a>
-    <div class="navbar-nav ms-auto">
-      <a class="nav-link" href="#">대여소 안내</a>
-      <a class="nav-link" href="#">이용권 구매</a>
-      <a class="nav-link" href="#">문의/FAQ</a>
-      <a class="nav-link" href="#">공지사항</a>
-      <a class="nav-link" href="#">안전수칙</a>
-    </div>
-  </div>
-</nav>
-
+<jsp:include page="../header/header.jsp" flush="true"/>
 <!-- 로그인 폼 -->
 <div class="login-container">
   <div class="login-title">따릉이 KOSA BIKE</div>
@@ -46,36 +31,12 @@
     <button type="submit" class="btn btn-primary">로그인</button>
     <a href="${pageContext.request.contextPath}/signup/select" type="button" class="btn btn-primary">회원가입</a>
   </form>
-  <div class="text-center mt-3">
+  <div class="find-auth text-center mt-3">
     <a href="#">아이디/비밀번호 찾기</a>
-    <div class="social-login text-center">
-      <button type="button" class="btn btn-outline-secondary">N</button>
-      <button type="button" class="btn btn-outline-secondary">K</button>
-    </div>
   </div>
 </div>
-
 <!-- 하단 푸터 -->
-<footer class="footer">
-  <div class="container">
-    <a href="#">이용약관</a> |
-    <a href="#">위치정보관련 약관</a> |
-    <a href="#">개인정보처리방침</a> |
-    <a href="#">보험안내</a> |
-    <a href="#">도움주신 분</a>
-    <div class="mt-2">
-      <span>서울특별시 중구 항공길 254 통합빌딩 5층, 우편번호 03077</span><br>
-      <span>COPYRIGHT © 2024 Ttalangi All RIGHTS RESERVED.</span>
-    </div>
-    <div class="social-icons mt-2">
-      <i class="bi bi-instagram"></i>
-      <i class="bi bi-facebook"></i>
-      <i class="bi bi-blog"></i>
-      <i class="bi bi-youtube"></i>
-      <i class="bi bi-github"></i>
-    </div>
-  </div>
-</footer>
+<jsp:include page="../footer/footer.jsp" flush="true"/>
 </body>
 <script src="${pageContext.request.contextPath}/js/login.js"></script>
 </html>

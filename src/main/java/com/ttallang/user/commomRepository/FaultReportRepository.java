@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface FaultReportRepository extends JpaRepository<FaultReport, Integer> {
 
+    // 신고 내역 조회
     @Query("SELECT new com.ttallang.user.mypage.model.JoinFault(r.reportId, c.categoryName, "
         + "r.reportDetails, r.reportDate, r.reportStatus, r.faultStatus) "
         + "FROM FaultReport r Join FaultCategory c ON c.categoryId = r.categoryId "

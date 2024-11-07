@@ -2,14 +2,17 @@ package com.ttallang.user.security.controller;
 
 import com.ttallang.user.security.response.SecurityResponse;
 import com.ttallang.user.security.service.SignupService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class SignupRestController {
+    // 리턴 타입이 JSON인 컨트롤러.
 
     private final SignupService signupService;
 
@@ -17,11 +20,17 @@ public class SignupRestController {
         this.signupService = signupService;
     }
 
-    @GetMapping("/oauth2/payco")
-    public ResponseEntity<String> paycoLogin() {
+    @GetMapping("/oauth2/{SNSType}")
+    public ResponseEntity<String> oAuth2Login(@PathVariable("SNSType") String SNSType) {
         System.out.println("로그인창 진입...");
-        String responseEntity = signupService.getAuthorizationUrl();
-        return ResponseEntity.ok(responseEntity);
+        String response = signupService.getAuthorizationUrl(SNSType);
+        try {
+            assert response != null;
+        } catch (Exception e) {
+            log.error("로그인창에 진입할 수 없습니다. 원인={}", e.getMessage());
+            return ResponseEntity.ok("/login/form");
+        }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signup/form/checkExisting")
@@ -54,26 +63,7 @@ public class SignupRestController {
             securityResponse.setStatus("failure");
             securityResponse.setRole("guest");
             securityResponse.setMessage("회원가입 실패,"+e.getMessage());
-            System.out.println("예외 발생: " + e.getMessage());
-        }
-        return securityResponse;
-    }
-
-    @PostMapping("/signup/admin")
-    public SecurityResponse signupAdmin(@RequestBody Map<String, String> userData) {
-        SecurityResponse securityResponse = new SecurityResponse();
-        try {
-            signupService.signupAdmin(userData);
-            securityResponse.setCode(200);
-            securityResponse.setStatus("success");
-            securityResponse.setRole("guest");
-            securityResponse.setMessage("회원가입 성공.");
-        } catch (Exception e) {
-            securityResponse.setCode(500);
-            securityResponse.setStatus("failure");
-            securityResponse.setRole("guest");
-            securityResponse.setMessage("회원가입 실패,"+e.getMessage());
-            System.out.println("예외 발생: " + e.getMessage());
+            log.error("회원가입에 실패했습니다. 원인={}", e.getMessage());
         }
         return securityResponse;
     }

@@ -39,7 +39,7 @@
     </table>
 </div>
 <div class="button-container">
-    <button class="button cancel" onclick="alert('결제가 취소되었습니다.');">취소</button>
+    <button class="button cancel" onclick="alert('결제를 진행하세요.\n결제가 완료 되어야 홈페이지로 이동할 수 있습니다');">취소</button>
     <button class="button" onclick="requestPay()">결제</button>
 </div>
 </body>

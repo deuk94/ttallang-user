@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/pay")
+@RequestMapping("/api/pay")
 public class PaymentRestController {
 
     private final PaymentService paymentService;
@@ -45,10 +45,9 @@ public class PaymentRestController {
     public Payment updatePayment() {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
-        Payment payment = paymentService.getPayment(loginId);
+        Payment payment = paymentService.getPayment(1);
         int paymentId = payment.getPaymentId();
         int paymentAmount = payment.getPaymentAmount();
-        System.out.println(payment.getPaymentId());
 
         // 결제 금액 검증
         if (!paymentService.validatePaymentAmount(paymentId, paymentAmount)) {

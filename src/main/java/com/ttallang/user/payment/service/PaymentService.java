@@ -8,14 +8,12 @@ import com.ttallang.user.payment.model.JoinPortOne;
 import com.ttallang.user.commomRepository.PaymentRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-
     private final RentalRepository rentalRepository;
 
     public PaymentService(PaymentRepository paymentRepository, RentalRepository rentalRepository) {
