@@ -16,6 +16,10 @@ $(document).ready(function () {
       $('#rentalStartDate').text(data.rentalStartDate.replace("T", " "));
       $('#returnBranch').text(data.returnBranch);
       $('#rentalEndDate').text(data.rentalEndDate.replace("T", " "));
+
+      let { minutes, seconds } = RentalCalculate(data.rentalStartDate, data.rentalEndDate);
+      $('#rentalDuration').text(`${minutes} 분 ${seconds} 초`);
+
       $('#paymentAmount').text(formatCurrency(data.paymentAmount));
     },
     error: function () {
@@ -96,4 +100,17 @@ function selectUser() {
 // 세자릿수 콤마, 금액 뒤에 원 붙이기
 function formatCurrency(amount) {
   return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " 원";
+}
+
+// 총 대여 시간 계산
+function RentalCalculate(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffInMs = end - start;
+  const diffInSeconds = Math.floor(diffInMs / 1000);
+
+  const minutes = Math.floor(diffInSeconds / 60);
+  const seconds = diffInSeconds % 60;
+
+  return { minutes, seconds };
 }

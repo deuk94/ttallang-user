@@ -31,7 +31,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable
         ).authorizeHttpRequests(auth -> auth
             .requestMatchers("/login/**", "/signup/**", "/api/oauth2/**").permitAll() // 로그인 페이지, 회원가입 페이지만 퍼밋올.
-            .requestMatchers("/user/**", "/map/**", "/pay/**", "/myPage/**").hasAnyRole("USER", "ADMIN")
+            .requestMatchers("/user/**", "/map/**", "/pay/**", "/myPage/**", "api/pay/**", "api/myPage/**").hasAnyRole("USER", "ADMIN")
             .requestMatchers("/admin/**").hasRole("ADMIN")
             .anyRequest().permitAll()
         ).formLogin(form -> form

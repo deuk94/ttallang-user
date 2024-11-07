@@ -23,26 +23,35 @@
     text-decoration: none;
     color: #333;
   }
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
+  .brand-name {
+    font-size: 35px; /* 글자 크기를 원하는 크기로 설정 */
+    font-weight: bold; /* 굵은 글씨 */
+    color: rgba(2, 2, 2, 0.97);
+  }
 </style>
 <header>
     <div>
         <a href="/map/main">
             <img src="/images/자전거.png" alt="따릉이 로고" />
-            <span>KOSA BIKE</span>
+            <span class="brand-name">딸랑이</span>
         </a>
     </div>
     <nav>
-        <a href="javascript:void(0);">사업소개</a>
-        <a href="javascript:void(0);">대여소 안내</a>
-        <a href="javascript:void(0);">이용권 구매</a>
-        <a href="javascript:void(0);">문의/FAQ</a>
-        <a href="javascript:void(0);">공지사항</a>
-        <a href="javascript:void(0);">안전수칙</a>
+        <a href="/myPage/information">이용 안내</a>
+        <a href="/myPage/charge">이용 요금</a>
+        <a href="/myPage/responsibility">책임 사항</a>
+        <a href="/myPage/insurance">보험 안내</a>
+        <a href="/myPage/safety">안전수칙</a>
     </nav>
     <div>
         <span>환영합니다 ${username}님!</span>
         | <a href="${pageContext.request.contextPath}/api/logout">로그아웃</a>
         | <a href="${pageContext.request.contextPath}/myPage/userModify">마이페이지</a>
-        | <a href="${pageContext.request.contextPath}/info">이용안내</a>
     </div>
 </header>

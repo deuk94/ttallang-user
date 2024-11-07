@@ -21,7 +21,7 @@
             <td id="rentalBranch"></td>
         </tr>
         <tr>
-            <th>대여 시간</th>
+            <th>대여 시작 시간</th>
             <td id="rentalStartDate"></td>
         </tr>
         <tr>
@@ -31,6 +31,10 @@
         <tr>
             <th>반납 시간</th>
             <td id="rentalEndDate"></td>
+        </tr>
+        <tr>
+            <th>총 대여 시간</th>
+            <td id="rentalDuration"></td>
         </tr>
         <tr>
             <th>총 금액</th>

@@ -5,18 +5,22 @@ $(document).ready(function () {
     type: "GET",
     success: function (data) {
       let rows = "";
-      $.each(data, function (index, faultReport) {
-        rows += "<tr id='row-" + faultReport.reportId + "'>";
-        rows += "<td>" + faultReport.categoryName + "</td>";
-        rows += "<td>" + faultReport.reportDetails + "</td>";
-        let formattedDate = faultReport.reportDate.replace("T", " ");
-        rows += "<td>" + formattedDate + "</td>";
+      if (data.length === 0) {
+        rows = "<tr><td colspan='5'>신고 내역이 없습니다</td></tr>";
+      } else {
+        $.each(data, function (index, faultReport) {
+          rows += "<tr id='row-" + faultReport.reportId + "'>";
+          rows += "<td>" + faultReport.categoryName + "</td>";
+          rows += "<td>" + faultReport.reportDetails + "</td>";
+          let formattedDate = faultReport.reportDate.replace("T", " ");
+          rows += "<td>" + formattedDate + "</td>";
 
-        let statusText = faultReport.reportStatus === '0' ? "처리 중" : "처리 완료";
-        rows += "<td>" + statusText + "</td>";
-        rows += "<td><button class='delete-btn' onclick='deleteReport(" + faultReport.reportId + ")'>삭제</button></td>";
-        rows += "</tr>";
-      });
+          let statusText = faultReport.reportStatus === '0' ? "처리 중" : "처리 완료";
+          rows += "<td>" + statusText + "</td>";
+          rows += "<td><button class='delete-btn' onclick='deleteReport(" + faultReport.reportId + ")'>삭제</button></td>";
+          rows += "</tr>";
+        });
+      }
       $("#rentalTable tbody").html(rows);
     },
     error: function () {
@@ -35,6 +39,9 @@ function deleteReport(reportId) {
       success: function () {
         alert("삭제되었습니다.");
         $("#row-" + reportId).remove();
+        if ($("#rentalTable tbody tr").length === 0) {
+          $("#rentalTable tbody").html("<tr><td colspan='5'>신고 내역이 없습니다</td></tr>");
+        }
       },
       error: function () {
         alert("삭제에 실패했습니다. 서버 응답을 확인하세요.");
