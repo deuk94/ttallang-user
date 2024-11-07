@@ -33,5 +33,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
         "WHERE u.customerId = :customerId AND p.paymentStatus = '0'")
     JoinPortOne getByJoinPortOneId(@Param("customerId") int customerId);
 
+    List<Payment> findByCustomerIdAndPaymentStatus(int customerId, String paymentStatus);
 
 }
