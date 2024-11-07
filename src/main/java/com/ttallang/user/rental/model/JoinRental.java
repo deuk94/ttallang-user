@@ -14,4 +14,5 @@ public class JoinRental {
     private String bicycleName; // 자전거 이름
     private String rentalBranch; // 대여 지점 이름
     private LocalDateTime rentalStartDate; // 대여 시작 시각
+
 }
