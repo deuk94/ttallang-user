@@ -56,6 +56,7 @@ public class BranchService {
 
     public String rentBicycle(int bicycleId, int customerId, String rentalBranch) {
         System.out.println("대여할 자전거 ID: " + bicycleId);
+
         List<Payment> unpaidPayments = paymentRepository.findByCustomerIdAndPaymentStatus(customerId, "0");
         if (!unpaidPayments.isEmpty()) {
             return "결제 되지 않은 자전거가 있습니다. 결제 페이지로 돌아갑니다.";
@@ -69,9 +70,13 @@ public class BranchService {
         Optional<Bicycle> bicycleOptional = bicycleRepository.findById(bicycleId);
         if (bicycleOptional.isPresent()) {
             Bicycle bicycle = bicycleOptional.get();
-            if (!"1".equals(bicycle.getRentalStatus())) {
-                return "이 자전거는 이미 대여 중입니다.";
+
+            // 자전거가 대여 가능한 상태인지 확인
+            if (!"1".equals(bicycle.getRentalStatus()) || !"1".equals(bicycle.getBicycleStatus())) {
+                return "이 자전거는 대여할 수 없는 상태입니다.";
             }
+
+            // 자전거 상태를 대여 중으로 설정
             bicycle.setRentalStatus("0");
             bicycleRepository.save(bicycle);
         } else {
@@ -87,6 +92,7 @@ public class BranchService {
 
         return "대여가 성공적으로 완료되었습니다.";
     }
+
 
     public String returnBicycle(int customerId, double returnLatitude, double returnLongitude, boolean isCustomLocation, String returnBranchName) {
         List<Rental> activeRentals = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId);
@@ -105,6 +111,12 @@ public class BranchService {
             bicycle.setRentalStatus("1");
             bicycle.setLatitude(returnLatitude);
             bicycle.setLongitude(returnLongitude);
+
+
+            if (isCustomLocation) {
+                bicycle.setBicycleStatus("0");
+            }
+
             bicycleRepository.save(bicycle);
         } else {
             return "자전거를 찾을 수 없습니다.";
@@ -113,6 +125,7 @@ public class BranchService {
         calculateAndSavePayment(rental, customerId);
         return "반납이 성공적으로 완료되었습니다.";
     }
+
 
     private void calculateAndSavePayment(Rental rental, int customerId) {
         Payment payment = new Payment();
@@ -157,6 +170,7 @@ public class BranchService {
         if (bicycleOptional.isPresent()) {
             Bicycle bicycle = bicycleOptional.get();
             bicycle.setReportStatus("0");
+            bicycle.setBicycleStatus("0");
             bicycleRepository.saveAndFlush(bicycle);
         } else {
             return "자전거를 찾을 수 없습니다.";

@@ -169,28 +169,56 @@
         }
       }
 
+      // 결제 상태 확인 함수 추가
+      async function checkPaymentStatus() {
+        try {
+          const response = await $.ajax({
+            url: "/map/check-payment-status", // 결제 상태를 확인하는 엔드포인트
+            method: "GET",
+            data: { customerId: customerId }
+          });
+          return response && response.paymentStatus === "1"; // 결제 완료 상태
+        } catch (error) {
+          console.error("Error checking payment status:", error);
+          return false;
+        }
+      }
+
+      // 신고 팝업 열기 함수 수정
       function openReportPopup() {
         closePopup('branchInfoPopup');
 
-        checkRentalStatus().then(isRented => {
-          const reportButton = document.getElementById("reportButton"); // 신고 버튼의 ID 사용 (가정)
-          if (isRented) {
-            reportButton.onclick = submitReportAndReturn; // 대여 중 신고 및 반납 함수 연결
-          } else {
-            reportButton.onclick = submitBrokenReport; // 기존 신고 함수 연결
+        // 결제 상태 확인 후 처리
+        checkPaymentStatus().then(isPaid => {
+          if (!isPaid) {
+            alert("결제되지 않은 자전거가 있습니다. 결제 페이지로 이동합니다.");
+            window.location.href = "/pay/payment"; // 결제 페이지로 이동
+            return;
           }
-          document.getElementById("reportPopup").style.display = 'block';
+
+          // 결제 상태 확인 후 대여 상태에 따른 신고 팝업 처리
+          checkRentalStatus().then(isRented => {
+            const reportButton = document.getElementById("reportButton"); // 신고 버튼의 ID 사용 (가정)
+            if (isRented) {
+              reportButton.onclick = submitReportAndReturn; // 대여 중 신고 및 반납 함수 연결
+            } else {
+              reportButton.onclick = submitBrokenReport; // 기존 신고 함수 연결
+            }
+            document.getElementById("reportPopup").style.display = 'block';
+          });
         });
       }
 
       function openLocationReportPopup() {
         closePopup('reportPopup');
-        document.getElementById("locationReportPopup").style.display = 'block';
+        $('#locationReportDetails').val(''); // 위치 신고 내용 초기화
+        $('#locationReportPopup').show();
       }
 
       function openBrokenReportPopup() {
-        closePopup('branchInfoPopup');  // 다른 팝업이 열린 상태라면 닫기
-        document.getElementById("brokenReportPopup").style.display = 'block'; // 고장 신고 팝업 열기
+        closePopup('reportPopup');
+        $('#brokenReportDetails').val(''); // 고장 신고 내용 초기화
+        $('#brokenReportPopup').show();
       }
 
       function handleReportClick() {
@@ -239,8 +267,9 @@
 
       // 반납 팝업의 신고 버튼 클릭 시 "신고 및 반납 팝업" 열기
       function openReportAndReturnPopup() {
-        closePopup('returnPopup'); // 반납 팝업 닫기
-        document.getElementById("reportAndReturnPopup").style.display = 'block'; // 새로운 신고 및 반납 팝업 열기
+        closePopup('returnPopup');
+        $('#reportAndReturnDetails').val(''); // 신고 및 반납 내용 초기화
+        $('#reportAndReturnPopup').show();
       }
 
 
@@ -358,7 +387,7 @@
           success: function() {
             alert("반납이 성공적으로 완료되었습니다.");
             closeAllPopups();
-            window.location.href = "/pay/userPayment";
+            window.location.href = "/pay/payment";
           },
           error: function(xhr) {
             alert("반납에 실패했습니다: " + xhr.responseText);
@@ -456,7 +485,8 @@
               reportButton.textContent = "신고";
               reportButton.onclick = function() {
                 selectedBicycleId = bike.bicycleId; // 신고 시 자전거 ID 설정
-                openBrokenReportPopup(); // 고장 신고 팝업 열기
+                closePopup('branchInfoPopup');
+                document.getElementById("reportPopup").style.display = 'block'; // 고장 신고 팝업 열기
               };
               bikeElement.appendChild(reportButton);
 
