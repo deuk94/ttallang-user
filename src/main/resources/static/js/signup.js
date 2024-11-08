@@ -24,15 +24,11 @@ function handleCheckButton(event) {
     event.preventDefault();
 
     if (validateUserName()) {
-        const data = {
-            username: userName.value
-        };
-        fetch("/api/signup/form/checkExisting", {
-            method: "POST",
+        fetch(`/api/signup/form/checkExisting/${userName.value}`, {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
+            }
         })
         .then(response => {
             if (response.ok) {

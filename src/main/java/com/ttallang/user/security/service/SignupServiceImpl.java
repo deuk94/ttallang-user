@@ -6,6 +6,7 @@ import com.ttallang.user.commomRepository.RolesRepository;
 import com.ttallang.user.commomRepository.UserRepository;
 import com.ttallang.user.security.config.RandomStateToken;
 import com.ttallang.user.security.model.CertInfo;
+import com.ttallang.user.security.response.SecurityResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -19,6 +20,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
@@ -138,9 +142,41 @@ public class SignupServiceImpl implements SignupService {
         return authorizationUrl;
     }
 
+    // 인가 코드를 받아서 액세스 토큰을 받기 위해 가공함.
+    private Map<String, String> getAuthorizationCodeAndSNSType(Map<String, String> params) {
+        Map<String, String> authorizationCodeMap = new HashMap<>();
+        String code = params.get("code");
+        String state = params.get("state");
+        if (code == null || state == null) {
+            // 로그인 도중 취소버튼을 누르는 경우.
+            authorizationCodeMap.put("cancel", "true");
+            return authorizationCodeMap;
+        }
+        log.info("code 받기 성공={}", code);
+        log.info("state 받기 성공={}", state);
+        String[] stateParts = state.split(":");
+        String stateTextPart = stateParts[1];
+        byte[] decodedBytes = Base64.getUrlDecoder().decode(stateTextPart);
+        String decodedState = new String(decodedBytes);
+
+        String SNSType = null;
+        if (decodedState.contains("payco")) {
+            SNSType = "payco";
+        } else if (decodedState.contains("kakao")) {
+            SNSType = "kakao";
+        } else if (decodedState.contains("naver")) {
+            SNSType = "naver";
+        } else {
+            throw new RuntimeException("SNS 타입이 지정되지 않았습니다.");
+        }
+        authorizationCodeMap.put("code", code);
+        authorizationCodeMap.put("SNSType", SNSType);
+        authorizationCodeMap.put("cancel", "false");
+        return authorizationCodeMap;
+    }
+
     // 유저가 외부 서비스의 로그인을 하면 액세스 토큰을 발급해줌.
-    @Override
-    public ResponseEntity<Map<String, String>> getAccessToken(String code, String SNSType) {
+    private ResponseEntity<Map<String, String>> getAccessToken(Map<String, String> authorizationCodeMap) {
         RestTemplate restTemplate = new RestTemplate();
         String grantType = "authorization_code";
         String state = null;
@@ -149,36 +185,40 @@ public class SignupServiceImpl implements SignupService {
         String clientSecret = null;
         HttpMethod httpMethod = null;
         HttpHeaders headers = new HttpHeaders();
-        switch (SNSType) {
-            case "payco" -> {
-                RandomStateToken randomStateToken = new RandomStateToken("payco");
-                state = randomStateToken.getRandomStateToken();
-                tokenUri = "https://id.payco.com/oauth2.0/token";
-                httpMethod = HttpMethod.GET;
-                clientId = paycoClientId;
-                clientSecret = paycoClientSecret;
-            }
-            case "kakao" -> {
-                headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-                RandomStateToken randomStateToken = new RandomStateToken("kakao");
-                state = randomStateToken.getRandomStateToken();
-                tokenUri = "https://kauth.kakao.com/oauth/token";
-                httpMethod = HttpMethod.POST;
-                clientId = kakaoClientId;
-                clientSecret = kakaoClientSecret;
-            }
-            case "naver" -> {
-                RandomStateToken randomStateToken = new RandomStateToken("naver");
-                state = randomStateToken.getRandomStateToken();
-                tokenUri = "https://nid.naver.com/oauth2.0/token";
-                httpMethod = HttpMethod.POST;
-                clientId = naverClientId;
-                clientSecret = naverClientSecret;
-            }
-            default -> throw new RuntimeException("토큰 요청 정보가 올바르지 않습니다.");
-        }
+
+        String code = authorizationCodeMap.get("code");
+        String SNSType = authorizationCodeMap.get("SNSType");
 
         try {
+            switch (SNSType) {
+                case "payco" -> {
+                    RandomStateToken randomStateToken = new RandomStateToken("payco");
+                    state = randomStateToken.getRandomStateToken();
+                    tokenUri = "https://id.payco.com/oauth2.0/token";
+                    httpMethod = HttpMethod.GET;
+                    clientId = paycoClientId;
+                    clientSecret = paycoClientSecret;
+                }
+                case "kakao" -> {
+                    headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+                    RandomStateToken randomStateToken = new RandomStateToken("kakao");
+                    state = randomStateToken.getRandomStateToken();
+                    tokenUri = "https://kauth.kakao.com/oauth/token";
+                    httpMethod = HttpMethod.POST;
+                    clientId = kakaoClientId;
+                    clientSecret = kakaoClientSecret;
+                }
+                case "naver" -> {
+                    RandomStateToken randomStateToken = new RandomStateToken("naver");
+                    state = randomStateToken.getRandomStateToken();
+                    tokenUri = "https://nid.naver.com/oauth2.0/token";
+                    httpMethod = HttpMethod.POST;
+                    clientId = naverClientId;
+                    clientSecret = naverClientSecret;
+                }
+                default -> throw new RuntimeException("토큰 요청 정보가 올바르지 않습니다.");
+            }
+
             assert tokenUri != null;
             assert clientId != null;
             assert clientSecret != null;
@@ -235,8 +275,7 @@ public class SignupServiceImpl implements SignupService {
 
     // 액세스 토큰 던져서 유저정보 가져오기.
     // 그러면서 동시에 유저와의 연결을 끊어버려야 함.
-    @Override
-    public ResponseEntity<Map<String, Object>> getUserInfo(String accessToken, String SNSType) {
+    private ResponseEntity<Map<String, Object>> getUserInfo(String accessToken, String SNSType) {
 
         RestTemplate restTemplate = new RestTemplate();
         String userInfoUri = null;
@@ -288,9 +327,56 @@ public class SignupServiceImpl implements SignupService {
         }
     }
 
+    // 콜백 이후부터 유저 정보 가져오기 까지의 모든 동작들.
+    @Override
+    public Map<String, Object> processSNSCert(Map<String, String> params) {
+
+        Map<String, Object> responseBody = new HashMap<>();
+        Map<String, String> accessTokenResponseBody;
+        
+        // 디코딩 작업.
+        Map<String, String> authorizationCodeMap = this.getAuthorizationCodeAndSNSType(params);
+        if (authorizationCodeMap.get("cancel").equals("true")) {
+            responseBody.put("cancel", "redirect:/login/form");
+            return responseBody;
+        }
+        String SNSType = authorizationCodeMap.get("SNSType");
+        
+        try {
+            // 인증 코드로 토큰 받기
+            ResponseEntity<Map<String, String>> accessTokenResponse = this.getAccessToken(authorizationCodeMap);
+            accessTokenResponseBody = accessTokenResponse.getBody();
+            assert accessTokenResponseBody != null;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            responseBody.put("error", "redirect:/login/form");
+            return responseBody;
+        }
+
+        String accessToken = accessTokenResponseBody.get("access_token");
+        log.info("토큰 받기 성공={}", accessToken);
+        
+        try {
+            // 토큰으로 사용자 정보 조회.
+            ResponseEntity<Map<String, Object>> result = this.getUserInfo(accessToken, SNSType);
+            log.info("result={}", result);
+            responseBody = result.getBody();
+            assert responseBody != null;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            responseBody.put("error", "redirect:/login/form");
+            return responseBody;
+        }
+        responseBody.put("accessToken", accessToken);
+        responseBody.put("SNSType", SNSType);
+        responseBody.put("cancel", null);
+        responseBody.put("error", null);
+        return responseBody;
+    }
+
     // 회원 연동정보 해제.
     @Override
-    public ResponseEntity<Map<String, Object>> unlinkUserCert(CertInfo certInfo) {
+    public void unlinkUserCert(CertInfo certInfo) {
 
         RestTemplate restTemplate = new RestTemplate();
         String providerType = certInfo.getServiceProvider();
@@ -351,13 +437,11 @@ public class SignupServiceImpl implements SignupService {
             assert response != null;
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("회원 연동정보 해제 성공...");
-                return response;
             } else {
                 throw new RestClientException("연동정보 해제 실패...");
             }
         } catch (RestClientException e) {
             log.error("회원 연동정보 해제 실패: {}", response.getStatusCode());
-            return null;
         }
     }
     
@@ -365,14 +449,58 @@ public class SignupServiceImpl implements SignupService {
     // ---------------------------------------------------------------------------
     // 아이디 존재 여부 확인.
     @Override
-    public boolean isExistingCustomer(String userName) {
+    public SecurityResponse isExistingRolesUserName(String userName) {
         Roles roles = rolesRepository.findByUserName(userName);
-        return roles != null;
+        SecurityResponse securityResponse = new SecurityResponse();
+        securityResponse.setRole("guest");
+        if (roles == null) {
+            securityResponse.setCode(204);
+            securityResponse.setStatus("success");
+            securityResponse.setMessage("가입 가능한 ID.");
+        } else {
+            securityResponse.setCode(200);
+            securityResponse.setStatus("success");
+            securityResponse.setMessage("이미 존재하는 ID.");
+        }
+        return securityResponse;
+    }
+
+    // 중복 유저 존재 여부 확인.
+    @Override
+    public boolean isExistingCustomer(String email, String customerPhone) {
+        System.out.println(customerPhone);
+        System.out.println(email);
+        List<User> userList = userRepository.findByCustomerPhoneOrEmail(customerPhone, email);
+        log.info("userList={}", userList);
+        return !userList.isEmpty();
     }
 
     // 일반 회원 가입.
     @Override
-    public void signupCustomer(Map<String, String> userData) {
+    public SecurityResponse signupCustomer(Map<String, String> userData) {
+        SecurityResponse securityResponse = new SecurityResponse();
+        try {
+            // 유저 상세 데이터 기록.
+            Roles roles = this.recordRoles(userData);
+            this.recordUser(userData, roles);
+            System.out.println("유저 회원가입 성공: " + roles);
+            // DB 기록 종료.
+
+            securityResponse.setCode(200);
+            securityResponse.setStatus("success");
+            securityResponse.setRole("guest");
+            securityResponse.setMessage("회원가입 성공.");
+        } catch (Exception e) {
+            securityResponse.setCode(500);
+            securityResponse.setStatus("failure");
+            securityResponse.setRole("guest");
+            securityResponse.setMessage("회원가입 실패,"+e.getMessage());
+            log.error("회원가입에 실패했습니다. 원인={}", e.getMessage());
+        }
+        return securityResponse;
+    }
+
+    private Roles recordRoles(Map<String, String> userData) {
         // 유저 권한 테이블 기록.
         log.info("userData={}", userData);
         Roles roles = new Roles();
@@ -389,7 +517,10 @@ public class SignupServiceImpl implements SignupService {
         roles.setUserStatus("1");
 
         rolesRepository.save(roles);
-        // 유저 상세 데이터 기록.
+        return roles;
+    };
+
+    private void recordUser(Map<String, String> userData, Roles roles) {
         User user = new User();
 
         int userId = roles.getUserId();
@@ -408,7 +539,5 @@ public class SignupServiceImpl implements SignupService {
         user.setBirthday(birthday);
 
         userRepository.save(user);
-        // DB 기록 종료.
-        System.out.println("유저 회원가입 성공: "+roles);
     }
 }
