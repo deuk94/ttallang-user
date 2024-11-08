@@ -10,7 +10,7 @@ import com.ttallang.user.commonModel.Rental;
 import com.ttallang.user.commomRepository.BicycleRepository;
 import com.ttallang.user.commomRepository.BranchRepository;
 import com.ttallang.user.commomRepository.FaultReportRepository;
-import com.ttallang.user.rental.model.JoinRental;
+import com.ttallang.user.rental.model.UseRental;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +55,7 @@ public class BranchService {
     }
 
     public String rentBicycle(int bicycleId, int customerId, String rentalBranch) {
+        System.out.println("대여할 자전거 ID: " + bicycleId);
         List<Payment> unpaidPayments = paymentRepository.findByCustomerIdAndPaymentStatus(customerId, "0");
         if (!unpaidPayments.isEmpty()) {
             return "결제 되지 않은 자전거가 있습니다. 결제 페이지로 돌아갑니다.";
@@ -123,21 +124,8 @@ public class BranchService {
         paymentRepository.save(payment);
     }
 
-    public List<JoinRental> getCurrentRentalsByCustomerId(int customerId) {
-        List<Rental> rentals = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId);
-        List<JoinRental> joinRentals = new ArrayList<>();
-
-        for (Rental rental : rentals) {
-            Optional<Bicycle> bicycle = bicycleRepository.findById(rental.getBicycleId());
-            if (bicycle.isPresent()) {
-                JoinRental joinRental = new JoinRental();
-                joinRental.setBicycleName(bicycle.get().getBicycleName());
-                joinRental.setRentalBranch(rental.getRentalBranch());
-                joinRental.setRentalStartDate(rental.getRentalStartDate());
-                joinRentals.add(joinRental);
-            }
-        }
-        return joinRentals;
+    public UseRental getCurrentRentalsByCustomerId(int customerId) {
+        return rentalRepository.findCustomerIdAndRentalStatus(customerId);
     }
 
     public Optional<Bicycle> getCurrentRentalByCustomerId(int customerId) {

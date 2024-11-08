@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JoinRental {
+public class UseRental {
 
     private int bicycleId; // 자전거 ID 추가
     private String bicycleName; // 자전거 이름
