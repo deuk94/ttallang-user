@@ -40,7 +40,6 @@ public class UserService {
     // 회원 탈퇴
     public Roles deleteUser(int userId) {
         Roles roles = getByRoleId(userId);
-        System.out.println(roles);
         roles.setUserStatus("0");
         return rolesRepository.save(roles);
     }
