@@ -89,7 +89,7 @@
         <button class="close-btn" onclick="closePopup('returnPopup')">X</button>
         <h3>선택한 대여소로 자전거를 반납하시겠습니까?</h3>
         <p>반납 위치: <span id="returnBranchName"></span></p>
-        <p>현재 대여중인 자전거 아이디: <span id="bicycleid"></span></p>
+<%--        <p>현재 대여중인 자전거 아이디: <span id="bicycleid"></span></p>--%>
         <p>현재 대여중인 자전거: <span id="bicycleName"></span></p> <!-- 자전거 이름 표시 -->
         <p>대여 지점: <span id="rentalBranch"></span></p>
         <p>대여 시작 시간: <span id="rentalStartDate"></span></p>
@@ -140,13 +140,13 @@
             rentalBranch: rentalBranch
           },
           success: function(response) {
-            alert(response);  // 대여 성공 메시지
-            closeAllPopups(); // 팝업 닫기
+            alert(response);
+            closeAllPopups();
           },
           error: function(xhr) {
             if (xhr.status === 400) { // Bad Request
               alert(xhr.responseText);
-              window.location.href = "/pay/userPayment";  // 결제 페이지로 리다이렉트
+              window.location.href = "/pay/payment";  // 결제 페이지로 리다이렉트
             } else {
               alert("대여에 실패했습니다: " + xhr.responseText);
             }
@@ -223,9 +223,9 @@
             // 서버에서 반환된 응답을 로그로 확인
             console.log(response);
             if (response.includes("신고가 접수되었습니다")) {
-              alert(response); // "신고가 접수되었습니다." 메시지 출력
+              alert(response);
             } else {
-              alert("신고 접수에 실패했습니다."); // 오류 메시지
+              alert("신고 접수에 실패했습니다."); 
             }
             closeAllPopups(); // 모든 팝업 닫기
           },
