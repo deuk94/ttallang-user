@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
+    // 이용 내역 조회
     @Query("SELECT new com.ttallang.user.mypage.model.JoinBicycle(b.bicycleName, " +
         "r.rentalBranch, r.rentalStartDate, r.returnBranch, r.rentalEndDate) " +
         "FROM Rental r JOIN Bicycle b ON b.bicycleId = r.bicycleId " +
