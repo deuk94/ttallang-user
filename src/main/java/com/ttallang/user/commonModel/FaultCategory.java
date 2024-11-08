@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Fault_category")
+@Table(name = "fault_category")
 public class FaultCategory {
 
     @Id
