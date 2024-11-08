@@ -358,7 +358,7 @@
           success: function() {
             alert("반납이 성공적으로 완료되었습니다.");
             closeAllPopups();
-            window.location.href = "/pay/userPayment";
+            window.location.href = "/pay/payment";
           },
           error: function(xhr) {
             alert("반납에 실패했습니다: " + xhr.responseText);
