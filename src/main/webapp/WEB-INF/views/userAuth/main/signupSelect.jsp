@@ -42,7 +42,7 @@
   const naverCert = document.querySelector("#naverCert");
   kakaoCert.addEventListener("click", async () => {
     const response = await fetch("/api/oauth2/kakao");
-    window.location.href = await response.text();
+    window.location.href = await response.text(); // SNS의 로그인 창을 연다.
   });
   naverCert.addEventListener("click", async () => {
     const response = await fetch("/api/oauth2/naver");

@@ -45,7 +45,7 @@ public class PaymentRestController {
     public Payment updatePayment() {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
-        Payment payment = paymentService.getPayment(1);
+        Payment payment = paymentService.getPayment(loginId);
         int paymentId = payment.getPaymentId();
         int paymentAmount = payment.getPaymentAmount();
 
