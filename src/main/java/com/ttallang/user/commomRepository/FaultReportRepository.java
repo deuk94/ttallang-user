@@ -17,4 +17,6 @@ public interface FaultReportRepository extends JpaRepository<FaultReport, Intege
         + "WHERE r.customerId = :customerId AND r.faultStatus = '1'"
         + "ORDER BY r.reportDate DESC ")
     List<JoinFault> findByFaultId(@Param("customerId") int customerId);
+
+    boolean existsByCustomerIdAndReportStatus(int customerId, String reportStatus);
 }

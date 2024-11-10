@@ -25,16 +25,4 @@ public class LoginController {
         return "userAuth/main/loginForm";
     }
 
-    @GetMapping(value = "/map/main")
-    public String userMainPage(Model model) {
-        try {
-            PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            model.addAttribute("customerId", pds.getCustomerID());
-            model.addAttribute("username", pds.getUsername());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return "redirect:/login/form";
-        }
-        return "userAuth/map/mymap";
-    }
 }
