@@ -8,11 +8,13 @@
     background-color: #f7f7f7;
     border-bottom: 1px solid #ddd;
     position: fixed; /* 고정 위치 설정 */
-    top: 0; /* 화면 상단에 고정 */
+    top: 0;
     left: 0;
-    width: 98%; /* 화면 너비에 맞춤 */
-    z-index: 1000; /* 다른 요소들 위에 표시되도록 설정 */
+    width: 100%; /* 전체 너비로 변경 */
+    z-index: 1000;
+    box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
   }
+
 
   header img {
     height: 40px;

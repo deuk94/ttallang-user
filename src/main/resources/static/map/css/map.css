@@ -1,11 +1,23 @@
-/* 기본 레이아웃 스타일 */
+/* 공통 스타일 */
 body, html {
   margin: 0;
   padding: 0;
+  height: 100%;
   font-family: Arial, sans-serif;
+  overflow: hidden; /* 전체 스크롤 제거 */
 }
 
+#map-container {
+  position: relative;
+  top: 60px; /* 헤더 높이 */
+  bottom: 40px; /* 푸터 높이 */
+  height: calc(100vh - 100px); /* 헤더와 푸터 높이 반영 */
+}
 
+#map {
+  width: 100%;
+  height: 100%;
+}
 
 header img {
   height: 40px;
@@ -17,28 +29,12 @@ header nav a {
   color: #333;
 }
 
-/* map.css */
-#map-container {
-  height: calc(100vh - 100px); /* 전체 화면 높이에서 헤더와 푸터의 높이를 뺀 값으로 설정 */
-  display: flex;
-  flex-direction: column;
-}
-
-#map {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-}
-
-
-
-
 /* 팝업 스타일 */
 .popup {
-  position: absolute;
-  bottom: 10px;
+  position: fixed;
+  top: 50%; /* 화면의 중앙에 가깝게 위치 */
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%); /* 화면 중앙 정렬 */
   width: 90%;
   max-width: 500px;
   padding: 15px;
@@ -47,8 +43,10 @@ header nav a {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   display: none;
-  z-index: 10;
+  z-index: 1000;
   font-family: Arial, sans-serif;
+  max-height: 50vh; /* 팝업의 최대 높이를 화면의 50%로 설정 */
+  overflow-y: auto; /* 내용이 넘칠 경우 스크롤 추가 */
 }
 
 .popup h3 {
@@ -80,6 +78,7 @@ header nav a {
 #branchInfoPopup, #reportPopup {
   max-height: 250px; /* 팝업의 최대 높이 설정 */
   overflow-y: auto; /* 내용이 넘칠 경우 스크롤 추가 */
+  z-index: 1000; /* 다른 팝업 요소와 겹치지 않도록 z-index 설정 */
 }
 
 /* 자전거 목록 스타일 */
@@ -115,7 +114,7 @@ header nav a {
 
 /* 신고 팝업 스타일 */
 .report-popup {
-  position: absolute;
+  position: fixed; /* 화면 고정 위치로 설정 */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -126,8 +125,8 @@ header nav a {
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
-  display: none;
-  z-index: 20;
+  display: none; /* 팝업 기본 비표시 */
+  z-index: 2000; /* 다른 요소 위에 표시 */
   font-family: Arial, sans-serif;
 }
 
@@ -158,7 +157,7 @@ header nav a {
 
 /* 위치 신고 및 고장 신고 팝업 스타일 */
 #locationReportPopup, #brokenReportPopup {
-  position: absolute;
+  position: fixed; /* 화면 고정 위치로 설정 */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -169,8 +168,8 @@ header nav a {
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
-  display: none;
-  z-index: 30;
+  display: none; /* 기본적으로 팝업 숨김 */
+  z-index: 3000; /* 다른 요소 위에 표시 */
   font-family: Arial, sans-serif;
 }
 
