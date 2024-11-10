@@ -3,7 +3,7 @@
 <html>
 <head>
   <title>로그인</title>
-  <link href="${pageContext.request.contextPath}/css/loginForm.css" rel="stylesheet">
+  <link href="${pageContext.request.contextPath}/userAuth/css/loginForm.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
@@ -39,5 +39,5 @@
 <!-- 하단 푸터 -->
 <jsp:include page="../footer/footer.jsp" flush="true"/>
 </body>
-<script src="${pageContext.request.contextPath}/js/login.js"></script>
+<script src="${pageContext.request.contextPath}/userAuth/js/login.js"></script>
 </html>

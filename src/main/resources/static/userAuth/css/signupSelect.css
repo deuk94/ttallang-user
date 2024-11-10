@@ -10,10 +10,19 @@
     font-weight: bold;
 }
 
-.btn-normal,
-.btn-normal > a:link,
-.btn-normal > a:visited,
-.btn-normal > a:hover {
+/* 로고 스타일 */
+.logo {
+    margin-top: 5rem;
+    height: 80px;
+    width: auto;
+    transition: transform 0.2s;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.btn-normal {
     background-color: #28a745;
     height: 45px;
     width: 180px;
@@ -29,38 +38,43 @@
     word-break: keep-all;
 }
 
-a {
-    color: black;
-    text-decoration: none;
-}
-
-a:link {
-    color: black;
-    text-decoration: none;
-}
-
-a:hover {
-    color: black;
-    text-decoration: none;
-}
-
 #kakaoCert {
+    margin-left: 2rem;
+    margin-right: 1rem;
     cursor: pointer;
 }
 
 #naverCert {
+    margin-left: 1rem;
+    margin-right: 2rem;
     cursor: pointer;
 }
 
 .btn-kakao {
     height: 45px;
     width: 180px;
-    margin: 0 2rem;
 }
 
 .btn-naver {
     height: 45px;
     width: 180px;
+}
+
+.btn-payco {
+    cursor: pointer;
+    background-color: #ff2233;
+    height: 45px;
+    width: 180px;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    text-wrap: pretty;
+    word-break: keep-all;
 }
 
 /* 안내 텍스트 */

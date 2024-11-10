@@ -1,14 +1,11 @@
 package com.ttallang.user.security.controller;
 
-import com.ttallang.user.security.model.CertInfo;
 import com.ttallang.user.security.response.SecurityResponse;
 import com.ttallang.user.security.service.SignupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Base64;
 import java.util.Map;
 
 @Slf4j

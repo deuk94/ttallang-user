@@ -16,14 +16,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 @Slf4j
@@ -31,6 +33,7 @@ import java.util.Map;
 public class SignupServiceImpl implements SignupService {
 
     // 의존성 주입.
+    private final Map<String, CertInfo> sharedCertInfoMap;
     private final BCryptPasswordEncoder bCryptPasswordEncoder; // 암호화해주는놈.
     private final RolesRepository rolesRepository;
     private final UserRepository userRepository;
@@ -38,8 +41,10 @@ public class SignupServiceImpl implements SignupService {
     public SignupServiceImpl(
             BCryptPasswordEncoder bCryptPasswordEncoder,
             RolesRepository rolesRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            Map<String, CertInfo> sharedCertInfoMap
     ) {
+        this.sharedCertInfoMap = sharedCertInfoMap;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.rolesRepository = rolesRepository;
         this.userRepository = userRepository;
@@ -248,13 +253,13 @@ public class SignupServiceImpl implements SignupService {
                     String accessToken = response.getBody().get("access_token");
                     if (SNSType.equals("payco")) {
                         CertInfo certInfo = new CertInfo(accessToken, clientId, clientSecret, "PACYO");
-                        CertInfo.sharedCertInfoMap.put(accessToken, certInfo);
+                        sharedCertInfoMap.put(accessToken, certInfo);
                     } else if (SNSType.equals("kakao")) {
                         CertInfo certInfo = new CertInfo(accessToken, "KAKAO");
-                        CertInfo.sharedCertInfoMap.put(accessToken, certInfo);
+                        sharedCertInfoMap.put(accessToken, certInfo);
                     } else {
                         CertInfo certInfo = new CertInfo("delete", accessToken, clientId, clientSecret, "NAVER");
-                        CertInfo.sharedCertInfoMap.put(accessToken, certInfo);
+                        sharedCertInfoMap.put(accessToken, certInfo);
                     }
 
                 } catch (RestClientException e) {
@@ -375,8 +380,7 @@ public class SignupServiceImpl implements SignupService {
     }
 
     // 회원 연동정보 해제.
-    @Override
-    public void unlinkUserCert(CertInfo certInfo) {
+    private void unlinkUserCert(CertInfo certInfo) {
 
         RestTemplate restTemplate = new RestTemplate();
         String providerType = certInfo.getServiceProvider();
@@ -444,6 +448,71 @@ public class SignupServiceImpl implements SignupService {
             log.error("회원 연동정보 해제 실패: {}", response.getStatusCode());
         }
     }
+
+    public String fillOutSignupForm(Map<String, Object> responseBody, String SNSType, CertInfo certInfo, Model model) {
+        switch (SNSType) {
+            case "payco" -> {
+                // 페이코는 연동 해제 주소가 따로 없음.
+                // signupService.unlinkUserCert(certInfo);
+                Map<String, Map<String, String>> data = (Map<String, Map<String, String>>) responseBody.get("data");
+                Map<String, String> member = data.get("member");
+                // 유저 중복 검사.
+                String customerPhone = member.get("mobile");
+                String email = member.get("email");
+                if (this.isExistingCustomer(email, customerPhone)) { // 중복 유저가 존재하는 경우.
+                    String encodedMessage = URLEncoder.encode("이미 해당 정보로 가입한 유저가 있습니다.", StandardCharsets.UTF_8);
+                    return "redirect:/login/form?error="+encodedMessage;
+                };
+                model.addAttribute("customerName", member.get("name"));
+                model.addAttribute("customerPhone", customerPhone);
+                model.addAttribute("email", email);
+                model.addAttribute("birthday", member.get("birthday"));
+            }
+            case "kakao" -> {
+                certInfo.setTargetIdType("user_id");
+                Long userId = (Long) responseBody.get("id");
+                certInfo.setTargetId(userId);
+                this.unlinkUserCert(certInfo);
+                Map<String, String> kakaoAccount = (Map<String, String>) responseBody.get("kakao_account");
+                // 유저 중복 검사.
+                String phoneNumber = kakaoAccount.get("phone_number");
+                String replacedPhoneNumber1 = phoneNumber.replace("+82 ", "0");
+                String replacedPhoneNumber2 = replacedPhoneNumber1.replace("-", "");
+                String email = kakaoAccount.get("email");
+                if (this.isExistingCustomer(email, replacedPhoneNumber2)) { // 중복 유저가 존재하는 경우.
+                    String encodedMessage = URLEncoder.encode("이미 해당 정보로 가입한 유저가 있습니다.", StandardCharsets.UTF_8);
+                    return "redirect:/login/form?error="+encodedMessage;
+                };
+                model.addAttribute("customerName", kakaoAccount.get("name"));
+                model.addAttribute("customerPhone", replacedPhoneNumber2);
+                model.addAttribute("email", email);
+                model.addAttribute("birthday", kakaoAccount.get("birthyear") + kakaoAccount.get("birthday"));
+            }
+            case "naver" -> {
+                this.unlinkUserCert(certInfo);
+                Map<String, String> response = (Map<String, String>) responseBody.get("response");
+                // 유저 중복 검사.
+                String mobile = response.get("mobile");
+                String replacedMobile = mobile.replace("-", "");
+                String email = response.get("email");
+                if (this.isExistingCustomer(email, replacedMobile)) { // 중복 유저가 존재하는 경우.
+                    String encodedMessage = URLEncoder.encode("이미 해당 정보로 가입한 유저가 있습니다.", StandardCharsets.UTF_8);
+                    return "redirect:/login/form?error="+encodedMessage;
+                };
+                model.addAttribute("customerName", response.get("name"));
+                model.addAttribute("customerPhone", replacedMobile);
+                model.addAttribute("email", email);
+                String birthday = response.get("birthday");
+                String replacedBirthday = birthday.replace("-", "");
+                model.addAttribute("birthday", response.get("birthyear") + replacedBirthday);
+            }
+            default -> {
+                String encodedMessage = URLEncoder.encode("SNS 타입이 지정되지 않았습니다.", StandardCharsets.UTF_8);
+                return "redirect:/login/form?error="+encodedMessage;
+            }
+        }
+        return "userAuth/main/signupForm";
+    }
     
     // 일반 회원가입 관련.
     // ---------------------------------------------------------------------------
@@ -466,8 +535,7 @@ public class SignupServiceImpl implements SignupService {
     }
 
     // 중복 유저 존재 여부 확인.
-    @Override
-    public boolean isExistingCustomer(String email, String customerPhone) {
+    private boolean isExistingCustomer(String email, String customerPhone) {
         System.out.println(customerPhone);
         System.out.println(email);
         List<User> userList = userRepository.findByCustomerPhoneOrEmail(customerPhone, email);
@@ -479,21 +547,27 @@ public class SignupServiceImpl implements SignupService {
     @Override
     public SecurityResponse signupCustomer(Map<String, String> userData) {
         SecurityResponse securityResponse = new SecurityResponse();
+        String email = userData.get("email");
+        String customerPhone = userData.get("customerPhone");
+        securityResponse.setRole("guest");
+        if (this.isExistingCustomer(email, customerPhone)) { // 중복 유저가 존재하는 경우.
+            securityResponse.setCode(401);
+            securityResponse.setStatus("failure");
+            securityResponse.setMessage("이미 해당 정보로 가입한 유저가 있습니다.");
+            return securityResponse;
+        };
         try {
             // 유저 상세 데이터 기록.
             Roles roles = this.recordRoles(userData);
             this.recordUser(userData, roles);
             System.out.println("유저 회원가입 성공: " + roles);
             // DB 기록 종료.
-
             securityResponse.setCode(200);
             securityResponse.setStatus("success");
-            securityResponse.setRole("guest");
             securityResponse.setMessage("회원가입 성공.");
         } catch (Exception e) {
             securityResponse.setCode(500);
             securityResponse.setStatus("failure");
-            securityResponse.setRole("guest");
             securityResponse.setMessage("회원가입 실패,"+e.getMessage());
             log.error("회원가입에 실패했습니다. 원인={}", e.getMessage());
         }

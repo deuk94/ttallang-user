@@ -2,6 +2,7 @@ package com.ttallang.user.security.config;
 
 
 import com.ttallang.user.security.config.handler.LoginHandler;
+import com.ttallang.user.security.model.CertInfo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -15,10 +16,15 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
+
+    private final LoginHandler loginHandler = new LoginHandler();
 
     @Bean
     public BCryptPasswordEncoder encodePwd() {
@@ -37,8 +43,8 @@ public class SecurityConfig {
         ).formLogin(form -> form
             .loginPage("/login/form") // 로그인 페이지.
             .loginProcessingUrl("/api/login") // 로그인 처리할 url.
-            .successHandler((request, response, authentication) -> new LoginHandler().onAuthenticationSuccess(request, response, authentication))
-            .failureHandler((request, response, authentication) -> new LoginHandler().onAuthenticationFailure(request, response, authentication))
+            .successHandler(loginHandler)
+            .failureHandler(loginHandler)
             .permitAll()
         ).securityContext(securityContext -> securityContext
             .requireExplicitSave(false) // 필요한 경우에만 SecurityContext를 세션에 저장.
@@ -68,5 +74,17 @@ public class SecurityConfig {
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
+    }
+
+    // 유저 인증 정보를 임시로 저장하는 곳.
+    @Bean
+    public Map<String, CertInfo> sharedCertInfoMap() {
+        return new ConcurrentHashMap<>();
+    }
+
+    // SMS 인증 정보를 임시로 저장하는 곳.
+    @Bean
+    public Map<String, String> sharedAuthNumberMap() {
+        return new ConcurrentHashMap<>();
     }
 }

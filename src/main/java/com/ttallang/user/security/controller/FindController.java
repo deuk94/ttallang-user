@@ -28,20 +28,8 @@ public class FindController {
         return "userAuth/main/inputCustomerPhone";
     }
 
-    @GetMapping("/find/userName/result")
-    public String findUserNameByCustomerPhone(String customerPhone) {
-        try {
-            if (findService.findUserNameByCustomerPhone(customerPhone)) {
-                findService.sendSms(customerPhone);
-            } else {
-                String encodedMessage = URLEncoder.encode("일치하는 유저 정보가 없습니다.", StandardCharsets.UTF_8);
-                return "redirect:/login/form?error="+encodedMessage;
-            }
-        } catch (Exception e) {
-            log.error("error={}", e.getMessage());
-            String encodedMessage = URLEncoder.encode("인증 도중 에러가 발생하였습니다.", StandardCharsets.UTF_8);
-            return "redirect:/login/form?error="+encodedMessage;
-        }
-        return "redirect:/login/form";
+    @GetMapping("/find/username/result")
+    public String result() {
+        return "userAuth/main/inputCustomerPhone";
     }
 }

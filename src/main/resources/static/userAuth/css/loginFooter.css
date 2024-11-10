@@ -1,14 +1,13 @@
 footer {
+    padding: 5px;
+    background-color: #f7f7f7;
+    text-align: center;
+    border-top: 1px solid #ddd;
     position: fixed;
     bottom: 0;
-    background-color: #f8f9fa;
-    color: #6c757d;
-    width: 100vw;
-}
-
-footer p {
-    margin: 0;
-    font-size: 14px;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
 .social-icons {

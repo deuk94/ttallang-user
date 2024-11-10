@@ -2,25 +2,21 @@
 <html>
 <head>
 	<title></title>
-	<link href="${pageContext.request.contextPath}/css/header.css" rel="stylesheet">
-	<link href="${pageContext.request.contextPath}/css/base.css" rel="stylesheet">
+	<link href="${pageContext.request.contextPath}/userAuth/css/loginHeader.css" rel="stylesheet">
+	<link href="${pageContext.request.contextPath}/userAuth/css/base.css" rel="stylesheet">
 </head>
 <body>
 <header>
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		<div class="container">
-			<a class="navbar-brand" href="/map/main">
-				<img src="${pageContext.request.contextPath}/images/자전거.png" alt="따릉이 KOSA BIKE">
-				<p class="logo-p">딸랑이 KOSA BIKE</p>
-			</a>
-			<div class="navbar-nav ms-auto">
-				<a class="nav-link" href="#">대여소 안내</a>
-				<a class="nav-link" href="#">이용권 구매</a>
-				<a class="nav-link" href="#">문의/FAQ</a>
-				<a class="nav-link" href="#">공지사항</a>
-				<a class="nav-link" href="#">안전수칙</a>
-			</div>
-		</div>
+	<a class="d-flex flex-row" href="/map/main">
+		<img src="/images/자전거.png" alt="따릉이 로고" />
+		<span class="brand-name">딸랑이</span>
+	</a>
+	<nav>
+		<a href="/myPage/information">이용 안내</a>
+		<a href="/myPage/charge">이용 요금</a>
+		<a href="/myPage/responsibility">책임 사항</a>
+		<a href="/myPage/insurance">보험 안내</a>
+		<a href="/myPage/safety">안전수칙</a>
 	</nav>
 </header>
 </body>

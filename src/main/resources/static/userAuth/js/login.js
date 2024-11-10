@@ -1,0 +1,98 @@
+const loginForm = document.querySelector("#loginForm");
+const userName = document.querySelector("#username");
+const userPassword = document.querySelector("#password");
+const errorMessage = document.querySelector("#errorMessage");
+
+loginForm.addEventListener("submit", handleLoginForm);
+
+function handleLoginForm(event) {
+    event.preventDefault();
+
+    if (checkValidation()) {
+        errorMessage.classList.add("d-none");
+
+        // Spring Security 는 application/x-www-form-urlencoded 타입의 값을 기대하고 있기 때문에 JSON 대신 아래 타입으로 보내야 함.
+        const formData = new URLSearchParams();
+        formData.append("username", userName.value);
+        formData.append("password", userPassword.value);
+
+        // 비동기 처리.
+        fetch("/api/login", {
+            method: "POST",
+            headers: {
+                // application/json 으로 보내면 안됨.
+                // 시큐리티에서 설정된 경로로 걸러지는 요청에 대해서 json 타입으로 하면 서버 측에서 못알아먹는다고 한다.
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData
+        }).then(async response => {
+            if (!response.ok) {
+                const error = new Error();
+                error.data = await response.json();
+                throw error;
+            }
+            return response.json();
+        })
+            .then(data => { // 이 data는 response.json()의 실제값.
+                if (data.role === "admin") {
+                    window.location.href = "/admin/branch/main"; // 어드민과 통신하는 부분.
+                } else if (data.role === "user") {
+                    // window.location.href = "/user/main";
+                    if (data.code === 402) {
+                        alert("결제를 먼저 진행해주세요!!!");
+                        window.location.href = "../../payment";
+                    } else {
+                        window.location.href = "/map/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
+                    }
+                } else {
+                    alert(data.message);
+                    throw new Error("로그인 실패 (권한 정보를 확인할 수 없습니다.)");
+                }
+            })
+            .catch(error => {
+                errorMessage.textContent = error.data.message;
+                errorMessage.classList.remove("d-none");
+            });
+    }
+}
+
+function checkValidation() {
+    // 아이디 유효성 검사 (영문/숫자 조합 6자 이상).
+    let isValidateId = false;
+    let isValidatePw = false;
+    const userNameRegex = /^[A-Za-z0-9]{6,}$/;
+    if (!userNameRegex.test(userName.value)) {
+        userName.classList.add("is-invalid");
+        isValidateId = false;
+    } else {
+        userName.classList.remove("is-invalid");
+        isValidateId = true;
+    }
+
+    // 비밀번호 유효성 검사 (영문 대소문자, 숫자, 특수문자 포함 8자 이상).
+    const userPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!userPasswordRegex.test(userPassword.value)) {
+        userPassword.classList.add("is-invalid");
+        isValidatePw = false;
+    } else {
+        userPassword.classList.remove("is-invalid");
+        isValidatePw = true;
+    }
+    return isValidateId && isValidatePw;
+}
+
+// URL에 "error" 파라미터가 존재하는지 확인하여 alert 표시.
+// 이것은 외부로부터 에러가 발생했을 때 로그인창으로 오면서 에러메세지를 전달하기 위함임.
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+const alertMessage = getQueryParam("error");
+const cancelMessage = getQueryParam("cancel");
+if (alertMessage) {
+    alert(alertMessage);
+}
+if (cancelMessage) {
+    alert(cancelMessage);
+}

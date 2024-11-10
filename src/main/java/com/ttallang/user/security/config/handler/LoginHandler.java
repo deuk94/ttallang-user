@@ -24,7 +24,6 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
         if (role.equals("ROLE_ADMIN")) {
             response.setContentType("application/json;charset=UTF-8");
             SecurityResponse securityResponse = new SecurityResponse(200, "success","admin", "관리자 로그인 성공.");
-
             new ObjectMapper().writeValue(response.getWriter(), securityResponse);
         } else if (role.equals("ROLE_USER")) {
             PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -34,7 +33,7 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
                 new ObjectMapper().writeValue(response.getWriter(), securityResponse);
             } else {
                 response.setContentType("application/json;charset=UTF-8");
-                SecurityResponse securityResponse = new SecurityResponse(400, "failure", "user", "미결제 상태.");
+                SecurityResponse securityResponse = new SecurityResponse(402, "failure", "user", "미결제 상태.");
                 new ObjectMapper().writeValue(response.getWriter(), securityResponse);
             }
         } else { // 로그인이 되었지만 권한을 찾을 수 없으므로 401 처리.
@@ -59,11 +58,17 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
         securityResponse.setCode(401);
         securityResponse.setStatus("failure");
         securityResponse.setRole("guest");
-        if (exception.getMessage().contains("Bad credentials")) {
+        if (exception.getMessage().contains("자격 증명에 실패하였습니다.")) {
+            System.out.println(exception.getMessage());
             securityResponse.setMessage("비밀번호를 확인해주세요.");
-        } else if (exception.getMessage().contains("User account is disabled")) {
-            securityResponse.setMessage("비활성화된 회원입니다.");
+        } else if (exception.getMessage().contains("사용자 계정의 유효 기간이 만료 되었습니다.")) {
+            System.out.println(exception.getMessage());
+            securityResponse.setMessage("탈퇴된 회원입니다.");
+        } else if (exception.getMessage().contains("유효하지 않은 사용자입니다.")) {
+            System.out.println(exception.getMessage());
+            securityResponse.setMessage("존재하지 않는 회원입니다.");
         } else {
+            System.out.println(exception.getMessage());
             securityResponse.setMessage("로그인에 실패하였습니다.");
         }
 

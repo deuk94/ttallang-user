@@ -71,7 +71,6 @@ function handleSignupForm(event) {
     // 폼 유효성 확인
     if (validateForm()) {
         const formData = new FormData(form);
-        console.log(formData);
         const data = Object.fromEntries(formData);
 
         fetch("/api/signup", {
@@ -79,7 +78,7 @@ function handleSignupForm(event) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         })
         .then(response => {
             if (response.ok) {
@@ -91,13 +90,13 @@ function handleSignupForm(event) {
         .then(data => {
             if (data.status === "success") {
                 alert("회원가입 성공.");
-                window.location.href = "/login/form";
             } else {
-                console.log(data.message);
+                alert(data.message);
             }
+            window.location.href = "/login/form";
         })
         .catch(error => {
-            console.error('Error:', error);
+            alert(error);
         });
     }
 }
