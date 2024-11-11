@@ -48,14 +48,6 @@ public class PaymentRestController {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
-//        Payment payment = paymentService.getPayment(loginId);
-//        int paymentId = payment.getPaymentId();
-//        int paymentAmount = payment.getPaymentAmount();
-//
-//        // 결제 금액 검증
-//        if (!paymentService.validatePaymentAmount(paymentId, paymentAmount)) {
-//            throw new RuntimeException("결제 금액이 일치하지 않습니다."); // 예외 처리
-//        }
         return paymentService.updatePayment(loginId);
     }
 

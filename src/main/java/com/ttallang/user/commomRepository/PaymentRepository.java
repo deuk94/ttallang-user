@@ -4,7 +4,6 @@ import com.ttallang.user.commonModel.Payment;
 import com.ttallang.user.payment.model.JoinPayment;
 import com.ttallang.user.payment.model.JoinPortOne;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
