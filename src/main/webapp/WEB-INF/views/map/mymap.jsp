@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<%@ include file="/WEB-INF/views/map/head/head.jsp" %>
+<%@ include file="/WEB-INF/views/myPage/head/head.jsp" %>
 
 <!-- 지도 영역 -->
 <div id="map-container">
@@ -79,7 +79,7 @@
     </div>
 </div>
 
-<%@ include file="/WEB-INF/views/map/footer/footer.jsp" %>
+<%@ include file="/WEB-INF/views/myPage/footer/footer.jsp" %>
 
 <!-- 외부 및 map.js 파일 포함 -->
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b4a025b0f93d9847f6948dcc823656aa"></script>

@@ -182,11 +182,16 @@ function submitReport() {
       closePopup('dynamicReportPopup');
     },
     error: function(xhr) {
-      alert("신고 처리에 실패했습니다: " + xhr.responseText);
+      alert("결제되지 않은 자전거가 있습니다. 결제 후 신고가 가능합니다.");
+      // 확인 버튼을 누른 후 결제 페이지로 이동
+      setTimeout(() => {
+        window.location.href = "/pay/payment";
+      }, 0); // 즉시 이동
       closePopup('dynamicReportPopup');
     }
   });
 }
+
 
 // 신고 및 반납 제출 함수
 function submitReportAndReturn() {
@@ -404,18 +409,23 @@ function loadBranches() {
 
 // 마커와 정보창 표시 함수
 function displayMarker(locPosition, message) {
-  var marker = new kakao.maps.Marker({
-    map: map,
-    position: locPosition
-  });
+  if (message !== '<div style="padding:5px;">현재 위치입니다.</div>') {
+    var marker = new kakao.maps.Marker({
+      map: map,
+      position: locPosition
+    });
 
-  var infowindow = new kakao.maps.InfoWindow({
-    content: message,
-    removable: true
-  });
+    var infowindow = new kakao.maps.InfoWindow({
+      content: message,
+      removable: true
+    });
 
-  infowindow.open(map, marker);
-  map.setCenter(locPosition);
+    infowindow.open(map, marker);
+    map.setCenter(locPosition);
+  } else {
+    // 사용자 위치만 센터로 설정
+    map.setCenter(locPosition);
+  }
 }
 
 // 페이지 로드 시 대여소 로드
