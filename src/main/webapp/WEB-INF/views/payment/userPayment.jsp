@@ -46,6 +46,6 @@
     <button class="button cancel" onclick="alert('결제를 진행하세요.\n결제가 완료 되어야 홈페이지로 이동할 수 있습니다');">취소</button>
     <button class="button" id="paymentButton">결제</button>
 </div>
-<jsp:include page="../myPage/footer/footer.jsp" />
+<jsp:include page="../footer/footer.jsp" />
 </body>
 </html>
