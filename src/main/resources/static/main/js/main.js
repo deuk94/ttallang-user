@@ -176,7 +176,6 @@ function openReportAndReturnPopup() {
   document.getElementById("reportAndReturnPopup").style.display = 'block';
 }
 
-// 신고 제출 함수
 function submitReport() {
   const categoryId = document.getElementById("reportCategorySelect1").value;
   const reportDetails = document.getElementById("reportDetails1").value;
@@ -192,6 +191,9 @@ function submitReport() {
       } else {
         alert(response.msg);
         closePopup('dynamicReportPopup');
+        if (response.redirectToPayment) {
+          window.location.href = "/pay/payment";
+        }
       }
     },
     error: function(xhr) {
@@ -200,7 +202,6 @@ function submitReport() {
     }
   });
 }
-
 
 
 
@@ -224,9 +225,11 @@ function submitReportAndReturn() {
     },
     success: function(response) {
       alert(response.msg);
+      console.log("Server response:", response); // 서버 응답 전체 확인
       if (response.code === 200) {
         closePopup('reportAndReturnPopup');
         if (response.redirectToPayment) {
+          console.log("Redirecting to payment page..."); // 리디렉션 로그 확인
           window.location.href = "/pay/payment";
         }
       }
@@ -237,6 +240,7 @@ function submitReportAndReturn() {
     }
   });
 }
+
 
 
 
