@@ -34,15 +34,12 @@ function handleLoginForm(event) {
             return response.json();
         })
             .then(data => { // 이 data는 response.json()의 실제값.
-                if (data.role === "admin") {
-                    window.location.href = "/admin/branch/main"; // 어드민과 통신하는 부분.
-                } else if (data.role === "user") {
-                    // window.location.href = "/user/main";
+                if (data.role === "user") {
                     if (data.code === 402) {
                         alert("결제를 먼저 진행해주세요!!!");
                         window.location.href = "../../payment";
                     } else {
-                        window.location.href = "/map/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
+                        window.location.href = "/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
                     }
                 } else {
                     alert(data.message);
