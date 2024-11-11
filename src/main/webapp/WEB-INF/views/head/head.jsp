@@ -4,7 +4,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 1px 20px;
     background-color: #f7f7f7;
     border-bottom: 1px solid #ddd;
     position: fixed; /* 고정 위치 설정 */
@@ -15,7 +15,8 @@
   }
 
   header img {
-    height: 40px;
+    height: 70px;
+    width: auto;
   }
 
   header nav a {
@@ -38,8 +39,7 @@
 <header>
     <div>
         <a href="/map/main">
-            <img src="/images/자전거.png" alt="따릉이 로고" />
-            <span class="brand-name">딸랑이</span>
+            <img src="/images/logo.png" alt="따릉이 로고" />
         </a>
     </div>
     <nav>

@@ -9,7 +9,7 @@
     <script src="/myPage/js/faultReport.js"></script>
 </head>
 <body>
-<jsp:include page="head/head.jsp" />
+<jsp:include page="../head/head.jsp" />
 <h1>신고 내역</h1>
 <div class="menu">
     <div><a href="/myPage/userModify">정보수정</a></div>
@@ -28,6 +28,6 @@
     </thead>
     <tbody></tbody>
 </table>
-<jsp:include page="footer/footer.jsp" />
+<jsp:include page="../footer/footer.jsp" />
 </body>
 </html>
