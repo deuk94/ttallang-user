@@ -8,8 +8,7 @@
 <body>
 <header>
 	<a class="d-flex flex-row" href="/login/form">
-		<img src="/images/자전거.png" alt="따릉이 로고" />
-		<span class="brand-name">딸랑이</span>
+		<img src="/images/logo.png" alt="따릉이 로고" />
 	</a>
 	<nav>
 		<a href="/myPage/information">이용 안내</a>
