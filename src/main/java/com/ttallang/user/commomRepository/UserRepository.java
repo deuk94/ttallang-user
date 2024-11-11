@@ -2,8 +2,8 @@ package com.ttallang.user.commomRepository;
 
 import com.ttallang.user.commonModel.User;
 import com.ttallang.user.mypage.model.JoinUser;
-import com.ttallang.user.security.model.PaymentUser;
-import com.ttallang.user.security.model.RolesUser;
+import com.ttallang.user.account.model.NotPaymentUser;
+import com.ttallang.user.account.model.RolesUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,16 +23,16 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findByUserId(int userId);
 
-    @Query("select new com.ttallang.user.security.model.PaymentUser(u.customerId, p.paymentStatus) " +
+    @Query("select new com.ttallang.user.account.model.NotPaymentUser(u.customerId, p.paymentStatus) " +
             "from User as u " +
             "join Payment as p " +
             "on u.customerId = p.customerId " +
             "where p.customerId = :customerId AND p.paymentStatus = '0' ")
-    PaymentUser findNoPaymentUser(@Param("customerId") int customerId);
+    NotPaymentUser findNotPaymentUser(@Param("customerId") int customerId);
 
     List<User> findByCustomerPhoneOrEmail(String customerPhone, String email);
 
-    @Query("select new com.ttallang.user.security.model.RolesUser(r.userName, u.customerPhone) " +
+    @Query("select new com.ttallang.user.account.model.RolesUser(r.userName, u.customerPhone) " +
             "from Roles r " +
             "join User u " +
             "on r.userId = u.userId " +

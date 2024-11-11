@@ -4,7 +4,7 @@ import com.ttallang.user.commomRepository.RolesRepository;
 import com.ttallang.user.commomRepository.UserRepository;
 import com.ttallang.user.commonModel.Roles;
 import com.ttallang.user.commonModel.User;
-import com.ttallang.user.security.model.PaymentUser;
+import com.ttallang.user.account.model.NotPaymentUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,18 +23,24 @@ public class PrincipalDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-    //시큐리티 session(내부 Authentication(내부 UserDetails)) 들어감
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         // userName 은 Roles 테이블에 등록되있는 유저의 아이디 (Unique 해야함.)
         System.out.println("userName="+userName);
         Roles roles = rolesRepository.findByUserName(userName);
+        if (roles == null) { // 이 경우는 유저 정보가 아예 없는 경우.
+            return new PrincipalDetails(
+                    // 시큐리티 콘피그에서 유저 로그인 핸들러를 통해 로그인 실패하는 것을 관리하기 위해 가짜 객체를 만들어줬음.
+                    new Roles(0, "", "", "", "-1"),
+                    new User(0, 0, "", "", "", "")
+            );
+        }
         int userId = roles.getUserId();
         User user = userRepository.findByUserId(userId);
-        PaymentUser paymentUser = userRepository.findNoPaymentUser(user.getCustomerId());
-        if (paymentUser == null) { // 결제를 잘 한 유저.
+        NotPaymentUser notPaymentUser = userRepository.findNotPaymentUser(user.getCustomerId());
+        if (notPaymentUser == null) { // 결제를 했기 때문에 null임.
             return new PrincipalDetails(roles, user);
         }
-        return new PrincipalDetails(roles, user, paymentUser);
+        return new PrincipalDetails(roles, user, notPaymentUser);
     }
 }
