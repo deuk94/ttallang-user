@@ -60,7 +60,7 @@ function requestPay() {
         }),
         success: function () {
           alert("결제가 완료되었습니다.");
-          window.location.href = "/map/main";
+          window.location.href = "../../main";
         },
         error: function () {
           alert("결제 검증에 실패했습니다.");

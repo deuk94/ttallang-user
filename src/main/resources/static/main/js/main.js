@@ -50,8 +50,11 @@ function showCustomReturnPopup() {
       isCustomReturnPopupOpen = true;
     },
     error: function(xhr) {
-      console.error("대여 중인 자전거 정보 가져오기 실패:", xhr);
-      alert("대여 정보를 불러오는 데 실패했습니다.");
+      if (xhr.status === 404) {
+        alert("대여 중인 자전거 정보를 찾을 수 없습니다.");
+      } else {
+        alert("대여 정보를 불러오는 데 실패했습니다.");
+      }
     }
   });
 }
@@ -62,23 +65,25 @@ function rentBike(bicycleId, rentalBranch) {
     url: '/api/map/rent/bicycle',
     type: 'POST',
     data: { bicycleId: bicycleId, rentalBranch: rentalBranch },
-    success: function() {
-      alert("자전거의 대여가 완료되었습니다.");
-      closeAllPopups();
+    success: function(response) {
+      if (response.code !== 200) {
+        alert(response.msg);
+        window.location.href = "/pay/payment";
+      } else {
+        alert("자전거의 대여가 완료되었습니다.");
+        console.log(response);
+        closeAllPopups();
+      }
     },
     error: function(xhr) {
-      const errorMessage = xhr.responseText || xhr.statusText;
-      if (errorMessage.includes("결제되지 않은 자전거가 있습니다")) {
-        alert(errorMessage);
-        window.location.href = "/pay/payment";
-      } else if (errorMessage.includes("5분 이내에는 신고가 가능합니다")) {
-        alert(errorMessage);
-      } else {
-        alert("대여에 실패했습니다: " + errorMessage);
-      }
+      alert("서버 에러가 발생했습니다.");
+      console.log(xhr);
+      // 결제 미완료 메시지 처리
     }
   });
 }
+
+
 
 // 자전거 반납 함수
 function returnBike(isCustomLocation) {
@@ -101,14 +106,18 @@ function returnBike(isCustomLocation) {
       window.location.href = "/pay/payment";
     },
     error: function(xhr) {
-      alert("반납에 실패했습니다: " + xhr.responseText);
+      if (xhr.status === 404) {
+        alert("반납할 자전거를 찾을 수 없습니다.");
+      } else {
+        alert("반납에 실패했습니다: " + xhr.responseText);
+      }
     }
   });
 }
 // 대여소 반납 팝업 표시 함수
 function showReturnPopup(isCustomLocation) {
   if (isCustomLocation) {
-    showCustomReturnPopup(); // 대여소 외 위치에서의 반납 팝업
+    showCustomReturnPopup();
   } else {
     document.getElementById("returnBranchName").innerText = selectedBranchName;
 
@@ -121,11 +130,14 @@ function showReturnPopup(isCustomLocation) {
         $('#rentalBranch').text(response.rentalBranch);
         $('#rentalStartDate').text(response.rentalStartDate.replace("T", " "));
         selectedBicycleId = response.bicycleId;
-        document.getElementById("returnPopup").style.display = 'block'; // 반납 팝업 표시
+        document.getElementById("returnPopup").style.display = 'block';
       },
       error: function(xhr) {
-        console.error("대여 중인 자전거 정보 가져오기 실패:", xhr);
-        alert("대여 정보를 불러오는 데 실패했습니다.");
+        if (xhr.status === 404) {
+          alert("대여 중인 자전거를 찾을 수 없습니다.");
+        } else {
+          alert("대여 정보를 불러오는 데 실패했습니다.");
+        }
       }
     });
   }
@@ -177,20 +189,18 @@ function submitReport() {
     url: '/api/map/report-issue',
     type: 'POST',
     data: { bicycleId: selectedBicycleId, categoryId: categoryId, reportDetails: reportDetails },
-    success: function() {
-      alert("신고가 성공적으로 접수되었습니다.");
+    success: function(response) {
+      alert(response.msg);
       closePopup('dynamicReportPopup');
     },
     error: function(xhr) {
-      alert("결제되지 않은 자전거가 있습니다. 결제 후 신고가 가능합니다.");
-      // 확인 버튼을 누른 후 결제 페이지로 이동
-      setTimeout(() => {
-        window.location.href = "/pay/payment";
-      }, 0); // 즉시 이동
+      alert("서버 에러가 발생했습니다. 신고 접수에 실패했습니다.");
       closePopup('dynamicReportPopup');
     }
   });
 }
+
+
 
 
 // 신고 및 반납 제출 함수
@@ -198,13 +208,6 @@ function submitReportAndReturn() {
   const categoryId = document.getElementById("reportCategorySelect2").value;
   const reportDetails = document.getElementById("reportDetails2").value;
   const returnBranchName = isCustomReturnPopupOpen ? "기타" : selectedBranchName;
-
-  console.log("Submitting Report and Return:");
-  console.log("Category ID:", categoryId);
-  console.log("Report Details:", reportDetails);
-  console.log("Return Branch Name:", returnBranchName);
-  console.log("Return Latitude:", selectedBranchLatitude);
-  console.log("Return Longitude:", selectedBranchLongitude);
 
   $.ajax({
     url: '/api/map/report-and-return',
@@ -217,15 +220,23 @@ function submitReportAndReturn() {
       returnLatitude: selectedBranchLatitude,
       returnLongitude: selectedBranchLongitude
     },
-    success: function() {
-      alert("신고 및 반납이 성공적으로 처리되었습니다.");
-      closePopup('reportAndReturnPopup');
+    success: function(response) {
+      alert(response.msg);
+      if (response.code === 200) {
+        closePopup('reportAndReturnPopup');
+        if (response.redirectToPayment) {
+          window.location.href = "/pay/payment";
+        }
+      }
     },
     error: function(xhr) {
-      alert("신고 및 반납 처리에 실패했습니다: " + xhr.responseText);
+      alert("서버 에러가 발생했습니다. 신고 및 반납 처리에 실패했습니다.");
+      console.log(xhr);
     }
   });
 }
+
+
 
 
 
@@ -333,18 +344,18 @@ async function checkRentalStatus() {
 // 카카오 지도 초기화
 var container = document.getElementById('map');
 var options = { center: new kakao.maps.LatLng(37.583883601891, 126.9999880311), level: 3 };
-var map = new kakao.maps.Map(container, options);
+var main = new kakao.maps.Map(container, options);
 
 // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
 var mapTypeControl = new kakao.maps.MapTypeControl();
 
 // 지도에 컨트롤을 추가해야 지도위에 표시됩니다
 // kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
-map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+main.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
 
 // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
 var zoomControl = new kakao.maps.ZoomControl();
-map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+main.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
 // 마커 이미지 설정
 var imageSrc = '/images/자전거.png',
@@ -367,7 +378,7 @@ if (navigator.geolocation) {
 }
 
 // 클릭 이벤트로 모든 팝업 닫기
-kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+kakao.maps.event.addListener(main, 'click', function(mouseEvent) {
   closeAllPopups();
   const clickedLatLng = mouseEvent.latLng;
   handleMapClickOutsideBranch(clickedLatLng.getLat(), clickedLatLng.getLng());
@@ -381,7 +392,7 @@ function loadBranches() {
     success: function(data) {
       data.forEach(function(branch) {
         var marker = new kakao.maps.Marker({
-          map: map,
+          map: main,
           position: new kakao.maps.LatLng(branch.latitude, branch.longitude),
           image: markerImage
         });
@@ -411,7 +422,7 @@ function loadBranches() {
 function displayMarker(locPosition, message) {
   if (message !== '<div style="padding:5px;">현재 위치입니다.</div>') {
     var marker = new kakao.maps.Marker({
-      map: map,
+      map: main,
       position: locPosition
     });
 
@@ -420,11 +431,11 @@ function displayMarker(locPosition, message) {
       removable: true
     });
 
-    infowindow.open(map, marker);
-    map.setCenter(locPosition);
+    infowindow.open(main, marker);
+    main.setCenter(locPosition);
   } else {
     // 사용자 위치만 센터로 설정
-    map.setCenter(locPosition);
+    main.setCenter(locPosition);
   }
 }
 
