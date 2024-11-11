@@ -1,12 +1,12 @@
-package com.ttallang.user.security.service;
+package com.ttallang.user.account.service;
 
 import com.ttallang.user.commonModel.Roles;
 import com.ttallang.user.commonModel.User;
 import com.ttallang.user.commomRepository.RolesRepository;
 import com.ttallang.user.commomRepository.UserRepository;
 import com.ttallang.user.security.config.RandomStateToken;
-import com.ttallang.user.security.model.CertInfo;
-import com.ttallang.user.security.response.SecurityResponse;
+import com.ttallang.user.account.model.CertInfo;
+import com.ttallang.user.account.model.AccountResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -181,7 +181,7 @@ public class SignupServiceImpl implements SignupService {
     }
 
     // 유저가 외부 서비스의 로그인을 하면 액세스 토큰을 발급해줌.
-    private ResponseEntity<Map<String, String>> getAccessToken(Map<String, String> authorizationCodeMap) {
+    private ResponseEntity<Map<String, Object>> getAccessToken(Map<String, String> authorizationCodeMap) {
         RestTemplate restTemplate = new RestTemplate();
         String grantType = "authorization_code";
         String state = null;
@@ -193,6 +193,7 @@ public class SignupServiceImpl implements SignupService {
 
         String code = authorizationCodeMap.get("code");
         String SNSType = authorizationCodeMap.get("SNSType");
+        System.out.println(authorizationCodeMap);
 
         try {
             switch (SNSType) {
@@ -239,18 +240,19 @@ public class SignupServiceImpl implements SignupService {
 
             assert httpMethod != null;
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<Map<String, String>> response = restTemplate.exchange(
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     tokenURL,
                     httpMethod,
                     entity,
-                    new ParameterizedTypeReference<Map<String, String>>() {}
+                    new ParameterizedTypeReference<Map<String, Object>>() {}
             );
+            System.out.println("#########################################################");
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("액세스 토큰 얻어오기 성공...");
                 try {
                     assert response.getBody() != null;
-                    String accessToken = response.getBody().get("access_token");
+                    String accessToken = (String) response.getBody().get("access_token");
                     if (SNSType.equals("payco")) {
                         CertInfo certInfo = new CertInfo(accessToken, clientId, clientSecret, "PACYO");
                         sharedCertInfoMap.put(accessToken, certInfo);
@@ -272,6 +274,7 @@ public class SignupServiceImpl implements SignupService {
                 return null;
             }
         } catch (RestClientException e) {
+            log.error("error={}", e.getMessage());
             log.error("토큰 서버 연결 실패", e);
             //throw new RuntimeException("토큰 서버 연결 실패...");
             return null;
@@ -337,7 +340,7 @@ public class SignupServiceImpl implements SignupService {
     public Map<String, Object> processSNSCert(Map<String, String> params) {
 
         Map<String, Object> responseBody = new HashMap<>();
-        Map<String, String> accessTokenResponseBody;
+        Map<String, Object> accessTokenResponseBody;
         
         // 디코딩 작업.
         Map<String, String> authorizationCodeMap = this.getAuthorizationCodeAndSNSType(params);
@@ -349,7 +352,7 @@ public class SignupServiceImpl implements SignupService {
         
         try {
             // 인증 코드로 토큰 받기
-            ResponseEntity<Map<String, String>> accessTokenResponse = this.getAccessToken(authorizationCodeMap);
+            ResponseEntity<Map<String, Object>> accessTokenResponse = this.getAccessToken(authorizationCodeMap);
             accessTokenResponseBody = accessTokenResponse.getBody();
             assert accessTokenResponseBody != null;
         } catch (Exception e) {
@@ -358,7 +361,7 @@ public class SignupServiceImpl implements SignupService {
             return responseBody;
         }
 
-        String accessToken = accessTokenResponseBody.get("access_token");
+        String accessToken = (String) accessTokenResponseBody.get("access_token");
         log.info("토큰 받기 성공={}", accessToken);
         
         try {
@@ -518,20 +521,20 @@ public class SignupServiceImpl implements SignupService {
     // ---------------------------------------------------------------------------
     // 아이디 존재 여부 확인.
     @Override
-    public SecurityResponse isExistingRolesUserName(String userName) {
+    public AccountResponse isExistingRolesUserName(String userName) {
         Roles roles = rolesRepository.findByUserName(userName);
-        SecurityResponse securityResponse = new SecurityResponse();
-        securityResponse.setRole("guest");
+        AccountResponse accountResponse = new AccountResponse();
+        accountResponse.setRole("guest");
         if (roles == null) {
-            securityResponse.setCode(204);
-            securityResponse.setStatus("success");
-            securityResponse.setMessage("가입 가능한 ID.");
+            accountResponse.setCode(204);
+            accountResponse.setStatus("success");
+            accountResponse.setMessage("가입 가능한 ID.");
         } else {
-            securityResponse.setCode(200);
-            securityResponse.setStatus("success");
-            securityResponse.setMessage("이미 존재하는 ID.");
+            accountResponse.setCode(200);
+            accountResponse.setStatus("success");
+            accountResponse.setMessage("이미 존재하는 ID.");
         }
-        return securityResponse;
+        return accountResponse;
     }
 
     // 중복 유저 존재 여부 확인.
@@ -545,16 +548,16 @@ public class SignupServiceImpl implements SignupService {
 
     // 일반 회원 가입.
     @Override
-    public SecurityResponse signupCustomer(Map<String, String> userData) {
-        SecurityResponse securityResponse = new SecurityResponse();
+    public AccountResponse signupCustomer(Map<String, String> userData) {
+        AccountResponse accountResponse = new AccountResponse();
         String email = userData.get("email");
         String customerPhone = userData.get("customerPhone");
-        securityResponse.setRole("guest");
+        accountResponse.setRole("guest");
         if (this.isExistingCustomer(email, customerPhone)) { // 중복 유저가 존재하는 경우.
-            securityResponse.setCode(401);
-            securityResponse.setStatus("failure");
-            securityResponse.setMessage("이미 해당 정보로 가입한 유저가 있습니다.");
-            return securityResponse;
+            accountResponse.setCode(401);
+            accountResponse.setStatus("failure");
+            accountResponse.setMessage("이미 해당 정보로 가입한 유저가 있습니다.");
+            return accountResponse;
         };
         try {
             // 유저 상세 데이터 기록.
@@ -562,16 +565,16 @@ public class SignupServiceImpl implements SignupService {
             this.recordUser(userData, roles);
             System.out.println("유저 회원가입 성공: " + roles);
             // DB 기록 종료.
-            securityResponse.setCode(200);
-            securityResponse.setStatus("success");
-            securityResponse.setMessage("회원가입 성공.");
+            accountResponse.setCode(200);
+            accountResponse.setStatus("success");
+            accountResponse.setMessage("회원가입 성공.");
         } catch (Exception e) {
-            securityResponse.setCode(500);
-            securityResponse.setStatus("failure");
-            securityResponse.setMessage("회원가입 실패,"+e.getMessage());
+            accountResponse.setCode(500);
+            accountResponse.setStatus("failure");
+            accountResponse.setMessage("회원가입 실패,"+e.getMessage());
             log.error("회원가입에 실패했습니다. 원인={}", e.getMessage());
         }
-        return securityResponse;
+        return accountResponse;
     }
 
     private Roles recordRoles(Map<String, String> userData) {

@@ -2,12 +2,12 @@
 <html>
 <head>
 	<title></title>
-	<link href="${pageContext.request.contextPath}/userAuth/css/loginHeader.css" rel="stylesheet">
-	<link href="${pageContext.request.contextPath}/userAuth/css/base.css" rel="stylesheet">
+	<link href="${pageContext.request.contextPath}/account/css/loginHeader.css" rel="stylesheet">
+	<link href="${pageContext.request.contextPath}/account/css/base.css" rel="stylesheet">
 </head>
 <body>
 <header>
-	<a class="d-flex flex-row" href="/map/main">
+	<a class="d-flex flex-row" href="/login/form">
 		<img src="/images/자전거.png" alt="따릉이 로고" />
 		<span class="brand-name">딸랑이</span>
 	</a>

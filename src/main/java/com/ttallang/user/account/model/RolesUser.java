@@ -1,4 +1,4 @@
-package com.ttallang.user.security.model;
+package com.ttallang.user.account.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

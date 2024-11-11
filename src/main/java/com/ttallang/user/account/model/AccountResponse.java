@@ -1,4 +1,4 @@
-package com.ttallang.user.security.response;
+package com.ttallang.user.account.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SecurityResponse {
+public class AccountResponse {
     private int code;
     private String status;
     private String role;

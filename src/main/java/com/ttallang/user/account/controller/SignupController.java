@@ -1,7 +1,7 @@
-package com.ttallang.user.security.controller;
+package com.ttallang.user.account.controller;
 
-import com.ttallang.user.security.model.CertInfo;
-import com.ttallang.user.security.service.SignupService;
+import com.ttallang.user.account.model.CertInfo;
+import com.ttallang.user.account.service.SignupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +27,7 @@ public class SignupController { // 리턴 타입이 JSP 페이지인 컨트롤�
     // SNS 계정연동 및 일반가입 선택하는 페이지.
     @GetMapping("/signup/select")
     public String signupSelect() {
-        return "userAuth/main/signupSelect";
+        return "account/signup/select";
     }
 
     @GetMapping("/signup/form")
@@ -36,7 +36,7 @@ public class SignupController { // 리턴 타입이 JSP 페이지인 컨트롤�
         model.addAttribute("customerPhone", "");
         model.addAttribute("email", (String) "");
         model.addAttribute("birthday", "");
-        return "userAuth/main/signupForm";
+        return "account/signup/form";
     }
 
     @GetMapping("/oauth2/callback")

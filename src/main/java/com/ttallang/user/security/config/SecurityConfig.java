@@ -2,7 +2,7 @@ package com.ttallang.user.security.config;
 
 
 import com.ttallang.user.security.config.handler.LoginHandler;
-import com.ttallang.user.security.model.CertInfo;
+import com.ttallang.user.account.model.CertInfo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;

@@ -1,10 +1,9 @@
-package com.ttallang.user.security.controller;
+package com.ttallang.user.account.controller;
 
 import com.ttallang.user.security.config.auth.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Slf4j
@@ -22,7 +21,7 @@ public class LoginController {
         if (user instanceof PrincipalDetails) {
             return "redirect:/map/main";
         }
-        return "userAuth/main/loginForm";
+        return "account/login/form";
     }
 
 }

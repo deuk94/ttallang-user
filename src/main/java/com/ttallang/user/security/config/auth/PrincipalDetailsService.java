@@ -4,7 +4,7 @@ import com.ttallang.user.commomRepository.RolesRepository;
 import com.ttallang.user.commomRepository.UserRepository;
 import com.ttallang.user.commonModel.Roles;
 import com.ttallang.user.commonModel.User;
-import com.ttallang.user.security.model.NotPaymentUser;
+import com.ttallang.user.account.model.NotPaymentUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

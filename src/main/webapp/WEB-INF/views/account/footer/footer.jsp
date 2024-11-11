@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title></title>
-	<link href="${pageContext.request.contextPath}/userAuth/css/loginFooter.css" rel="stylesheet">
+	<link href="${pageContext.request.contextPath}/account/css/loginFooter.css" rel="stylesheet">
 </head>
 <body>
 <footer>

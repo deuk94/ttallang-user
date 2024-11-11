@@ -11,7 +11,7 @@
 <html lang="ko">
 <head>
   <title>아이디/비밀번호 찾기</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/userAuth/css/findSelect.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/account/css/findSelect.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <!-- 상단 네비게이션 바 -->
@@ -21,8 +21,8 @@
   <div class="d-flex justify-content-center">
     <div class="card p-3 select-card">
       <h2 class="text-center mb-5">아이디/비밀번호 찾기</h2>
-      <a href="${pageContext.request.contextPath}/find/username" class="btn btn-primary mb-3">아이디 찾기</a>
-      <a href="${pageContext.request.contextPath}/find/password" class="btn btn-primary mb-3">비밀번호 찾기</a>
+      <a href="${pageContext.request.contextPath}/find/username/input" class="btn btn-primary mb-3">아이디 찾기</a>
+      <a href="${pageContext.request.contextPath}/find/password/input" class="btn btn-primary mb-3">비밀번호 찾기</a>
     </div>
   </div>
 </div>

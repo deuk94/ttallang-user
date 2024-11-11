@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.ttallang.user.commonModel.User;
-import com.ttallang.user.security.model.NotPaymentUser;
+import com.ttallang.user.account.model.NotPaymentUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

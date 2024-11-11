@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
   <title>회원가입 방법 선택</title>
-  <link href="${pageContext.request.contextPath}/userAuth/css/signupSelect.css" rel="stylesheet">
+  <link href="${pageContext.request.contextPath}/account/css/signupSelect.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
@@ -29,10 +29,10 @@
         </div>
       </a>
       <div id="kakaoCert">
-        <img class="btn-kakao" src="${pageContext.request.contextPath}/images/kakaoLogin.png" alt="카카오 아이콘">
+        <img class="btn-kakao" src="${pageContext.request.contextPath}/account/images/kakaoLogin.png" alt="카카오 아이콘">
       </div>
       <div id="naverCert">
-        <img class="btn-naver" src="${pageContext.request.contextPath}/images/naverLogin.png" alt="네이버 아이콘">
+        <img class="btn-naver" src="${pageContext.request.contextPath}/account/images/naverLogin.png" alt="네이버 아이콘">
       </div>
       <div id="paycoCert" class="btn-payco">PAYCO 로그인</div>
     </div>
