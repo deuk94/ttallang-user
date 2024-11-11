@@ -32,11 +32,17 @@
     </tr>
     <tr>
         <th>휴대폰번호</th>
-        <td><input type="text" id="customerPhone" /></td>
+        <td><input type="text" id="customerPhone"
+                   pattern="^01[0-9]{8,9}$"
+                   placeholder="'-'는 제외하고 입력해주세요."
+                   maxlength="11"/></td>
     </tr>
     <tr>
         <th>생년월일</th>
-        <td><input type="text" id="birthday" /></td>
+        <td><input type="text" id="birthday"
+                   pattern="^(19|20)\d\d(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$"
+                   placeholder="19990101"
+                   maxlength="8"/></td>
     </tr>
     <tr>
         <th>이메일</th>
