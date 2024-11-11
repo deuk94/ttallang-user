@@ -44,7 +44,7 @@ function deleteReport(reportId) {
         }
       },
       error: function () {
-        alert("삭제에 실패했습니다. 서버 응답을 확인하세요.");
+        alert("삭제에 실패했습니다.");
       }
     });
   }

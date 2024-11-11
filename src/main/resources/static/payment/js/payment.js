@@ -2,10 +2,9 @@ let name = "자전거 대여 요금"
 let amount, email, userName, phoneNumber;
 
 $(document).ready(function () {
-  updatePaymentAmount()
-  selectUser()
+  updatePaymentAmount();
+  selectUser();
 
-  // 결제 내역 조회
   $.ajax({
     url: '/api/pay/payment',
     method: 'GET',
@@ -26,7 +25,30 @@ $(document).ready(function () {
       alert('결제 정보를 가져오는 데 실패했습니다.');
     }
   });
+
+  // 결제 버튼 클릭 이벤트
+  $('#paymentButton').on('click', function () {
+    validatePayment();
+  });
 });
+
+// 결제 전 검증
+function validatePayment() {
+  $.ajax({
+    url: '/api/pay/paymentValidation',
+    method: 'GET',
+    success: function (isValid) {
+      if (isValid) {
+        requestPay();
+      } else {
+        alert("결제 정보가 일치하지 않습니다.");
+      }
+    },
+    error: function () {
+      alert('결제 정보 검증에 실패했습니다.');
+    }
+  });
+}
 
 function requestPay() {
   let IMP = window.IMP;
@@ -60,14 +82,14 @@ function requestPay() {
         }),
         success: function () {
           alert("결제가 완료되었습니다.");
-          window.location.href = "/map/main";
+          window.location.href = "../../main";
         },
         error: function () {
           alert("결제 검증에 실패했습니다.");
         }
       });
     } else {
-      alert("결제에 실패하였습니다. \n" + rsp.error_msg);
+      alert("결제에 실패하였습니다.");
     }
   });
 }
@@ -112,5 +134,5 @@ function RentalCalculate(startDate, endDate) {
   const minutes = Math.floor(diffInSeconds / 60);
   const seconds = diffInSeconds % 60;
 
-  return { minutes, seconds };
+  return {minutes, seconds};
 }

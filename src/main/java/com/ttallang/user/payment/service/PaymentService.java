@@ -57,10 +57,9 @@ public class PaymentService {
         return paymentRepository.getByJoinPortOneId(customerId);
     }
 
-    // 결제 금액 검증
+    // 결제 검증
     public boolean validatePaymentAmount(int paymentId, int amount) {
         Payment payment = paymentRepository.findById(paymentId).orElse(null);
         return payment != null && payment.getPaymentAmount() == amount;
     }
-
 }

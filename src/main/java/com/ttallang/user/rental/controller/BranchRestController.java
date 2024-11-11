@@ -10,6 +10,7 @@ import com.ttallang.user.rental.service.BranchService;
 import com.ttallang.user.rental.service.RentalsService;
 import com.ttallang.user.rental.service.ReportService;
 import com.ttallang.user.security.config.auth.PrincipalDetails;
+import java.util.Map;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,7 @@ public class BranchRestController {
     }
 
     @PostMapping("/rent/bicycle")
-    public Rental rentBicycle(@RequestParam int bicycleId, @RequestParam String rentalBranch) {
+    public Map<String, Object> rentBicycle(@RequestParam int bicycleId, @RequestParam String rentalBranch) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         return rentalsService.rentBicycle(bicycleId, rentalBranch, loginId);
@@ -84,7 +85,7 @@ public class BranchRestController {
     }
 
     @PostMapping("/report-issue")
-    public FaultReport reportIssue(@RequestParam int bicycleId, @RequestParam int categoryId,
+    public Map<String, Object> reportIssue(@RequestParam int bicycleId, @RequestParam int categoryId,
         @RequestParam String reportDetails) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
@@ -92,7 +93,7 @@ public class BranchRestController {
     }
 
     @PostMapping("/report-and-return")
-    public FaultReport reportAndReturn(
+    public Map<String, Object> reportAndReturn(
         @RequestParam int bicycleId,
         @RequestParam int categoryId,
         @RequestParam String reportDetails,

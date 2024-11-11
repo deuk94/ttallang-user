@@ -7,6 +7,8 @@ import com.ttallang.user.rental.model.UseRental;
 import com.ttallang.user.commomRepository.BicycleRepository;
 import com.ttallang.user.commomRepository.RentalRepository;
 import com.ttallang.user.commomRepository.PaymentRepository;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,23 +34,38 @@ public class RentalsService {
     }
 
     // 자전거 대여
-    public Rental rentBicycle(int bicycleId, String rentalBranch, int customerId) {
-
+    public Map<String, Object> rentBicycle(int bicycleId, String rentalBranch, int customerId) {
+        Map<String, Object> result = new HashMap<>();
         // 결제 상태 확인 - 미결제 상태가 있을 경우 예외 발생
         if (!paymentRepository.findByCustomerIdAndPaymentStatus(customerId, "0").isEmpty()) {
-            throw new IllegalArgumentException("결제되지 않은 자전거가 있습니다. 결제를 완료해 주세요.");
+            result.put("rental", null);
+            result.put("code", 403);
+            result.put("msg", "결제되지 않은 자전거가 있습니다. 결제를 완료해 주세요.");
+            return result;
         }
 
         // 대여 중인 자전거가 있는지 확인
         if (!rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId).isEmpty()) {
-            throw new IllegalArgumentException("이미 대여 중인 자전거가 있습니다. 반납 후 새로운 대여가 가능합니다.");
+            result.put("rental", null);
+            result.put("code", 403);
+            result.put("msg", "이미 대여 중인 자전거가 있습니다. 반납 후 새로운 대여가 가능합니다.");
+            return result;
         }
 
         // 자전거 대여 상태 확인
         Bicycle bicycle = bicycleRepository.findById(bicycleId)
-            .orElseThrow(() -> new IllegalArgumentException("자전거를 찾을 수 없습니다."));
+            .orElseThrow(() -> {
+                result.put("msg", "자전거를 찾을 수 없습니다.");
+                result.put("code", 404);
+                result.put("rental", null);
+                return null;
+            });
+
         if (!"1".equals(bicycle.getRentalStatus()) || !"1".equals(bicycle.getBicycleStatus())) {
-            throw new IllegalStateException("이 자전거는 대여할 수 없는 상태입니다.");
+            result.put("rental", null);
+            result.put("code", 400);
+            result.put("msg", "이 자전거는 대여할 수 없는 상태입니다.");
+            return result;
         }
 
         // 자전거 대여 가능 상태로 설정 및 저장
@@ -61,7 +78,11 @@ public class RentalsService {
         rental.setCustomerId(customerId);
         rental.setRentalBranch(rentalBranch);
         rental.setRentalStartDate(LocalDateTime.now());
-        return rentalRepository.save(rental);
+        result.put("rental", rental);
+        result.put("code", 200);
+        result.put("msg", "렌탈 성공.");
+        rentalRepository.save(rental);
+        return result;
     }
 
     // 자전거 반납

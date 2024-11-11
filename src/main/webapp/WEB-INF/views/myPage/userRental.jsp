@@ -9,7 +9,7 @@
     <script src="/myPage/js/rental.js"></script>
 </head>
 <body>
-<jsp:include page="head/head.jsp" />
+<jsp:include page="../head/head.jsp" />
 <div>
     <h1>이용 내역</h1>
     <div class="menu">
@@ -34,6 +34,6 @@
         </table>
     </div>
 </div>
-<jsp:include page="footer/footer.jsp" />
+<jsp:include page="../footer/footer.jsp" />
 </body>
 </html>
