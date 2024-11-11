@@ -298,25 +298,33 @@ function showAvailableBicycles(latitude, longitude) {
       bicycles.forEach(function(bike) {
         var bikeElement = document.createElement("div");
         bikeElement.className = "bicycle-item";
+
         var bikeInfo = document.createElement("span");
         bikeInfo.textContent = bike.bicycleName;
         bikeElement.appendChild(bikeInfo);
+
         var rentButton = document.createElement("button");
         rentButton.textContent = "대여";
+        rentButton.style.backgroundColor = "#001f54"; // 새로운 배경색
+        rentButton.style.color = "white";
         rentButton.style.marginRight = "10px";
         rentButton.onclick = function() {
           selectedBicycleId = bike.bicycleId;
           rentBike(bike.bicycleId, selectedBranchName);
         };
         bikeElement.appendChild(rentButton);
+
         var reportButton = document.createElement("button");
         reportButton.textContent = "신고";
+        reportButton.style.backgroundColor = "#001f54"; // 새로운 배경색
+        reportButton.style.color = "white";
         reportButton.onclick = function() {
           selectedBicycleId = bike.bicycleId;
           closePopup('branchInfoPopup');
           openReportPopup();
         };
         bikeElement.appendChild(reportButton);
+
         container.appendChild(bikeElement);
       });
     },
@@ -325,6 +333,7 @@ function showAvailableBicycles(latitude, longitude) {
     }
   });
 }
+
 
 // 대여 상태 확인 함수
 async function checkRentalStatus() {
