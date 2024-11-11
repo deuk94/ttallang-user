@@ -20,13 +20,13 @@ public class FindServiceImpl implements FindService {
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
-    @Value("${coolsms.key}")
+//    @Value("${coolsms.key}")
     private String coolsmsKey;
 
-    @Value("${coolsms.secret}")
+//    @Value("${coolsms.secret}")
     private String coolsmsSecret;
 
-    @Value("${coolsms.sender}")
+//    @Value("${coolsms.sender}")
     private String coolsmsSender;
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

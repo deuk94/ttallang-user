@@ -24,7 +24,8 @@ public class PaymentRestController {
     // 결제 금액 수정
     @PatchMapping("/updateAmount")
     public Payment updatePaymentAmount() {
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         Payment payment = paymentService.getPayment(loginId);
         int rentalId = payment.getRentalId();
@@ -35,7 +36,8 @@ public class PaymentRestController {
     // 결제 페이지 보여주기
     @GetMapping("/payment")
     public JoinPayment getPayment() {
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         return paymentService.getByPayment(loginId);
     }
@@ -43,25 +45,38 @@ public class PaymentRestController {
     // 결제 버튼 누른 후 내역 수정
     @PatchMapping("/payment")
     public Payment updatePayment() {
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
-        Payment payment = paymentService.getPayment(loginId);
-        int paymentId = payment.getPaymentId();
-        int paymentAmount = payment.getPaymentAmount();
-
-        // 결제 금액 검증
-        if (!paymentService.validatePaymentAmount(paymentId, paymentAmount)) {
-            throw new RuntimeException("결제 금액이 일치하지 않습니다."); // 예외 처리
-        }
-
+//        Payment payment = paymentService.getPayment(loginId);
+//        int paymentId = payment.getPaymentId();
+//        int paymentAmount = payment.getPaymentAmount();
+//
+//        // 결제 금액 검증
+//        if (!paymentService.validatePaymentAmount(paymentId, paymentAmount)) {
+//            throw new RuntimeException("결제 금액이 일치하지 않습니다."); // 예외 처리
+//        }
         return paymentService.updatePayment(loginId);
     }
 
     // 결제 정보 조회
     @GetMapping("/paymentInfo")
     public JoinPortOne paymentInfo() {
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         return paymentService.getByPaymentInfo(loginId);
+    }
+
+    // 결제 검증
+    @GetMapping("/paymentValidation")
+    public boolean paymentValidation() {
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
+        int loginId = pds.getCustomerID();
+        Payment payment = paymentService.getPayment(loginId);
+        int paymentId = payment.getPaymentId();
+        int paymentAmount = payment.getPaymentAmount();
+        return paymentService.validatePaymentAmount(paymentId, paymentAmount);
     }
 }
