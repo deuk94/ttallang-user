@@ -134,7 +134,7 @@ public class ReportService {
         Rental rental = activeRental.get();
         Duration rentalDuration = Duration.between(rental.getRentalStartDate(), LocalDateTime.now());
 
-        boolean shouldRedirectToPayment = rentalDuration.toMinutes() > 1;
+        boolean shouldRedirectToPayment = rentalDuration.toMinutes() > 5;
 
         // 신고 생성 및 저장
         FaultReport faultReport = new FaultReport();
