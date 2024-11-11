@@ -52,7 +52,7 @@ $(document).ready(function () {
         type: "patch",
         success: function () {
           alert("회원탈퇴가 완료되었습니다.");
-          window.location.href = "/";
+          window.location.href = "/api/logout";
         },
         error: function () {
           alert("회원탈퇴에 실패했습니다.");

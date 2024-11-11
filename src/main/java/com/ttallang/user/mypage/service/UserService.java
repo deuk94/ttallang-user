@@ -33,7 +33,6 @@ public class UserService {
         User user = userRepository.findById(customerId).orElse(null);
         user.setBirthday(updateUser.getBirthday());
         user.setEmail(updateUser.getEmail());
-        user.setCustomerPhone(updateUser.getCustomerPhone());
         return userRepository.save(user);
     }
 

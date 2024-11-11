@@ -32,10 +32,7 @@
     </tr>
     <tr>
         <th>휴대폰번호</th>
-        <td><input type="text" id="customerPhone"
-                   pattern="^01[0-9]{8,9}$"
-                   placeholder="'-'는 제외하고 입력해주세요."
-                   maxlength="11"/></td>
+        <td><input type="text" id="customerPhone" readonly></td>
     </tr>
     <tr>
         <th>생년월일</th>
