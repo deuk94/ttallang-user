@@ -15,7 +15,6 @@ public class MyPageController {
     public String userModify(Model model) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        model.addAttribute("customerId", pds.getCustomerID());
         model.addAttribute("username", pds.getUsername());
         return "myPage/userModify";
     }
@@ -24,7 +23,6 @@ public class MyPageController {
     public String userRental(Model model) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        model.addAttribute("customerId", pds.getCustomerID());
         model.addAttribute("username", pds.getUsername());
         return "myPage/userRental";
     }
@@ -33,7 +31,6 @@ public class MyPageController {
     public String userFaultReport(Model model) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        model.addAttribute("customerId", pds.getCustomerID());
         model.addAttribute("username", pds.getUsername());
         return "myPage/userFaultReport";
     }
@@ -42,7 +39,6 @@ public class MyPageController {
     public String responsibility(Model model) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        model.addAttribute("customerId", pds.getCustomerID());
         model.addAttribute("username", pds.getUsername());
         return "info/responsibility";
     }
@@ -52,7 +48,6 @@ public class MyPageController {
     public String insurance(Model model) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        model.addAttribute("customerId", pds.getCustomerID());
         model.addAttribute("username", pds.getUsername());
         return "info/insurance";
     }
@@ -61,7 +56,6 @@ public class MyPageController {
     public String charge(Model model) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        model.addAttribute("customerId", pds.getCustomerID());
         model.addAttribute("username", pds.getUsername());
         return "info/charge";
     }
@@ -70,7 +64,6 @@ public class MyPageController {
     public String safety(Model model) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        model.addAttribute("customerId", pds.getCustomerID());
         model.addAttribute("username", pds.getUsername());
         return "info/safety";
     }
@@ -79,7 +72,6 @@ public class MyPageController {
     public String information(Model model) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        model.addAttribute("customerId", pds.getCustomerID());
         model.addAttribute("username", pds.getUsername());
         return "info/information";
     }
