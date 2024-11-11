@@ -13,7 +13,6 @@ import com.ttallang.user.commonModel.Rental;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,11 +44,6 @@ public class ReportService {
         this.paymentsService = paymentsService;
     }
 
-    // 미처리 신고 여부 확인 메서드
-    public boolean hasUnresolvedReport(int customerId) {
-        return faultReportRepository.existsByCustomerIdAndReportStatus(customerId, "0");
-    }
-
     // 모든 신고 카테고리 조회
     public List<FaultCategory> getAllFaultCategories() {
         return faultCategoryRepository.findAll();
@@ -58,14 +52,6 @@ public class ReportService {
     // 신고 처리
     public Map<String, Object> reportIssue(int customerId, int bicycleId, int categoryId, String reportDetails) {
         Map<String, Object> result = new HashMap<>();
-
-        // 미처리 신고 확인
-        if (hasUnresolvedReport(customerId)) {
-            result.put("report", null);
-            result.put("code", 403);
-            result.put("msg", "처리되지 않은 신고가 있습니다. 기존 신고가 처리된 후 새로운 신고가 가능합니다.");
-            return result;
-        }
 
         // 미결제 상태 확인
         if (!paymentRepository.findByCustomerIdAndPaymentStatus(customerId, "0").isEmpty()) {
@@ -113,20 +99,11 @@ public class ReportService {
         return result;
     }
 
-
     // 신고 및 반납 처리 메서드
     public Map<String, Object> reportAndReturn(int customerId, int bicycleId, int categoryId,
         String reportDetails, String returnBranchName, double returnLatitude, double returnLongitude) {
 
         Map<String, Object> result = new HashMap<>();
-
-        // 미처리 신고 확인
-        if (hasUnresolvedReport(customerId)) {
-            result.put("report", null);
-            result.put("code", 403);
-            result.put("msg", "처리되지 않은 신고가 있습니다. 기존 신고가 처리된 후 새로운 신고가 가능합니다.");
-            return result;
-        }
 
         // 유효한 카테고리인지 확인
         if (!faultCategoryRepository.existsById(categoryId)) {
@@ -157,10 +134,7 @@ public class ReportService {
         Rental rental = activeRental.get();
         Duration rentalDuration = Duration.between(rental.getRentalStartDate(), LocalDateTime.now());
 
-        boolean shouldRedirectToPayment = rentalDuration.toMinutes() > 5;
-
-        System.out.println("Rental Duration: " + rentalDuration.toMinutes() + " minutes");
-        System.out.println("Redirect to Payment: " + shouldRedirectToPayment);
+        boolean shouldRedirectToPayment = rentalDuration.toMinutes() > 1;
 
         // 신고 생성 및 저장
         FaultReport faultReport = new FaultReport();
@@ -190,11 +164,14 @@ public class ReportService {
         result.put("report", faultReport);
         result.put("code", 200);
         result.put("msg", "신고 및 자전거 반납이 성공적으로 완료되었습니다.");
-        result.put("redirectToPayment", shouldRedirectToPayment); // 결제 페이지로 넘길지 여부 포함
+        result.put("redirectToPayment", shouldRedirectToPayment);
 
-        paymentsService.calculateAndSavePayment(rental.getRentalId(), customerId);
+        // 5분이 넘었을 때만 결제 계산
+        if (shouldRedirectToPayment) {
+            paymentsService.calculateAndSavePayment(rental.getRentalId(), customerId);
+        }
+
         return result;
     }
-
 
 }
