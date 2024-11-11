@@ -186,8 +186,13 @@ function submitReport() {
     type: 'POST',
     data: { bicycleId: selectedBicycleId, categoryId: categoryId, reportDetails: reportDetails },
     success: function(response) {
-      alert(response.msg);
-      closePopup('dynamicReportPopup');
+      if (response.code === 403) {  // 미결제 상태로 신고 불가
+        alert(response.msg);  // 결제 필요 메시지 표시
+        window.location.href = "/pay/payment";  // 결제 페이지로 이동
+      } else {
+        alert(response.msg);
+        closePopup('dynamicReportPopup');
+      }
     },
     error: function(xhr) {
       alert("서버 에러가 발생했습니다. 신고 접수에 실패했습니다.");
@@ -195,6 +200,7 @@ function submitReport() {
     }
   });
 }
+
 
 
 
@@ -305,7 +311,7 @@ function showAvailableBicycles(latitude, longitude) {
 
         var rentButton = document.createElement("button");
         rentButton.textContent = "대여";
-        rentButton.style.backgroundColor = "#001f54"; // 새로운 배경색
+        rentButton.style.backgroundColor = "#001f54";
         rentButton.style.color = "white";
         rentButton.style.marginRight = "10px";
         rentButton.onclick = function() {
@@ -316,7 +322,7 @@ function showAvailableBicycles(latitude, longitude) {
 
         var reportButton = document.createElement("button");
         reportButton.textContent = "신고";
-        reportButton.style.backgroundColor = "#001f54"; // 새로운 배경색
+        reportButton.style.backgroundColor = "#001f54";
         reportButton.style.color = "white";
         reportButton.onclick = function() {
           selectedBicycleId = bike.bicycleId;
