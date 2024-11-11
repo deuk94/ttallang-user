@@ -17,6 +17,7 @@ body, html {
 #map {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 header img {
@@ -29,7 +30,7 @@ header nav a {
   color: #333;
 }
 
-/* 팝업 스타일 tset*/
+/* 팝업 스타일 */
 .popup {
   position: fixed;
   top: 50%; /* 화면의 중앙에 가깝게 위치 */
@@ -97,20 +98,21 @@ header nav a {
   flex-grow: 1;
 }
 
-.bicycle-item button {
+.bicycle-item .button-group button {
   padding: 8px 12px;
-  background-color: #333;
+  background-color: #001f54; /* 새로운 배경색 */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
-.bicycle-item .button-group {
-  display: flex;
-  gap: 5px;
+.bicycle-item .button-group button:hover {
+  background-color: #003d82; /* 호버 시 색상 */
 }
+
 
 /* 신고 팝업 스타일 */
 .report-popup {
@@ -193,10 +195,11 @@ textarea {
   margin-bottom: 15px;
 }
 
+/* 신고 및 반납하기 버튼 스타일 */
 button.report-submit {
   width: 100%;
   padding: 10px;
-  background-color: #0056b3;
+  background-color: #001f54; /* 새로운 배경색 */
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -206,5 +209,95 @@ button.report-submit {
 }
 
 button.report-submit:hover {
-  background-color: #003d82;
+  background-color: #003d82; /* 호버 시 색상 */
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* 버튼들을 오른쪽으로 정렬 */
+  gap: 10px; /* 버튼 간의 간격 */
+  margin-top: 15px; /* 버튼 상단 여백 */
+}
+
+/* 반납하기 버튼 스타일 */
+.return-button {
+  background-color: #001f54; /* 새로운 배경색 */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.return-button:hover {
+  background-color: #003d82; /* 호버 시 색상 */
+}
+
+/* 신고하기 버튼 스타일 */
+.report-button {
+  background-color: #001f54; /* 새로운 배경색 */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.report-button:hover {
+  background-color: #003d82; /* 호버 시 색상 */
+}
+
+/* 지도 컨트롤 버튼 스타일 */
+.btn-container {
+  position: absolute;
+  bottom: 40px; /* 하단으로 위치 조정 */
+  right: 10px;
+  z-index: 1001;
+}
+
+.zoom-container {
+  position: absolute;
+  top: 60px; /* 스카이뷰 버튼 바로 아래에 위치 */
+  right: 10px; /* 우측으로 약간 간격 */
+  z-index: 1001;
+}
+
+.zoom-container .btn {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  cursor: pointer;
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.zoom-container .btn:hover {
+  background-color: #f1f1f1;
+}
+
+.btn {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  cursor: pointer;
+  margin: 5px 2px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #f0f0f0;
+}
+
+.selected_btn {
+  background-color: #333;
+  color: white;
+  border: 1px solid #333;
 }

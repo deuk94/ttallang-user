@@ -16,6 +16,11 @@
 <div id="map-container">
     <div id="map"></div>
 
+    <!-- 커스텀 확대/축소 버튼 -->
+    <div class="zoom-container">
+        <button class="btn" onclick="zoomIn()">+</button>
+        <button class="btn" onclick="zoomOut()">-</button>
+    </div>
     <!-- 대여소 정보 팝업 -->
     <div class="popup" id="branchInfoPopup">
         <button class="close-btn" onclick="closePopup('branchInfoPopup')">X</button>
@@ -51,8 +56,10 @@
         <p>대여 지점: <span id="customRentalBranch"></span></p>
         <p>대여 시작 시간: <span id="customRentalStartDate"></span></p>
         <p>그래도 반납하시겠습니까?</p>
-        <button onclick="returnBike(true)">반납하기</button>
-        <button onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
+        <div class="button-container">
+            <button class="return-button" onclick="returnBike(true)">반납하기</button>
+            <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
+        </div>
     </div>
 
     <!-- 대여소 반납 팝업 -->
@@ -63,9 +70,12 @@
         <p>현재 대여중인 자전거: <span id="bicycleName"></span></p>
         <p>대여 지점: <span id="rentalBranch"></span></p>
         <p>대여 시작 시간: <span id="rentalStartDate"></span></p>
-        <button onclick="returnBike(false)">반납하기</button>
-        <button onclick="openReportAndReturnPopup(); closePopup('returnPopup');">신고하기</button>
+        <div class="button-container">
+            <button class="return-button" onclick="returnBike(false)">반납하기</button>
+            <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('returnPopup');">신고하기</button>
+        </div>
     </div>
+
 
     <!-- 신고 및 반납 팝업 -->
     <div class="report-popup" id="reportAndReturnPopup" style="display: none;">
