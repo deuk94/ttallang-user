@@ -27,15 +27,11 @@ function closeAllPopups() {
   closePopup('dynamicReportPopup');
   closePopup('customReturnPopup');
   closePopup('returnPopup');
+  closePopup('reportAndReturnPopup');
   isCustomReturnPopupOpen = false;
   isBranchInfoPopupOpen = false;
 }
 
-// 대여소 팝업 표시 함수
-function showBranchInfoPopup() {
-  document.getElementById("branchInfoPopup").style.display = 'block';
-  isBranchInfoPopupOpen = true;
-}
 
 // 대여소 외 지역 반납 팝업 표시 함수
 function showCustomReturnPopup() {
@@ -348,18 +344,37 @@ var main = new kakao.maps.Map(container, options);
 
 // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
 var mapTypeControl = new kakao.maps.MapTypeControl();
+main.addControl(mapTypeControl, kakao.maps.ControlPosition.RIGHT);
 
-// 지도에 컨트롤을 추가해야 지도위에 표시됩니다
-// kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
-main.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+// 페이지가 로드된 후에 컨트롤의 위치를 조정
+window.onload = function() {
+  // 지도 타입 컨트롤 요소의 위치를 조정
+  var mapTypeControlDiv = document.querySelector("div[style*='background-color: rgb(255, 255, 255)']");
+  if (mapTypeControlDiv) {
+    mapTypeControlDiv.style.top = "15px";  // 원하는 top 위치로 조정
+    mapTypeControlDiv.style.right = "4px"; // 원하는 left 위치로 조정
+    mapTypeControlDiv.style.zIndex = "1001"; // 다른 요소들 위에 표시되도록 설정
+  }
 
-// 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
-var zoomControl = new kakao.maps.ZoomControl();
-main.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+};
+
+
+// 지도 확대 기능
+function zoomIn() {
+  main.setLevel(main.getLevel() - 1);
+}
+
+// 지도 축소 기능
+function zoomOut() {
+  main.setLevel(main.getLevel() + 1);
+}
+
+
+
 
 // 마커 이미지 설정
-var imageSrc = '/images/자전거.png',
-    imageSize = new kakao.maps.Size(40, 40),
+var imageSrc = '/images/bicycle.svg',
+    imageSize = new kakao.maps.Size(50, 50),
     imageOption = { offset: new kakao.maps.Point(20, 20) };
 var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
