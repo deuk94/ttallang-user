@@ -37,7 +37,7 @@ function handleLoginForm(event) {
                 if (data.role === "user") {
                     if (data.code === 402) {
                         alert("결제를 먼저 진행해주세요!!!");
-                        window.location.href = "../../payment";
+                        window.location.href = "/pay/payment";
                     } else {
                         window.location.href = "/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
                     }
