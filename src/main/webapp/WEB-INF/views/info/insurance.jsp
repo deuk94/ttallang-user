@@ -71,7 +71,7 @@
   </style>
 </head>
 <body>
-<jsp:include page="../myPage/head/head.jsp" />
+<jsp:include page="../head/head.jsp" />
 <div class="container">
   <h2>보험항목 및 보장금액</h2>
   <table>
@@ -122,6 +122,6 @@
     <p>기타문의: 딸랑컴퍼니 고객 센터 <span class="icon">☎</span>02-1234-9876</p>
   </div>
 </div>
-<jsp:include page="../myPage/footer/footer.jsp" />
+<jsp:include page="../footer/footer.jsp" />
 </body>
 </html>

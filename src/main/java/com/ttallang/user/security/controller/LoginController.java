@@ -20,7 +20,7 @@ public class LoginController {
     public String loginForm() {
         Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user instanceof PrincipalDetails) {
-            return "redirect:/map/main";
+            return "redirect:/main";
         }
         return "userAuth/main/loginForm";
     }

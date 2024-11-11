@@ -38,7 +38,7 @@
 </style>
 <header>
     <div>
-        <a href="/map/main">
+        <a href="/main">
             <img src="/images/logo.png" alt="따릉이 로고" />
         </a>
     </div>
