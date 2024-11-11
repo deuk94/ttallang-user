@@ -246,7 +246,6 @@ public class SignupServiceImpl implements SignupService {
                     entity,
                     new ParameterizedTypeReference<Map<String, Object>>() {}
             );
-            System.out.println("#########################################################");
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("액세스 토큰 얻어오기 성공...");
@@ -514,7 +513,7 @@ public class SignupServiceImpl implements SignupService {
                 return "redirect:/login/form?error="+encodedMessage;
             }
         }
-        return "userAuth/main/signupForm";
+        return "account/signup/form";
     }
     
     // 일반 회원가입 관련.
