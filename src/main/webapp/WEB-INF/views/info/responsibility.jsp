@@ -83,7 +83,7 @@
     </style>
 </head>
 <body>
-<jsp:include page="../myPage/head/head.jsp" />
+<jsp:include page="../head/head.jsp" />
 <div class="container">
     <h1>의무 및 책임사항</h1>
 
@@ -122,6 +122,6 @@
         </div>
     </div>
 </div>
-<jsp:include page="../myPage/footer/footer.jsp" />
+<jsp:include page="../footer/footer.jsp" />
 </body>
 </html>

@@ -65,7 +65,7 @@
   </style>
 </head>
 <body>
-<jsp:include page="../myPage/head/head.jsp" />
+<jsp:include page="../head/head.jsp" />
 <div class="container">
   <!-- 첫 번째 테이블: 자전거 대여시간 초과요금 -->
   <h2>자전거 대여시간 초과요금</h2>
@@ -111,6 +111,6 @@
     </tbody>
   </table>
 </div>
-<jsp:include page="../myPage/footer/footer.jsp" />
+<jsp:include page="../footer/footer.jsp" />
 </body>
 </html>
