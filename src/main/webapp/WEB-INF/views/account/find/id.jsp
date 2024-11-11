@@ -36,7 +36,6 @@
               maxlength="11"
               required
           />
-          <button id="sendSMS" form="phoneForm" type="submit" class="btn btn-outline-secondary ms-2">전송</button>
           <div class="invalid-feedback">
             유효한 휴대폰 번호를 입력해주세요. (ex. 01011112222)
           </div>
@@ -46,11 +45,12 @@
         <div id="authInputGroup" class="input-group mb-3 d-none">
           <label for="authNumber"></label>
           <input type="text" id="authNumber" name="authNumber" class="form-control" maxlength="4" pattern="\d{4}" required>
-          <button id="checkAuthNumber" type="submit" class="btn btn-outline-secondary ms-2">확인</button>
         </div>
       </form>
-      <div class="d-grid gap-2">
-        <a href="${pageContext.request.contextPath}/login/form" class="btn btn-warning">취소</a>
+      <div class="d-flex justify-content-center">
+        <a href="${pageContext.request.contextPath}/login/form" class="btn-cancel">취소</a>
+        <button id="sendSMS" form="phoneForm" type="submit" class="btn btn-outline-secondary ms-2">전송</button>
+        <button id="checkAuthNumber" form="authForm" type="submit" class="btn btn-outline-secondary ms-2 d-none">확인</button>
       </div>
     </div>
   </div>

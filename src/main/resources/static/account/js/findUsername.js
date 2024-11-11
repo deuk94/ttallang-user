@@ -4,6 +4,7 @@ const helpAuthNumber = document.querySelector("#helpAuthNumber");
 const customerPhoneInputGroup = document.querySelector("#customerPhoneInputGroup");
 const customerPhone = document.querySelector("#customerPhone");
 const authInputGroup = document.querySelector("#authInputGroup");
+const checkAuthNumber = document.querySelector("#checkAuthNumber");
 
 customerPhone.addEventListener("input", validateCustomerPhone);
 phoneForm.addEventListener("submit", handlePhoneForm);
@@ -40,6 +41,8 @@ function handlePhoneForm(event) {
                     customerPhoneInputGroup.classList.add("d-none");
                     helpAuthNumber.classList.remove("d-none");
                     authInputGroup.classList.remove("d-none");
+                    authInputGroup.classList.remove("d-none");
+                    checkAuthNumber.classList.remove("d-none");
                 }
             })
             .catch(error => {
@@ -70,7 +73,7 @@ function handleAuthForm(event) {
 
     const formData = new FormData(authForm);
     const data = Object.fromEntries(formData);
-    data[customerPhone] = customerPhone.value;
+    data[customerPhone.name] = customerPhone.value;
 
     if (isSubmitted) {
         fetch(`/api/find/username/auth`, {
@@ -91,7 +94,7 @@ function handleAuthForm(event) {
                     alert(data.message);
                 } else { // 인증 성공.
                     alert(`회원님의 아이디는 ${data.message} 입니다.`);
-                    // 아이디 찾은 다음 아이디 알려주는 곳으로 이동.
+                    window.location.href = "/login/form";
                 }
             })
             .catch(error => {

@@ -29,8 +29,8 @@
       </div>
     </div>
     <div id="errorMessage" class="alert alert-danger d-none" role="alert"></div>
-    <button type="submit" class="btn btn-primary">로그인</button>
-    <a href="${pageContext.request.contextPath}/signup/select" type="button" class="btn btn-primary">회원가입</a>
+    <button type="submit" class="btn-login">로그인</button>
+    <a href="${pageContext.request.contextPath}/signup/select" type="button" class="btn-signup">회원가입</a>
   </form>
   <div class="find-auth text-center mt-3">
     <a href="${pageContext.request.contextPath}/find/select">아이디/비밀번호 찾기</a>

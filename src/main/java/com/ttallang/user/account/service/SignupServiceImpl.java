@@ -542,7 +542,7 @@ public class SignupServiceImpl implements SignupService {
         System.out.println(email);
         List<User> userList = userRepository.findByCustomerPhoneOrEmail(customerPhone, email);
         log.info("userList={}", userList);
-        return !userList.isEmpty();
+        return !(userList.isEmpty());
     }
 
     // 일반 회원 가입.

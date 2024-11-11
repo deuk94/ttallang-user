@@ -59,6 +59,7 @@ public class FindRestController {
         accountResponse.setStatus("failure");
         accountResponse.setRole("guest");
         accountResponse.setMessage("인증 실패.");
+        System.out.println(requestBody);
         String customerPhone = requestBody.get("customerPhone");
         String number1 = requestBody.get("authNumber");
         try {

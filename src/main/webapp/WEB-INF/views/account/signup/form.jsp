@@ -109,9 +109,9 @@
 							유효한 생년월일을 입력해주세요. (ex. 19990101)
 						</div>
 					</div>
-					<div class="d-grid gap-2">
-						<button form="signupForm" type="submit" class="btn btn-primary">가입하기</button>
-						<a href="${pageContext.request.contextPath}/login/form" class="btn btn-warning">취소</a>
+					<div class="d-flex justify-content-center mt-5">
+						<button form="signupForm" type="submit" class="btn-submit me-3">가입하기</button>
+						<a id="btn-cancel" href="${pageContext.request.contextPath}/login/form" class="btn-cancel">취소</a>
 					</div>
 				</form>
 			</div>
