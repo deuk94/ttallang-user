@@ -13,8 +13,8 @@
   }
 </style>
 <footer>
-    <p> 이용약관 | 위치정보관련 약관 | 개인정보처리방침 </p>
     <p>서울 종로구 창경궁로 254 7층 딸랑컴퍼니 대표 김영윤</p>
+    <p>대표 번호 : 010-1234-9876</p>
     <p>COPYRIGHT ⓒ 2024 ttallang ALL RIGHTS RESERVED.</p>
 </footer>
 

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.ttallang.user.commonModel.User;
-import com.ttallang.user.security.model.PaymentUser;
+import com.ttallang.user.account.model.NotPaymentUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -18,19 +18,20 @@ public class PrincipalDetails implements UserDetails {
 
     private final Roles roles;
     private final User user;
-    private final PaymentUser paymentUser;
+    private final NotPaymentUser notPaymentUser;
 
-    // 유저의 경우.
-    public PrincipalDetails(Roles roles, User user, PaymentUser paymentUser) {
+    // 이 유저의 경우 결제를 안한 유저임.
+    public PrincipalDetails(Roles roles, User user, NotPaymentUser notPaymentUser) {
         this.roles = roles;
         this.user = user;
-        this.paymentUser = paymentUser;
+        this.notPaymentUser = notPaymentUser;
     }
 
+    // 이 유저의 경우 결제를 한 유저임.
     public PrincipalDetails(Roles roles, User user) {
         this.roles = roles;
         this.user = user;
-        this.paymentUser = null;
+        this.notPaymentUser = null;
     }
 
     //해당 유저의 권한 리턴 하는 곳
@@ -58,7 +59,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return !roles.getUserStatus().equals("0");
     }
 
     @Override
@@ -73,7 +74,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return !roles.getUserStatus().equals("0"); // "2"인경우 블랙리스트로 취급할까?
+        return !roles.getUserStatus().equals("-1"); // 유저 정보가 테이블에 없는 경우.
     }
 
     public int getUserId() {
@@ -83,7 +84,7 @@ public class PrincipalDetails implements UserDetails {
     // 이 속성의 경우 로그인할 때 인증객체를 만들면서 오직 한 번만 검사하는 속성임.
     public String getPaymentStatus() {
         String paymentStatus = "0";
-        if (paymentUser == null) {
+        if (notPaymentUser == null) {
             paymentStatus = "1";
         }
         return paymentStatus;
