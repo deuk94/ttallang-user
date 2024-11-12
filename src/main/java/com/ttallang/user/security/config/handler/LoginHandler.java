@@ -10,9 +10,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class LoginHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
     @Override
     public void onAuthenticationSuccess(
@@ -21,26 +23,28 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
             Authentication authentication
     ) throws IOException {
         String role = authentication.getAuthorities().iterator().next().getAuthority();
+        response.setContentType("application/json;charset=UTF-8");
+        AccountResponse accountResponse = new AccountResponse();
         if (role.equals("ROLE_ADMIN")) {
-            response.setContentType("application/json;charset=UTF-8");
-            AccountResponse accountResponse = new AccountResponse(200, "success","admin", "관리자 로그인 성공.");
+            response.setStatus(HttpServletResponse.SC_OK);
+            accountResponse.setRole("admin");
+            accountResponse.setMessage("관리자 로그인 성공.");
             new ObjectMapper().writeValue(response.getWriter(), accountResponse);
         } else if (role.equals("ROLE_USER")) {
             PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            accountResponse.setRole("user");
             if (pds.getPaymentStatus().equals("1")) {
-                response.setContentType("application/json;charset=UTF-8");
-                AccountResponse accountResponse = new AccountResponse(200, "success", "user", "유저 로그인 성공.");
+                response.setStatus(HttpServletResponse.SC_OK);
+                accountResponse.setMessage("유저 로그인 성공.");
                 new ObjectMapper().writeValue(response.getWriter(), accountResponse);
             } else {
-                response.setContentType("application/json;charset=UTF-8");
-                AccountResponse accountResponse = new AccountResponse(402, "failure", "user", "미결제 상태.");
+                response.setStatus(HttpServletResponse.SC_PAYMENT_REQUIRED);
+                accountResponse.setMessage("미결제 상태.");
                 new ObjectMapper().writeValue(response.getWriter(), accountResponse);
             }
         } else { // 로그인이 되었지만 권한을 찾을 수 없으므로 401 처리.
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
             AccountResponse accountResponse = new AccountResponse(401, "failure", "unknown", "권한 정보를 찾을 수 없습니다.");
-
             new ObjectMapper().writeValue(response.getWriter(), accountResponse);
         }
     }

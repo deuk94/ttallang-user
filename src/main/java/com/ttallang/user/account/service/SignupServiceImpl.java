@@ -4,16 +4,13 @@ import com.ttallang.user.commonModel.Roles;
 import com.ttallang.user.commonModel.User;
 import com.ttallang.user.commomRepository.RolesRepository;
 import com.ttallang.user.commomRepository.UserRepository;
-import com.ttallang.user.security.config.RandomStateToken;
+import com.ttallang.user.security.config.token.RandomStateToken;
 import com.ttallang.user.account.model.CertInfo;
 import com.ttallang.user.account.model.AccountResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -520,20 +517,16 @@ public class SignupServiceImpl implements SignupService {
     // ---------------------------------------------------------------------------
     // 아이디 존재 여부 확인.
     @Override
-    public AccountResponse isExistingRolesUserName(String userName) {
+    public ResponseEntity<AccountResponse> isExistingRolesUserName(String userName) {
         Roles roles = rolesRepository.findByUserName(userName);
         AccountResponse accountResponse = new AccountResponse();
         accountResponse.setRole("guest");
         if (roles == null) {
-            accountResponse.setCode(204);
-            accountResponse.setStatus("success");
             accountResponse.setMessage("가입 가능한 ID.");
-        } else {
-            accountResponse.setCode(200);
-            accountResponse.setStatus("success");
-            accountResponse.setMessage("이미 존재하는 ID.");
+            return new ResponseEntity<>(accountResponse, HttpStatus.NO_CONTENT);
         }
-        return accountResponse;
+        accountResponse.setMessage("이미 존재하는 ID.");
+        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 
     // 중복 유저 존재 여부 확인.
@@ -547,16 +540,14 @@ public class SignupServiceImpl implements SignupService {
 
     // 일반 회원 가입.
     @Override
-    public AccountResponse signupCustomer(Map<String, String> userData) {
+    public ResponseEntity<AccountResponse> signupCustomer(Map<String, String> userData) {
         AccountResponse accountResponse = new AccountResponse();
         String email = userData.get("email");
         String customerPhone = userData.get("customerPhone");
         accountResponse.setRole("guest");
         if (this.isExistingCustomer(email, customerPhone)) { // 중복 유저가 존재하는 경우.
-            accountResponse.setCode(401);
-            accountResponse.setStatus("failure");
             accountResponse.setMessage("이미 해당 정보로 가입한 유저가 있습니다.");
-            return accountResponse;
+            return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
         };
         try {
             // 유저 상세 데이터 기록.
@@ -564,16 +555,13 @@ public class SignupServiceImpl implements SignupService {
             this.recordUser(userData, roles);
             System.out.println("유저 회원가입 성공: " + roles);
             // DB 기록 종료.
-            accountResponse.setCode(200);
-            accountResponse.setStatus("success");
             accountResponse.setMessage("회원가입 성공.");
         } catch (Exception e) {
-            accountResponse.setCode(500);
-            accountResponse.setStatus("failure");
             accountResponse.setMessage("회원가입 실패,"+e.getMessage());
             log.error("회원가입에 실패했습니다. 원인={}", e.getMessage());
+            return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return accountResponse;
+        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 
     private Roles recordRoles(Map<String, String> userData) {
