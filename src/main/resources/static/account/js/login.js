@@ -27,27 +27,20 @@ function handleLoginForm(event) {
             body: formData
         }).then(async response => {
             if (!response.ok) {
-                const error = new Error();
-                error.data = await response.json();
-                throw error;
+                if (response.status === 402) {
+                    alert("결제를 먼저 진행해주세요!!!");
+                    window.location.href = "/pay/payment";
+                }
+                const result = await response.json();
+                throw new Error(result.message);
             }
             return response.json();
         })
-            .then(data => { // 이 data는 response.json()의 실제값.
-                if (data.role === "user") {
-                    if (data.code === 402) {
-                        alert("결제를 먼저 진행해주세요!!!");
-                        window.location.href = "/pay/payment";
-                    } else {
-                        window.location.href = "/main"; // -> /user/** 형식으로 바꿔야 권한 적용 가능함.
-                    }
-                } else {
-                    alert(data.message);
-                    throw new Error("로그인 실패 (권한 정보를 확인할 수 없습니다.)");
-                }
+            .then(result => { // 이 data는 response.json()의 실제값.
+                window.location.href = "/main";
             })
             .catch(error => {
-                errorMessage.textContent = error.data.message;
+                errorMessage.textContent = error.message;
                 errorMessage.classList.remove("d-none");
             });
     }
@@ -89,7 +82,9 @@ const alertMessage = getQueryParam("error");
 const cancelMessage = getQueryParam("cancel");
 if (alertMessage) {
     alert(alertMessage);
+    window.location.href = "/login/form";
 }
 if (cancelMessage) {
     alert(cancelMessage);
+    window.location.href = "/login/form";
 }

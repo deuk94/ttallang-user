@@ -24,7 +24,7 @@
     </div>
     <div class="d-flex justify-content-center m-0">
       <a href="/signup/form">
-        <div class="btn-normal">
+        <div class="btn-base btn-normal">
           일반 회원가입
         </div>
       </a>
@@ -34,7 +34,7 @@
       <div id="naverCert">
         <img class="btn-naver" src="${pageContext.request.contextPath}/account/images/naverLogin.png" alt="네이버 아이콘">
       </div>
-      <div id="paycoCert" class="btn-payco">PAYCO 로그인</div>
+      <div id="paycoCert" class="btn-base btn-payco">PAYCO 로그인</div>
     </div>
   </div>
 </div>

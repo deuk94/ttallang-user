@@ -1,14 +1,19 @@
 const phoneForm = document.querySelector("#phoneForm");
+
 const helpPhoneNumber = document.querySelector("#helpPhoneNumber");
 const helpAuthNumber = document.querySelector("#helpAuthNumber");
+
 const customerPhoneInputGroup = document.querySelector("#customerPhoneInputGroup");
 const customerPhone = document.querySelector("#customerPhone");
+
 const authInputGroup = document.querySelector("#authInputGroup");
+
+const sendSMS = document.querySelector("#sendSMS");
 const checkAuthNumber = document.querySelector("#checkAuthNumber");
 
 customerPhone.addEventListener("input", validateCustomerPhone);
 phoneForm.addEventListener("submit", handlePhoneForm);
-let isAuthenticated = false;
+
 let isSubmitted = false;
 
 function handlePhoneForm(event) {
@@ -25,28 +30,26 @@ function handlePhoneForm(event) {
             },
             body: JSON.stringify(data),
         })
-            .then(response => {
+            .then(async response => {
                 if (!response.ok) {
-                    throw new Error("문자 보내기를 실패하였습니다.");
+                    const result = await response.json();
+                    throw new Error(result.message);
                 }
                 return response.json();
             })
-            .then(data => {
-                if (data.code !== 200) {
-                    alert(data.message);
-                } else { // 전송 성공.
-                    isSubmitted = true;
-                    // 인증번호 입력란 보여주기.
-                    helpPhoneNumber.classList.add("d-none");
-                    customerPhoneInputGroup.classList.add("d-none");
-                    helpAuthNumber.classList.remove("d-none");
-                    authInputGroup.classList.remove("d-none");
-                    authInputGroup.classList.remove("d-none");
-                    checkAuthNumber.classList.remove("d-none");
-                }
+            .then(() => {
+                // 전송 성공.
+                isSubmitted = true;
+                // 인증번호 입력란 보여주기.
+                changeForm();
             })
             .catch(error => {
-                alert(error)
+                if (error.message === "이미 인증이 진행중입니다.") {
+                    // 이미 전송함.
+                    isSubmitted = true;
+                    changeForm();
+                }
+                alert(error.message);
             });
     } else {
         alert("형식에 맞게 입력해주세요!");
@@ -83,24 +86,31 @@ function handleAuthForm(event) {
             },
             body: JSON.stringify(data),
         })
-            .then(response => {
+            .then(async response => {
                 if (!response.ok) {
-                    throw new Error("인증을 실패하였습니다.");
+                    const result = await response.json();
+                    throw new Error(result.message);
                 }
                 return response.json();
             })
-            .then(data => {
-                if (data.code !== 200) {
-                    alert(data.message);
-                } else { // 인증 성공.
-                    alert(`회원님의 아이디는 ${data.message} 입니다.`);
-                    window.location.href = "/login/form";
-                }
+            .then(result => {
+                alert(`회원님의 아이디는 ${result.message} 입니다.`);
+                window.location.href = "/login/form";
             })
             .catch(error => {
-                alert(error)
+                alert(error.message);
             });
     } else {
-        alert("핸드폰 번호 입력 후 전송 버튼을 눌러주세요!");
+        alert("전송 버튼을 눌러주세요!");
     }
+}
+
+function changeForm() {
+    sendSMS.classList.add("d-none");
+    helpPhoneNumber.classList.add("d-none");
+    customerPhoneInputGroup.classList.add("d-none");
+    helpAuthNumber.classList.remove("d-none");
+    authInputGroup.classList.remove("d-none");
+    authInputGroup.classList.remove("d-none");
+    checkAuthNumber.classList.remove("d-none");
 }

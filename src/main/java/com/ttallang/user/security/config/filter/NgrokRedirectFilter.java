@@ -13,9 +13,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Slf4j
-@Component  // 스프링 빈으로 등록
+@Component  // 빈에서 관리하기.
 public class NgrokRedirectFilter extends OncePerRequestFilter {
 
+    // 만약 ngrok으로 리다이렉트 된다면 이 필터가 로컬호스트로 돌려놓을것임.
     @Override
     public void doFilterInternal(
             HttpServletRequest request,

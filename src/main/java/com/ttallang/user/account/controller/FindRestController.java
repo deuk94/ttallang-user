@@ -25,10 +25,8 @@ public class FindRestController {
 
     @PostMapping("/find/username")
     public ResponseEntity<AccountResponse> findUserNameByCustomerPhone(@RequestBody Map<String, String> requestBody) {
-        AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setRole("guest");
+        AccountResponse accountResponse = new AccountResponse("guest", null);
         String customerPhone = requestBody.get("customerPhone");
-        System.out.println(customerPhone);
         try {
             if (findService.findUserNameByCustomerPhone(customerPhone)) {
                 if (!findService.sendSms(customerPhone)) { // 보내기 시도.
@@ -44,15 +42,13 @@ public class FindRestController {
             log.error("유저 정보 찾기 에러: {}", e.getMessage());
             return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        accountResponse.setMessage("보내기 성공.");
+        accountResponse.setMessage("전송 성공.");
         return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 
     @PostMapping("/find/username/auth")
     public ResponseEntity<AccountResponse> checkAuthNumber(@RequestBody Map<String, String> requestBody) {
-        AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setRole("guest");
-        accountResponse.setMessage("인증 실패.");
+        AccountResponse accountResponse = new AccountResponse("guest", "인증 번호가 다릅니다.");
         System.out.println(requestBody);
         String customerPhone = requestBody.get("customerPhone");
         String number1 = requestBody.get("authNumber");
@@ -63,12 +59,13 @@ public class FindRestController {
                 accountResponse.setMessage(rolesUser.getUserName());
                 sharedAuthNumberMap.remove(customerPhone); // 임시 인증정보를 지운다.
                 return new ResponseEntity<>(accountResponse, HttpStatus.OK); // 200.
+            } else {
+                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST); // 200.
             }
         } catch (Exception e) {
             accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
             log.error("SMS 인증 에러: {}", e.getMessage());
             return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR); // 500.
         }
-        return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST); // 400.
     }
 }

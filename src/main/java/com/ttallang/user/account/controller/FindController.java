@@ -17,4 +17,9 @@ public class FindController {
     public String inputCustomerPhone() {
         return "account/find/id";
     }
+
+    @GetMapping("/find/password/input")
+    public String inputUsernameCustomerPhone() {
+        return "account/find/pw";
+    }
 }

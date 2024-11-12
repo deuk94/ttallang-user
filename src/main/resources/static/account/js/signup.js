@@ -11,45 +11,42 @@ const existDiv = document.querySelector("#existDiv");
 
 const form = document.querySelector("#signupForm");
 
+let isExist = true;
+
 // 폼 처리 관련
 form.addEventListener("submit", handleSignupForm);
 
 // 아이디 중복 검사 버튼
 checkExistButton.addEventListener("click", handleCheckButton);
 
-let isExist = true;
-
 // 중복검사 버튼.
 function handleCheckButton(event) {
     event.preventDefault();
 
-    if (validateUserName()) {
+    if (validateUserName(event)) {
         fetch(`/api/signup/form/checkExisting/${userName.value}`, {
             method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            }
         })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error("확인 실패.");
+        .then(async response => {
+            if (!response.ok) {
+                const result = await response.json();
+                throw new Error(result.message);
             }
+            return response.json();
         })
-        .then(data => {
-            if (data.code === 204) { // 아이디 사용 가능.
+        .then(result => {
+            if (result.message === "가입 가능한 ID.") { // 아이디 사용 가능.
                 existId.classList.add("d-none");
                 notExistId.classList.remove("d-none");
                 isExist = false;
-            } else if (data.code === 200) { // 아이디 사용 불가능.
+            } else if (result.message === "이미 존재하는 ID.") { // 아이디 사용 불가능.
                 notExistId.classList.add("d-none");
                 existId.classList.remove("d-none");
                 isExist = true;
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            alert(error.message);
             isExist = true;
         });
     } else {
@@ -58,7 +55,9 @@ function handleCheckButton(event) {
 }
 
 // 유효성 검사 이벤트 등록
-userName.addEventListener("input", validateUserName);
+userName.addEventListener("input", (event) => {
+    validateUserName(event);
+});
 userPassword.addEventListener("input", validateUserPassword);
 confirmPassword.addEventListener("input", validateConfirmPassword);
 userEmail.addEventListener("input", validateEmail);
@@ -68,8 +67,8 @@ userBirthday.addEventListener("input", validateBirthday);
 function handleSignupForm(event) {
     event.preventDefault();
 
-    // 폼 유효성 확인
-    if (validateForm()) {
+    // 폼 유효성 확인.
+    if (validateForm(event)) {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
 
@@ -80,58 +79,37 @@ function handleSignupForm(event) {
             },
             body: JSON.stringify(data),
         })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error("회원가입 실패.");
+        .then(async response => {
+            if (!response.ok) {
+                const result = await response.json();
+                throw new Error(result.message);
             }
+            return response.json();
         })
-        .then(data => {
-            if (data.status === "success") {
-                alert("회원가입 성공.");
-            } else {
-                alert(data.message);
-            }
+        .then(result => {
+            alert(result.message);
             window.location.href = "/login/form";
         })
         .catch(error => {
-            alert(error);
+            alert(error.message);
         });
     }
 }
 
-function validateForm() {
-    const complete =
-        !isExist &&
-        validateUserName() &&
-        validateUserPassword() &&
-        validateConfirmPassword() &&
-        validateEmail() &&
-        validateBirthday() &&
-        validateCustomerPhone();
-    if (complete) {
-        return true;
-    } else {
-        if (isExist) {
-            alert("아이디 중복 검사를 해주세요!");
-        } else {
-            alert("올바른 정보를 입력해주세요!");
+function validateUserName(event) {
+    // 이벤트가 있을 때 마다 중복검사 결과를 초기화 해야함.
+    // 단, 폼 제출 이벤트가 아닌 경우에만.
+    if (event !== undefined && event.type !== "submit") {
+        isExist = true;
+        existDiv.classList.add("d-none")
+        if (!existId.classList.contains("d-none")) {
+            existId.classList.add("d-none");
+        }
+        if (!notExistId.classList.contains("d-none")) {
+            notExistId.classList.add("d-none");
         }
     }
-    return false;
-}
-
-function validateUserName() {
-    // 인풋이 새로 있을 때 마다 중복검사 결과를 초기화 해야함.
-    isExist = true;
-    existDiv.classList.add("d-none")
-    if (!existId.classList.contains("d-none")) {
-        existId.classList.add("d-none");
-    }
-    if (!notExistId.classList.contains("d-none")) {
-        notExistId.classList.add("d-none");
-    }
+    // 폼 제출이던 아니던 어떤 경우라도 유효성 검사는 진행함.
     const userNameRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{6,}$/;
     if (!userNameRegex.test(userName.value)) {
         userName.classList.add("is-invalid");
@@ -141,8 +119,6 @@ function validateUserName() {
         existDiv.classList.remove("d-none")
         return true;
     }
-
-
 }
 
 function validateUserPassword() {
@@ -198,4 +174,25 @@ function validateCustomerPhone() {
         customerPhone.classList.remove("is-invalid");
         return true;
     }
+}
+
+function validateForm(event) {
+    const complete =
+        !isExist &&
+        validateUserName(event) &&
+        validateUserPassword() &&
+        validateConfirmPassword() &&
+        validateEmail() &&
+        validateBirthday() &&
+        validateCustomerPhone();
+    if (complete) {
+        return true;
+    } else {
+        if (isExist) {
+            alert("아이디 중복 검사를 해주세요!");
+        } else {
+            alert("올바른 정보를 입력해주세요!");
+        }
+    }
+    return false;
 }

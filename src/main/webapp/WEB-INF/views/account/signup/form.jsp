@@ -110,7 +110,7 @@
 						</div>
 					</div>
 					<div class="d-flex justify-content-center mt-5">
-						<button form="signupForm" type="submit" class="btn-submit me-3">가입하기</button>
+						<button id="form-submit" form="signupForm" type="submit" class="btn-submit me-3">가입하기</button>
 						<a id="btn-cancel" href="${pageContext.request.contextPath}/login/form" class="btn-cancel">취소</a>
 					</div>
 				</form>

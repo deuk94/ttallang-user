@@ -458,7 +458,7 @@ public class SignupServiceImpl implements SignupService {
                 // 유저 중복 검사.
                 String customerPhone = member.get("mobile");
                 String email = member.get("email");
-                if (this.isExistingCustomer(email, customerPhone)) { // 중복 유저가 존재하는 경우.
+                if (this.isExistingCustomers(email, customerPhone)) { // 중복 유저가 존재하는 경우.
                     String encodedMessage = URLEncoder.encode("이미 해당 정보로 가입한 유저가 있습니다.", StandardCharsets.UTF_8);
                     return "redirect:/login/form?error="+encodedMessage;
                 };
@@ -478,7 +478,7 @@ public class SignupServiceImpl implements SignupService {
                 String replacedPhoneNumber1 = phoneNumber.replace("+82 ", "0");
                 String replacedPhoneNumber2 = replacedPhoneNumber1.replace("-", "");
                 String email = kakaoAccount.get("email");
-                if (this.isExistingCustomer(email, replacedPhoneNumber2)) { // 중복 유저가 존재하는 경우.
+                if (this.isExistingCustomers(email, replacedPhoneNumber2)) { // 중복 유저가 존재하는 경우.
                     String encodedMessage = URLEncoder.encode("이미 해당 정보로 가입한 유저가 있습니다.", StandardCharsets.UTF_8);
                     return "redirect:/login/form?error="+encodedMessage;
                 };
@@ -494,7 +494,7 @@ public class SignupServiceImpl implements SignupService {
                 String mobile = response.get("mobile");
                 String replacedMobile = mobile.replace("-", "");
                 String email = response.get("email");
-                if (this.isExistingCustomer(email, replacedMobile)) { // 중복 유저가 존재하는 경우.
+                if (this.isExistingCustomers(email, replacedMobile)) { // 중복 유저가 존재하는 경우.
                     String encodedMessage = URLEncoder.encode("이미 해당 정보로 가입한 유저가 있습니다.", StandardCharsets.UTF_8);
                     return "redirect:/login/form?error="+encodedMessage;
                 };
@@ -519,18 +519,16 @@ public class SignupServiceImpl implements SignupService {
     @Override
     public ResponseEntity<AccountResponse> isExistingRolesUserName(String userName) {
         Roles roles = rolesRepository.findByUserName(userName);
-        AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setRole("guest");
+        AccountResponse accountResponse = new AccountResponse("guest", "이미 존재하는 ID.");
         if (roles == null) {
             accountResponse.setMessage("가입 가능한 ID.");
-            return new ResponseEntity<>(accountResponse, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(accountResponse, HttpStatus.OK);
         }
-        accountResponse.setMessage("이미 존재하는 ID.");
         return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 
     // 중복 유저 존재 여부 확인.
-    private boolean isExistingCustomer(String email, String customerPhone) {
+    private boolean isExistingCustomers(String email, String customerPhone) {
         System.out.println(customerPhone);
         System.out.println(email);
         List<User> userList = userRepository.findByCustomerPhoneOrEmail(customerPhone, email);
@@ -541,21 +539,18 @@ public class SignupServiceImpl implements SignupService {
     // 일반 회원 가입.
     @Override
     public ResponseEntity<AccountResponse> signupCustomer(Map<String, String> userData) {
-        AccountResponse accountResponse = new AccountResponse();
+        AccountResponse accountResponse = new AccountResponse("guest", "회원가입 성공.");
         String email = userData.get("email");
         String customerPhone = userData.get("customerPhone");
-        accountResponse.setRole("guest");
-        if (this.isExistingCustomer(email, customerPhone)) { // 중복 유저가 존재하는 경우.
-            accountResponse.setMessage("이미 해당 정보로 가입한 유저가 있습니다.");
+        if (this.isExistingCustomers(email, customerPhone)) { // 중복 유저가 존재하는 경우.
+            accountResponse.setMessage("이미 해당 정보(휴대폰 번호 혹은 이메일)로 가입한 유저가 있습니다.");
+            System.out.println(email+" : "+customerPhone);
             return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
         };
         try {
             // 유저 상세 데이터 기록.
             Roles roles = this.recordRoles(userData);
-            this.recordUser(userData, roles);
-            System.out.println("유저 회원가입 성공: " + roles);
-            // DB 기록 종료.
-            accountResponse.setMessage("회원가입 성공.");
+            this.recordUser(userData, roles); // DB 기록 종료.
         } catch (Exception e) {
             accountResponse.setMessage("회원가입 실패,"+e.getMessage());
             log.error("회원가입에 실패했습니다. 원인={}", e.getMessage());
