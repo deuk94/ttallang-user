@@ -50,6 +50,13 @@ public class BranchRestController {
         return branchService.getAvailableBikesList(latitude, longitude);
     }
 
+    @GetMapping("/rental/status")
+    public Map<String, Object> getRentalStatus() {
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int loginId = pds.getCustomerID();
+        return rentalsService.getRentalStatusForCustomer(loginId);
+    }
+
     @PostMapping("/rent/bicycle")
     public Map<String, Object> rentBicycle(@RequestParam int bicycleId, @RequestParam String rentalBranch) {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -64,6 +71,20 @@ public class BranchRestController {
         int loginId = pds.getCustomerID();
         return rentalsService.returnBicycle(returnLatitude, returnLongitude, isCustomLocation, returnBranchName, loginId);
     }
+    // 현황판에서 반납 후 결제 처리
+    @PostMapping("/return/bicycle/status")
+    public Map<String, Object> returnBicycleWithPayment(
+        @RequestParam double returnLatitude,
+        @RequestParam double returnLongitude,
+        @RequestParam boolean isCustomLocation,
+        @RequestParam String returnBranchName) {
+
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int loginId = pds.getCustomerID();
+
+        return rentalsService.completeReturn(returnLatitude, returnLongitude, isCustomLocation, returnBranchName, loginId);
+    }
+
 
     @GetMapping("/check-rental-status")
     public Bicycle checkRentalStatus() {

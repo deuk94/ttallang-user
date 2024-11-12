@@ -133,4 +133,73 @@ public class RentalsService {
         }
         return Optional.empty();
     }
+
+    // 현황판을 위한 메서드
+    public Map<String, Object> getRentalStatusForCustomer(int customerId) {
+        Map<String, Object> rentalStatus = new HashMap<>();
+
+        Rental currentRental = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId)
+            .stream()
+            .findFirst()
+            .orElse(null);
+
+        if (currentRental != null) {
+            Optional<Bicycle> rentedBicycle = bicycleRepository.findById(currentRental.getBicycleId());
+            if (rentedBicycle.isPresent()) {
+                rentalStatus.put("bicycleName", rentedBicycle.get().getBicycleName());
+                rentalStatus.put("rentalBranch", currentRental.getRentalBranch());
+                rentalStatus.put("rentalStartDate", currentRental.getRentalStartDate());
+                rentalStatus.put("currentLatitude", rentedBicycle.get().getLatitude());
+                rentalStatus.put("currentLongitude", rentedBicycle.get().getLongitude());
+                rentalStatus.put("code", 200);
+                rentalStatus.put("msg", "대여 현황 조회 성공");
+            } else {
+                rentalStatus.put("code", 404);
+                rentalStatus.put("msg", "대여 중인 자전거 정보를 찾을 수 없습니다.");
+            }
+        } else {
+            rentalStatus.put("code", 404);
+            rentalStatus.put("msg", "대여 중인 자전거가 없습니다.");
+        }
+        return rentalStatus;
+    }
+    // 현황판 반납 기능에 결제 로직을 포함한 새로운 메서드
+    public Map<String, Object> completeReturn(double returnLatitude, double returnLongitude, boolean isCustomLocation, String returnBranchName, int customerId) {
+        Map<String, Object> result = new HashMap<>();
+
+        // 반납할 대여 내역 조회
+        Rental rental = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId)
+            .stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("반납할 대여 내역이 없습니다."));
+
+        // 자전거 상태 업데이트 및 반납 처리
+        rental.setReturnBranch(returnBranchName);
+        rental.setRentalEndDate(LocalDateTime.now());
+        rentalRepository.save(rental);
+
+        Bicycle bicycle = bicycleRepository.findById(rental.getBicycleId())
+            .orElseThrow(() -> new IllegalArgumentException("자전거를 찾을 수 없습니다."));
+        bicycle.setRentalStatus("1");
+        bicycle.setLatitude(returnLatitude);
+        bicycle.setLongitude(returnLongitude);
+
+        if (isCustomLocation) {
+            bicycle.setBicycleStatus("0");
+        }
+
+        bicycleRepository.save(bicycle);
+        bicycleRepository.flush();
+
+        // 결제 처리 로직
+        paymentsService.calculateAndSavePayment(rental.getRentalId(), customerId);
+
+        result.put("rental", rental);
+        result.put("code", 200);
+        result.put("msg", "반납 및 결제 처리 완료.");
+        return result;
+    }
+
+
+
 }
