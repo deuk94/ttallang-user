@@ -21,8 +21,8 @@
   <div class="d-flex justify-content-center">
     <div class="card p-3 input-card">
       <h2 class="text-center mb-5">아이디 찾기</h2>
-      <p id="helpPhoneNumber" class="mb-2">회원가입 시 입력했던 휴대폰 번호를 입력해주세요.</p>
-      <p id="helpAuthNumber" class="mb-2 d-none">인증 번호를 입력 후 확인 버튼을 눌러주세요.</p>
+      <p id="helpPhoneNumber" class="mb-2">회원가입 시 입력했던 <span>휴대폰 번호</span>를 입력해주세요.</p>
+      <p id="helpAuthNumber" class="mb-2 d-none">인증 번호를 입력 후 <span>확인</span> 버튼을 눌러주세요.</p>
       <form id="phoneForm" class="m-0" novalidate>
         <div id="customerPhoneInputGroup" class="input-group mb-3">
           <label for="customerPhone" class="form-label"></label>
@@ -36,7 +36,6 @@
               maxlength="11"
               required
           />
-          <button id="sendSMS" form="phoneForm" type="submit" class="btn btn-outline-secondary ms-2">전송</button>
           <div class="invalid-feedback">
             유효한 휴대폰 번호를 입력해주세요. (ex. 01011112222)
           </div>
@@ -46,11 +45,12 @@
         <div id="authInputGroup" class="input-group mb-3 d-none">
           <label for="authNumber"></label>
           <input type="text" id="authNumber" name="authNumber" class="form-control" maxlength="4" pattern="\d{4}" required>
-          <button id="checkAuthNumber" type="submit" class="btn btn-outline-secondary ms-2">확인</button>
         </div>
       </form>
-      <div class="d-grid gap-2">
-        <a href="${pageContext.request.contextPath}/login/form" class="btn btn-warning">취소</a>
+      <div class="d-flex justify-content-center">
+        <button id="sendSMS" form="phoneForm" type="submit" class="btn btn-outline-secondary me-2">전송</button>
+        <button id="checkAuthNumber" form="authForm" type="submit" class="btn btn-outline-secondary me-2 d-none">확인</button>
+        <a href="${pageContext.request.contextPath}/login/form" class="btn-cancel">취소</a>
       </div>
     </div>
   </div>

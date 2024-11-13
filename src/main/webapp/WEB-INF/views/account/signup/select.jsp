@@ -13,7 +13,7 @@
 <!-- 회원가입 안내 카드 -->
 <div class="container mt-5">
   <div class="d-flex justify-content-center mb-4">
-    <img src="${pageContext.request.contextPath}/images/자전거.png" alt="딸랑이" class="logo">
+    <img src="${pageContext.request.contextPath}/images/bicycle.svg" alt="딸랑이" class="logo">
   </div>
   <div class="card text-center p-4">
     <h3 class="mb-3">회원가입</h3>
@@ -24,7 +24,7 @@
     </div>
     <div class="d-flex justify-content-center m-0">
       <a href="/signup/form">
-        <div class="btn-normal">
+        <div class="btn-base btn-normal">
           일반 회원가입
         </div>
       </a>
@@ -34,7 +34,7 @@
       <div id="naverCert">
         <img class="btn-naver" src="${pageContext.request.contextPath}/account/images/naverLogin.png" alt="네이버 아이콘">
       </div>
-      <div id="paycoCert" class="btn-payco">PAYCO 로그인</div>
+      <div id="paycoCert" class="btn-base btn-payco">PAYCO 로그인</div>
     </div>
   </div>
 </div>

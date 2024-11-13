@@ -7,3 +7,27 @@
 .input-card {
     width: 30rem;
 }
+
+#sendSMS,
+#checkAuthNumber,
+.btn-cancel {
+    background-color: #001f54;
+    height: 45px;
+    width: 60px;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    text-wrap: pretty;
+    word-break: keep-all;
+}
+
+#helpAuthNumber > span,
+#helpPhoneNumber > span {
+    color: red;
+    font-weight: bold;
+}

@@ -31,6 +31,9 @@ public class PaymentService {
         Rental rental = rentalRepository.findById(rentalId).orElse(null);
         long minutes = Duration.between(rental.getRentalStartDate(), rental.getRentalEndDate()).toMinutes();
         int paymentAmount = 500 + (int) (minutes * 150);
+        if (rental.getReturnBranch().equals("기타")) {
+            paymentAmount += 20000;
+        }
 
         Payment payment = paymentRepository.findById(paymentId).orElse(null);
         payment.setPaymentAmount(paymentAmount);

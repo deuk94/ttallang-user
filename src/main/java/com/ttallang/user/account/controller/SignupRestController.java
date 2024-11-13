@@ -3,6 +3,7 @@ package com.ttallang.user.account.controller;
 import com.ttallang.user.account.model.AccountResponse;
 import com.ttallang.user.account.service.SignupService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,12 +33,12 @@ public class SignupRestController { // 리턴 타입이 JSON인 컨트롤러.
     }
 
     @GetMapping("/signup/form/checkExisting/{userName}")
-    public AccountResponse checkExistingRolesUserName(@PathVariable String userName) {
+    public ResponseEntity<AccountResponse> checkExistingRolesUserName(@PathVariable String userName) {
         return signupService.isExistingRolesUserName(userName);
     }
 
     @PostMapping("/signup")
-    public AccountResponse signup(@RequestBody Map<String, String> userData) {
+    public ResponseEntity<AccountResponse> signup(@RequestBody Map<String, String> userData) {
         return signupService.signupCustomer(userData);
     }
 }

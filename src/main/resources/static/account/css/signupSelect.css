@@ -22,8 +22,7 @@
     transform: scale(1.05);
 }
 
-.btn-normal {
-    background-color: #28a745;
+.btn-base {
     height: 45px;
     width: 180px;
     padding: 8px;
@@ -36,6 +35,16 @@
     color: white;
     text-wrap: pretty;
     word-break: keep-all;
+}
+
+.btn-normal {
+    background-color: #001f54;
+
+}
+
+.btn-payco {
+    cursor: pointer;
+    background-color: #ff2233;
 }
 
 #kakaoCert {
@@ -58,23 +67,6 @@
 .btn-naver {
     height: 45px;
     width: 180px;
-}
-
-.btn-payco {
-    cursor: pointer;
-    background-color: #ff2233;
-    height: 45px;
-    width: 180px;
-    padding: 8px;
-    font-size: 16px;
-    border-radius: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: white;
-    text-wrap: pretty;
-    word-break: keep-all;
 }
 
 /* 안내 텍스트 */

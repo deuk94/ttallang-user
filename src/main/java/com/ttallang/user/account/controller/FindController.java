@@ -15,6 +15,11 @@ public class FindController {
 
     @GetMapping("/find/username/input")
     public String inputCustomerPhone() {
-        return "account/find/phone";
+        return "account/find/id";
+    }
+
+    @GetMapping("/find/password/input")
+    public String inputUsernameCustomerPhone() {
+        return "account/find/pw";
     }
 }
