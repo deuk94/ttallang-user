@@ -13,7 +13,7 @@
       display: flex;
       flex-direction: column;
       min-height: 90vh;
-      overflow: hidden;
+      overflow: auto
     }
 
     .container {
