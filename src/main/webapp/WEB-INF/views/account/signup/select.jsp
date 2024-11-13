@@ -13,7 +13,7 @@
 <!-- 회원가입 안내 카드 -->
 <div class="container mt-5">
   <div class="d-flex justify-content-center mb-4">
-    <img src="${pageContext.request.contextPath}/images/자전거.png" alt="딸랑이" class="logo">
+    <img src="${pageContext.request.contextPath}/images/bicycle.svg" alt="딸랑이" class="logo">
   </div>
   <div class="card text-center p-4">
     <h3 class="mb-3">회원가입</h3>
