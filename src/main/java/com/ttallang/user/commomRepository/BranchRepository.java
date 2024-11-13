@@ -19,5 +19,6 @@ public interface BranchRepository extends JpaRepository<Branch, Integer> {
         "AND SQRT(POWER(b.latitude - :latitude, 2) + POWER(b.longitude - :longitude, 2)) < :radius")
     Optional<String> findNearbyBranchName(@Param("latitude") double latitude,
         @Param("longitude") double longitude,
-        @Param("radius") double radius);
+        @Param("radius") double radius); // radius는 0.0009로 설정
+
 }
