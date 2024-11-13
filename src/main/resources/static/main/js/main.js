@@ -54,6 +54,38 @@ function showCustomReturnPopup() {
     }
   });
 }
+function loadRentalStatus() {
+  $.ajax({
+    url: '/api/map/rental/status',  // 대여 현황 정보 API
+    type: 'GET',
+    success: function(response) {
+      if (response.code === 200) {
+        const rentalBranchName = response.rentalBranch ? response.rentalBranch : "기타";
+
+        $('#rentedBicycleName').text(response.bicycleName);
+        $('#rentalStartTime').text(response.rentalStartDate.replace("T", " "));
+        $('#currentLatitude').text(response.currentLatitude);
+        $('#currentLongitude').text(response.currentLongitude);
+        $('#rentalBranchName').text(rentalBranchName);  // 대여 지점 표시 추가
+
+        if (rentalBranchName === "기타") {
+          $('#customLocationText').show();
+        } else {
+          $('#customLocationText').hide();
+        }
+
+        document.getElementById("rentalStatusPopup").style.display = 'block';
+      } else {
+        alert(response.msg);
+      }
+    },
+    error: function(xhr) {
+      alert("서버 오류가 발생했습니다. 대여 현황을 불러올 수 없습니다.");
+      console.log(xhr);
+    }
+  });
+}
+
 
 // 자전거 대여 함수
 function rentBike(bicycleId, rentalBranch) {
@@ -67,24 +99,37 @@ function rentBike(bicycleId, rentalBranch) {
         window.location.href = "/pay/payment";
       } else {
         alert("자전거의 대여가 완료되었습니다.");
-        console.log(response);
         closeAllPopups();
+
+        // 대여 완료 후 대여 현황을 표시하기 위해 호출
+        loadRentalStatus();
       }
     },
     error: function(xhr) {
       alert("서버 에러가 발생했습니다.");
       console.log(xhr);
-      // 결제 미완료 메시지 처리
     }
   });
 }
 
 
 
+
+let isReturnInProgress = false;  // 반납이 진행 중인지 확인하는 변수
+
 // 자전거 반납 함수
-function returnBike(isCustomLocation) {
-  var returnLatitude = isCustomLocation ? selectedReturnLatitude : selectedBranchLatitude;
-  var returnLongitude = isCustomLocation ? selectedReturnLongitude : selectedBranchLongitude;
+function returnBike() {
+  if (isReturnInProgress) {
+    // 이미 반납이 진행 중이면 중복 실행 방지
+    return;
+  }
+
+  isReturnInProgress = true;  // 반납 시작
+
+  // 현재 위치가 대여소 외 지역인지 자동 판단
+  var isCustomLocation = !(selectedBranchLatitude === currentLatitude && selectedBranchLongitude === currentLongitude);
+  var returnLatitude = isCustomLocation ? currentLatitude : selectedBranchLatitude;
+  var returnLongitude = isCustomLocation ? currentLongitude : selectedBranchLongitude;
   var returnBranchName = isCustomLocation ? "기타" : selectedBranchName;
 
   $.ajax({
@@ -96,47 +141,52 @@ function returnBike(isCustomLocation) {
       isCustomLocation: isCustomLocation,
       returnBranchName: returnBranchName
     },
-    success: function() {
+    success: function(response) {
       alert("반납이 성공적으로 완료되었습니다.");
       closeAllPopups();
-      window.location.href = "/pay/payment";
+      window.location.href = "/pay/payment"; // 결제 페이지로 이동
     },
     error: function(xhr) {
-      if (xhr.status === 404) {
-        alert("반납할 자전거를 찾을 수 없습니다.");
+      if (xhr.status === 400) {
+        alert("반납할 위치 정보를 찾을 수 없습니다.");
       } else {
         alert("반납에 실패했습니다: " + xhr.responseText);
       }
+    },
+    complete: function() {
+      isReturnInProgress = false;  // 반납 완료 후 상태 리셋
     }
   });
 }
+
+// 현황판의 반납하기 버튼 클릭 이벤트
+document.getElementById("rentalStatusPopup").querySelector(".return-button").addEventListener("click", returnBike);
+
+
+
 // 대여소 반납 팝업 표시 함수
 function showReturnPopup(isCustomLocation) {
-  if (isCustomLocation) {
-    showCustomReturnPopup();
-  } else {
-    document.getElementById("returnBranchName").innerText = selectedBranchName;
+  document.getElementById("returnBranchName").innerText = selectedBranchName;
 
-    $.ajax({
-      url: '/api/map/current-rentals',
-      type: 'GET',
-      success: function(response) {
-        $('#bicycleid').text(response.bicycleId);
-        $('#bicycleName').text(response.bicycleName);
-        $('#rentalBranch').text(response.rentalBranch);
-        $('#rentalStartDate').text(response.rentalStartDate.replace("T", " "));
-        selectedBicycleId = response.bicycleId;
-        document.getElementById("returnPopup").style.display = 'block';
-      },
-      error: function(xhr) {
-        if (xhr.status === 404) {
-          alert("대여 중인 자전거를 찾을 수 없습니다.");
-        } else {
-          alert("대여 정보를 불러오는 데 실패했습니다.");
-        }
+  $.ajax({
+    url: '/api/map/current-rentals',
+    type: 'GET',
+    success: function(response) {
+      $('#bicycleid').text(response.bicycleId);
+      $('#bicycleName').text(response.bicycleName);
+      $('#rentalBranch').text(response.rentalBranch);
+      $('#rentalStartDate').text(response.rentalStartDate.replace("T", " "));
+      selectedBicycleId = response.bicycleId;
+      document.getElementById("returnPopup").style.display = 'block';
+    },
+    error: function(xhr) {
+      if (xhr.status === 404) {
+        alert("대여 중인 자전거를 찾을 수 없습니다.");
+      } else {
+        alert("대여 정보를 불러오는 데 실패했습니다.");
       }
-    });
-  }
+    }
+  });
 }
 
 
@@ -270,6 +320,12 @@ async function handleMapClickOutsideBranch(latitude, longitude) {
 async function handleBranchClick(latitude, longitude) {
   closePopup('customReturnPopup');
   const isRented = await checkRentalStatus();
+
+
+  currentLatitude = latitude;
+  currentLongitude = longitude;
+  updateRentalStatusLocation(); // 현황판의 위치 정보 업데이트
+
   if (isRented) {
     selectedBranchLatitude = latitude;
     selectedBranchLongitude = longitude;
@@ -355,41 +411,24 @@ async function checkRentalStatus() {
     return false;
   }
 }
+$(document).ready(async function() {
+  const isRented = await checkRentalStatus();
+  if (isRented) {
+    // 대여 중인 상태라면 대여 현황 팝업을 표시
+    loadRentalStatus();
+  }
+
+});
+
+
+// 전역 변수로 현재 위치(위도, 경도)를 관리
+let currentLatitude = 0;
+let currentLongitude = 0;
 
 // 카카오 지도 초기화
 var container = document.getElementById('map');
 var options = { center: new kakao.maps.LatLng(37.583883601891, 126.9999880311), level: 3 };
 var main = new kakao.maps.Map(container, options);
-
-// 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
-var mapTypeControl = new kakao.maps.MapTypeControl();
-main.addControl(mapTypeControl, kakao.maps.ControlPosition.RIGHT);
-
-// 페이지가 로드된 후에 컨트롤의 위치를 조정
-window.onload = function() {
-  // 지도 타입 컨트롤 요소의 위치를 조정
-  var mapTypeControlDiv = document.querySelector("div[style*='background-color: rgb(255, 255, 255)']");
-  if (mapTypeControlDiv) {
-    mapTypeControlDiv.style.top = "15px";  // 원하는 top 위치로 조정
-    mapTypeControlDiv.style.right = "4px"; // 원하는 left 위치로 조정
-    mapTypeControlDiv.style.zIndex = "1001"; // 다른 요소들 위에 표시되도록 설정
-  }
-
-};
-
-
-// 지도 확대 기능
-function zoomIn() {
-  main.setLevel(main.getLevel() - 1);
-}
-
-// 지도 축소 기능
-function zoomOut() {
-  main.setLevel(main.getLevel() + 1);
-}
-
-
-
 
 // 마커 이미지 설정
 var imageSrc = '/images/bicycle.svg',
@@ -403,20 +442,39 @@ if (navigator.geolocation) {
     var lat = position.coords.latitude, // 위도
         lon = position.coords.longitude; // 경도
 
+    currentLatitude = lat; // 초기 위치 설정
+    currentLongitude = lon;
+
     var locPosition = new kakao.maps.LatLng(lat, lon);
     displayMarker(locPosition, '<div style="padding:5px;">현재 위치입니다.</div>'); // 사용자 위치에 마커 표시
+    updateRentalStatusLocation(); // 현황판의 위치 업데이트
   });
 } else {
   var locPosition = new kakao.maps.LatLng(37.583883601891, 126.9999880311); // 기본 위치 설정 (혜화)
   displayMarker(locPosition, 'geolocation을 사용할 수 없어요..');
 }
 
-// 클릭 이벤트로 모든 팝업 닫기
+// 지도 클릭 이벤트로 모든 팝업 닫기 및 위치 업데이트
 kakao.maps.event.addListener(main, 'click', function(mouseEvent) {
   closeAllPopups();
   const clickedLatLng = mouseEvent.latLng;
-  handleMapClickOutsideBranch(clickedLatLng.getLat(), clickedLatLng.getLng());
+  currentLatitude = clickedLatLng.getLat();
+  currentLongitude = clickedLatLng.getLng();
+
+  handleMapClickOutsideBranch(currentLatitude, currentLongitude);
+  updateRentalStatusLocation(); // 현황판의 위치 업데이트
 });
+
+// 현황판의 위도, 경도 업데이트 함수
+function updateRentalStatusLocation() {
+  const rentalLatitudeElement = document.getElementById("currentLatitude");
+  const rentalLongitudeElement = document.getElementById("currentLongitude");
+
+  if (rentalLatitudeElement && rentalLongitudeElement) {
+    rentalLatitudeElement.innerText = currentLatitude;
+    rentalLongitudeElement.innerText = currentLongitude;
+  }
+}
 
 // 대여소 마커 로드 함수
 function loadBranches() {
@@ -451,6 +509,12 @@ function loadBranches() {
     }
   });
 }
+
+// 초기 로드 시 현황판 업데이트
+$(document).ready(function() {
+  updateRentalStatusLocation(); // 페이지 로드 시 현황판에 초기 위치 정보 표시
+});
+
 
 // 마커와 정보창 표시 함수
 function displayMarker(locPosition, message) {

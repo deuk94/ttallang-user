@@ -16,11 +16,7 @@
 <div id="map-container">
     <div id="map"></div>
 
-    <!-- 커스텀 확대/축소 버튼 -->
-    <div class="zoom-container">
-        <button class="btn" onclick="zoomIn()">+</button>
-        <button class="btn" onclick="zoomOut()">-</button>
-    </div>
+  
     <!-- 대여소 정보 팝업 -->
     <div class="popup" id="branchInfoPopup">
         <button class="close-btn" onclick="closePopup('branchInfoPopup')">X</button>
@@ -33,6 +29,23 @@
             </p>
             <p class="pricing-info">잠금해제 500원, 분당 150원</p>
             <div class="bicycle-list" id="bicycleListContainer"></div>
+        </div>
+    </div>
+
+    <!-- 대여 현황판 팝업 -->
+    <div class="popup" id="rentalStatusPopup" style="display: none;">
+<%--        <button class="close-btn" onclick="closePopup('rentalStatusPopup')">X</button>--%>
+        <h3>자전거 대여 현황</h3>
+        <p>자전거 이름: <span id="rentedBicycleName"></span></p>
+        <p>대여 지점: <span id="rentalBranchName"></span></p>
+        <p>대여 시작 시간: <span id="rentalStartTime"></span></p>
+        <p>현재 위치 (위도, 경도):
+            <span id="currentLatitude"></span>,
+            <span id="currentLongitude"></span>
+        </p>
+        <div class="button-container">
+            <button class="return-button" onclick="returnBike()">반납하기</button>
+            <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
         </div>
     </div>
 
@@ -58,7 +71,6 @@
         <p>그래도 반납하시겠습니까?</p>
         <div class="button-container">
             <button class="return-button" onclick="returnBike(true)">반납하기</button>
-            <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
         </div>
     </div>
 
@@ -72,7 +84,6 @@
         <p>대여 시작 시간: <span id="rentalStartDate"></span></p>
         <div class="button-container">
             <button class="return-button" onclick="returnBike(false)">반납하기</button>
-            <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('returnPopup');">신고하기</button>
         </div>
     </div>
 
