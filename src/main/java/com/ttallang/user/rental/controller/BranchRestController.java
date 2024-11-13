@@ -71,6 +71,7 @@ public class BranchRestController {
         int loginId = pds.getCustomerID();
         return rentalsService.returnBicycle(returnLatitude, returnLongitude, isCustomLocation, returnBranchName, loginId);
     }
+
     // 현황판에서 반납 후 결제 처리
     @PostMapping("/return/bicycle/status")
     public Map<String, Object> returnBicycleWithPayment(
@@ -84,7 +85,6 @@ public class BranchRestController {
 
         return rentalsService.completeReturn(returnLatitude, returnLongitude, isCustomLocation, returnBranchName, loginId);
     }
-
 
     @GetMapping("/check-rental-status")
     public Bicycle checkRentalStatus() {
@@ -131,6 +131,10 @@ public class BranchRestController {
         return reportService.reportAndReturn(loginId, bicycleId, categoryId, reportDetails, returnBranchName, returnLatitude, returnLongitude);
     }
 
-
+    // 근처 대여소 이름 가져오는 API 추가
+    @GetMapping("/nearby-branch")
+    public String getNearbyBranch(@RequestParam double latitude, @RequestParam double longitude) {
+        String branchName = branchService.getNearbyBranchName(latitude, longitude);
+        return branchName != null ? branchName : "기타"; // "기타"로 기본값 처리
+    }
 }
-
