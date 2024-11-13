@@ -1,7 +1,7 @@
 package com.ttallang.user.account.service;
 
 import com.ttallang.user.commomRepository.UserRepository;
-import com.ttallang.user.security.config.RandomAuthNumber;
+import com.ttallang.user.security.config.token.RandomAuthNumber;
 import com.ttallang.user.account.model.RolesUser;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

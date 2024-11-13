@@ -1,4 +1,4 @@
-package com.ttallang.user.security.config;
+package com.ttallang.user.security.config.token;
 
 import lombok.Getter;
 

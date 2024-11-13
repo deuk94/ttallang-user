@@ -5,14 +5,17 @@ import com.ttallang.user.security.config.auth.PrincipalDetails;
 import com.ttallang.user.account.model.AccountResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class LoginHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
     @Override
     public void onAuthenticationSuccess(
@@ -21,26 +24,28 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
             Authentication authentication
     ) throws IOException {
         String role = authentication.getAuthorities().iterator().next().getAuthority();
+        response.setContentType("application/json;charset=UTF-8");
+        AccountResponse accountResponse = new AccountResponse("unknown", "권한 정보를 찾을 수 없습니다.");
         if (role.equals("ROLE_ADMIN")) {
-            response.setContentType("application/json;charset=UTF-8");
-            AccountResponse accountResponse = new AccountResponse(200, "success","admin", "관리자 로그인 성공.");
+            response.setStatus(HttpServletResponse.SC_OK);
+            accountResponse.setRole("admin");
+            accountResponse.setMessage("관리자 로그인 성공.");
             new ObjectMapper().writeValue(response.getWriter(), accountResponse);
         } else if (role.equals("ROLE_USER")) {
             PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            accountResponse.setRole("user");
             if (pds.getPaymentStatus().equals("1")) {
-                response.setContentType("application/json;charset=UTF-8");
-                AccountResponse accountResponse = new AccountResponse(200, "success", "user", "유저 로그인 성공.");
+                response.setStatus(HttpServletResponse.SC_OK);
+                accountResponse.setMessage("유저 로그인 성공.");
                 new ObjectMapper().writeValue(response.getWriter(), accountResponse);
             } else {
-                response.setContentType("application/json;charset=UTF-8");
-                AccountResponse accountResponse = new AccountResponse(402, "failure", "user", "미결제 상태.");
+                response.setStatus(HttpServletResponse.SC_PAYMENT_REQUIRED);
+                accountResponse.setMessage("마지막 대여 이후 미결제 상태입니다.");
                 new ObjectMapper().writeValue(response.getWriter(), accountResponse);
             }
-        } else { // 로그인이 되었지만 권한을 찾을 수 없으므로 401 처리.
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            AccountResponse accountResponse = new AccountResponse(401, "failure", "unknown", "권한 정보를 찾을 수 없습니다.");
-
+        } else { // 로그인이 되긴 했지만 권한이 잘못되었으므로 403 처리.
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            accountResponse.setMessage("잘못된 권한입니다.");
             new ObjectMapper().writeValue(response.getWriter(), accountResponse);
         }
     }
@@ -54,22 +59,17 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
 
-        AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setCode(401);
-        accountResponse.setStatus("failure");
-        accountResponse.setRole("guest");
-        if (exception.getMessage().contains("자격 증명에 실패하였습니다.")) {
-            System.out.println(exception.getMessage());
-            accountResponse.setMessage("비밀번호를 확인해주세요.");
-        } else if (exception.getMessage().contains("사용자 계정의 유효 기간이 만료 되었습니다.")) {
-            System.out.println(exception.getMessage());
-            accountResponse.setMessage("탈퇴된 회원입니다.");
-        } else if (exception.getMessage().contains("유효하지 않은 사용자입니다.")) {
-            System.out.println(exception.getMessage());
-            accountResponse.setMessage("존재하지 않는 회원입니다.");
-        } else {
-            System.out.println(exception.getMessage());
-            accountResponse.setMessage("로그인에 실패하였습니다.");
+        AccountResponse accountResponse = new AccountResponse("guest", null);
+        String errorMessage = exception.getMessage();
+        switch (errorMessage) {
+            case "자격 증명에 실패하였습니다." ->
+                    accountResponse.setMessage("비밀번호를 확인해주세요.");
+            case "사용자 계정의 유효 기간이 만료 되었습니다." ->
+                    accountResponse.setMessage("탈퇴한 회원입니다.");
+            case "유효하지 않은 사용자입니다." ->
+                    accountResponse.setMessage("존재하지 않는 회원입니다.");
+            default ->
+                    accountResponse.setMessage("로그인에 실패하였습니다.");
         }
 
         new ObjectMapper().writeValue(response.getWriter(), accountResponse);

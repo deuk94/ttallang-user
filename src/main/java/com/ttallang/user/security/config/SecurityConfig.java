@@ -1,6 +1,7 @@
 package com.ttallang.user.security.config;
 
 
+import com.ttallang.user.security.config.filter.NgrokRedirectFilter;
 import com.ttallang.user.security.config.handler.LoginHandler;
 import com.ttallang.user.account.model.CertInfo;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Map;
@@ -24,7 +26,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
 
-    private final LoginHandler loginHandler = new LoginHandler();
+    private final LoginHandler loginHandler;
+    private final NgrokRedirectFilter ngrokRedirectFilter;
+
+    public SecurityConfig(LoginHandler loginHandler, NgrokRedirectFilter ngrokRedirectFilter) {
+        this.loginHandler = loginHandler;
+        this.ngrokRedirectFilter = ngrokRedirectFilter;
+    }
 
     @Bean
     public BCryptPasswordEncoder encodePwd() {
@@ -32,28 +40,28 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // Disable CSRF for this example
-        http.csrf(AbstractHttpConfigurer::disable
-        ).authorizeHttpRequests(auth -> auth
-            .requestMatchers("/login/**", "/signup/**", "/api/oauth2/**").permitAll() // 로그인 페이지, 회원가입 페이지만 퍼밋올.
-            .requestMatchers("/user/**", "/map/**", "/pay/**", "/myPage/**", "api/pay/**", "api/myPage/**").hasAnyRole("USER", "ADMIN")
-            .requestMatchers("/admin/**").hasRole("ADMIN")
-            .anyRequest().permitAll()
-        ).formLogin(form -> form
-            .loginPage("/login/form") // 로그인 페이지.
-            .loginProcessingUrl("/api/login") // 로그인 처리할 url.
-            .successHandler(loginHandler)
-            .failureHandler(loginHandler)
-            .permitAll()
-        ).securityContext(securityContext -> securityContext
-            .requireExplicitSave(false) // 필요한 경우에만 SecurityContext를 세션에 저장.
-        ).logout(logout -> logout
-            .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout")) // 로그아웃 요청 URL.
-            .logoutSuccessUrl("/login/form") // 로그아웃 후 이동할 URL.
-            .invalidateHttpSession(true) // 세션 무효화.
-            .permitAll()
-        );
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .addFilterBefore(ngrokRedirectFilter, SecurityContextPersistenceFilter.class
+                ).csrf(AbstractHttpConfigurer::disable
+                ).authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/user/**", "/map/**", "/pay/**", "/myPage/**", "api/pay/**", "api/myPage/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().permitAll()
+                ).formLogin(form -> form
+                        .loginPage("/login/form") // 로그인 페이지.
+                        .loginProcessingUrl("/api/login") // 로그인 처리할 url.
+                        .successHandler(loginHandler)
+                        .failureHandler(loginHandler)
+                        .permitAll()
+                ).securityContext(securityContext -> securityContext
+                        .requireExplicitSave(false) // 필요한 경우에만 SecurityContext를 세션에 저장.
+                        ).logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout")) // 로그아웃 요청 URL.
+                        .logoutSuccessUrl("/login/form") // 로그아웃 후 이동할 URL.
+                        .invalidateHttpSession(true) // 세션 무효화.
+                        .permitAll()
+                );
 
         // Configure exception handling
         http.exceptionHandling(exceptionHandling -> exceptionHandling

@@ -31,7 +31,7 @@
 }
 
 .form-control:focus {
-    border-color: #007bff;
+    border-color: #001f54;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
 }
 
@@ -62,4 +62,21 @@
 
 .find-auth a:hover {
     color: #001ab5;
+}
+
+.btn-login,
+.btn-signup {
+    background-color: #001f54;
+    height: 45px;
+    width: 180px;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    text-wrap: pretty;
+    word-break: keep-all;
 }
