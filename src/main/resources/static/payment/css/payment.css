@@ -4,6 +4,7 @@ body {
   padding: 20px;
   background: linear-gradient(135deg, #f0f4f8, #e6e9f0);
   text-align: center;
+  overflow: auto;
 }
 
 h1 {
@@ -49,6 +50,7 @@ td {
 .button-container {
   text-align: center;
   margin-top: 30px;
+  margin-bottom: 130px;
 }
 
 .button {
