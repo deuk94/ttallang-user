@@ -64,9 +64,7 @@ function loadRentalStatus() {
 
         $('#rentedBicycleName').text(response.bicycleName);
         $('#rentalStartTime').text(response.rentalStartDate.replace("T", " "));
-        $('#currentLatitude').text(response.currentLatitude);
-        $('#currentLongitude').text(response.currentLongitude);
-        $('#rentalBranchName').text(rentalBranchName);  // 대여 지점 표시 추가
+        $('#rentalBranchName').text(rentalBranchName);
 
         if (rentalBranchName === "기타") {
           $('#customLocationText').show();
@@ -75,6 +73,9 @@ function loadRentalStatus() {
         }
 
         document.getElementById("rentalStatusPopup").style.display = 'block';
+
+        // 현황판 위치를 현재 위치로 업데이트
+        updateCurrentLocationOnStatusPopup();
       } else {
         alert(response.msg);
       }
@@ -84,6 +85,29 @@ function loadRentalStatus() {
       console.log(xhr);
     }
   });
+}
+
+
+function updateCurrentLocationOnStatusPopup() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const lat = position.coords.latitude; // 현재 위도
+      const lon = position.coords.longitude; // 현재 경도
+
+      // 전역 변수 업데이트 (필요 시)
+      currentLatitude = lat;
+      currentLongitude = lon;
+
+      // 현황판 위치 정보 업데이트
+      $('#currentLatitude').text(lat);
+      $('#currentLongitude').text(lon);
+    }, function(error) {
+      console.error("위치 정보를 가져오는 데 실패했습니다:", error);
+      alert("위치 정보를 가져올 수 없습니다. 위치 접근을 허용했는지 확인하세요.");
+    });
+  } else {
+    alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
+  }
 }
 
 
@@ -126,7 +150,7 @@ function returnBike() {
 
   isReturnInProgress = true;  // 반납 시작
 
-  // 현재 위치가 대여소 외 지역인지 자동 판단
+
   var isCustomLocation = !(selectedBranchLatitude === currentLatitude && selectedBranchLongitude === currentLongitude);
   var returnLatitude = isCustomLocation ? currentLatitude : selectedBranchLatitude;
   var returnLongitude = isCustomLocation ? currentLongitude : selectedBranchLongitude;
@@ -255,12 +279,24 @@ function submitReport() {
 
 
 
-
-// 신고 및 반납 제출 함수
 function submitReportAndReturn() {
   const categoryId = document.getElementById("reportCategorySelect2").value;
   const reportDetails = document.getElementById("reportDetails2").value;
-  const returnBranchName = isCustomReturnPopupOpen ? "기타" : selectedBranchName;
+
+  // 현 위치를 사용하여 반납 처리
+  const returnLatitude = currentLatitude;
+  const returnLongitude = currentLongitude;
+
+  // 두 위치가 근사치로 일치하면 대여소 위치를 사용, 그렇지 않으면 "기타"로 설정
+  const isSameLocation = Math.abs(selectedBranchLatitude - returnLatitude) < 0.0001 && Math.abs(selectedBranchLongitude - returnLongitude) < 0.0001;
+  const returnBranchName = isSameLocation ? selectedBranchName : "기타";
+
+  console.log("bicycleId :", selectedBicycleId);
+  console.log("categoryId :", categoryId);
+  console.log("reportDetails :", reportDetails);
+  console.log("returnBranchName :", returnBranchName);
+  console.log("returnLatitude :", returnLatitude);
+  console.log("returnLongitude :", returnLongitude);
 
   $.ajax({
     url: '/api/map/report-and-return',
@@ -270,26 +306,35 @@ function submitReportAndReturn() {
       categoryId: categoryId,
       reportDetails: reportDetails,
       returnBranchName: returnBranchName,
-      returnLatitude: selectedBranchLatitude,
-      returnLongitude: selectedBranchLongitude
+      returnLatitude: returnLatitude,
+      returnLongitude: returnLongitude
     },
     success: function(response) {
       alert(response.msg);
-      console.log("Server response:", response); // 서버 응답 전체 확인
       if (response.code === 200) {
-        closePopup('reportAndReturnPopup');
+        closePopup('reportAndReturnPopup'); // 신고 및 반납 팝업 닫기
+        closePopup('rentalStatusPopup'); // 현황판 팝업 닫기
         if (response.redirectToPayment) {
-          console.log("Redirecting to payment page..."); // 리디렉션 로그 확인
           window.location.href = "/pay/payment";
         }
       }
     },
     error: function(xhr) {
-      alert("서버 에러가 발생했습니다. 신고 및 반납 처리에 실패했습니다.");
+      closePopup('reportAndReturnPopup');
+      if (xhr.status === 500) {
+        alert("서버 오류가 발생했습니다. 다시 시도해 주세요.");
+      } else {
+        alert("서버 오류가 발생했습니다. 다시 시도해 주세요.");
+      }
       console.log(xhr);
     }
   });
 }
+
+
+
+
+
 
 
 
@@ -405,20 +450,24 @@ function showAvailableBicycles(latitude, longitude) {
 async function checkRentalStatus() {
   try {
     const response = await $.ajax({ url: "/api/map/check-rental-status", method: "GET" });
-    return response && response.rentalStatus === "0";
+    if (response && response.rentalStatus === "0") {
+      selectedBicycleId = response.bicycleId; // 자전거 ID 설정
+      return true;
+    }
+    return false;
   } catch (error) {
     console.error("Error checking rental status:", error);
     return false;
   }
 }
+
 $(document).ready(async function() {
   const isRented = await checkRentalStatus();
   if (isRented) {
-    // 대여 중인 상태라면 대여 현황 팝업을 표시
-    loadRentalStatus();
+    loadRentalStatus(); // 대여 중인 상태라면 대여 현황 팝업 표시
   }
-
 });
+
 
 
 // 전역 변수로 현재 위치(위도, 경도)를 관리
@@ -536,6 +585,10 @@ function displayMarker(locPosition, message) {
     main.setCenter(locPosition);
   }
 }
+$(document).ready(function() {
+  // 페이지 로드 시 현황판의 위치를 현재 위치로 설정
+  updateCurrentLocationOnStatusPopup();
+});
 
 // 페이지 로드 시 대여소 로드
 loadBranches();

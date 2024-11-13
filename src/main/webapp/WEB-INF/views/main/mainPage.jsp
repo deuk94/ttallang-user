@@ -39,10 +39,6 @@
         <p>자전거 이름: <span id="rentedBicycleName"></span></p>
         <p>대여 지점: <span id="rentalBranchName"></span></p>
         <p>대여 시작 시간: <span id="rentalStartTime"></span></p>
-        <p>현재 위치 (위도, 경도):
-            <span id="currentLatitude"></span>,
-            <span id="currentLongitude"></span>
-        </p>
         <div class="button-container">
             <button class="return-button" onclick="returnBike()">반납하기</button>
             <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
