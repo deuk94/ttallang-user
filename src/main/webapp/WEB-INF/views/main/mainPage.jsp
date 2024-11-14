@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>따릉이 - KOSA BIKE</title>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}../main/css/main.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/main/css/main.css">
 </head>
 <body>
 
@@ -16,7 +16,6 @@
 <div id="map-container">
     <div id="map"></div>
 
-  
     <!-- 대여소 정보 팝업 -->
     <div class="popup" id="branchInfoPopup">
         <button class="close-btn" onclick="closePopup('branchInfoPopup')">X</button>
@@ -34,7 +33,6 @@
 
     <!-- 대여 현황판 팝업 -->
     <div class="popup" id="rentalStatusPopup" style="display: none;">
-<%--        <button class="close-btn" onclick="closePopup('rentalStatusPopup')">X</button>--%>
         <h3>자전거 대여 현황</h3>
         <p>자전거 이름: <span id="rentedBicycleName"></span></p>
         <p>대여 지점: <span id="rentalBranchName"></span></p>
@@ -50,7 +48,6 @@
         <button class="close-btn" onclick="closePopup('dynamicReportPopup')">X</button>
         <h3>신고하기</h3>
         <select id="reportCategorySelect1">
-            <!-- 카테고리 옵션 로딩됨 -->
         </select>
         <textarea id="reportDetails1" placeholder="신고 내용을 입력해주세요..."></textarea>
         <button class="report-submit" onclick="submitReport()">신고하기</button>
@@ -67,6 +64,7 @@
         <p>그래도 반납하시겠습니까?</p>
         <div class="button-container">
             <button class="return-button" onclick="returnBike(true)">반납하기</button>
+            <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
         </div>
     </div>
 
@@ -80,6 +78,7 @@
         <p>대여 시작 시간: <span id="rentalStartDate"></span></p>
         <div class="button-container">
             <button class="return-button" onclick="returnBike(false)">반납하기</button>
+            <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
         </div>
     </div>
 
@@ -87,12 +86,12 @@
     <!-- 신고 및 반납 팝업 -->
     <div class="report-popup" id="reportAndReturnPopup" style="display: none;">
         <button class="close-btn" onclick="closePopup('reportAndReturnPopup')">X</button>
-        <h3>신고 및 반납</h3>
+        <h3>신고하기</h3>
         <select id="reportCategorySelect2">
             <!-- 카테고리 옵션 로딩됨 -->
         </select>
         <textarea id="reportDetails2" placeholder="신고 내용을 입력해주세요..."></textarea>
-        <button class="report-submit" onclick="submitReportAndReturn()">신고 및 반납하기</button>
+        <button class="report-submit" onclick="submitReportAndReturn()">신고하기</button>
     </div>
 </div>
 
