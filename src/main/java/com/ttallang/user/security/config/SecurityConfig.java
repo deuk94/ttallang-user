@@ -90,9 +90,22 @@ public class SecurityConfig {
         return new ConcurrentHashMap<>();
     }
 
-    // SMS 인증 정보를 임시로 저장하는 곳.
+    // SMS 인증 관련 임시 저장소 목록.
+    // userName 찾기 관련.
     @Bean
-    public Map<String, String> sharedAuthNumberMap() {
+    public Map<String, String> sharedUserNameAuthNumberMap() {
+        return new ConcurrentHashMap<>();
+    }
+
+    // password 찾기 관련.
+    @Bean
+    public Map<String, String> sharedPasswordAuthNumberMap() {
+        return new ConcurrentHashMap<>();
+    }
+
+    // password 찾기 관련 state code 임시 저장.
+    @Bean
+    public Map<String, String> sharedStateCodeMap() {
         return new ConcurrentHashMap<>();
     }
 }
