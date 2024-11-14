@@ -320,7 +320,7 @@ function submitReport() {
         }
       }
     },
-    error: function(xhr) {
+    error: function() {
       alert("서버 에러가 발생했습니다. 신고 접수에 실패했습니다.");
       closePopup('dynamicReportPopup');
     }
@@ -388,7 +388,7 @@ function submitReportAndReturn() {
         }
       });
     },
-    error: function(xhr) {
+    error: function() {
       alert("서버 오류가 발생했습니다. 대여소 정보를 가져올 수 없습니다.");
     }
   });
@@ -575,7 +575,7 @@ function moveToMyLocation() {
       var locPosition = new kakao.maps.LatLng(currentLatitude, currentLongitude);
       main.setCenter(locPosition);
       showMyLocationOnMap(currentLatitude, currentLongitude);
-    }, function(error) {
+    }, function() {
       alert("위치 정보를 가져올 수 없습니다.");
     });
   } else {
