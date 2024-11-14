@@ -1,7 +1,6 @@
 package com.ttallang.user.rental.service;
 
 import com.ttallang.user.commonModel.Bicycle;
-import com.ttallang.user.commonModel.Payment;
 import com.ttallang.user.commonModel.Rental;
 import com.ttallang.user.rental.model.UseRental;
 import com.ttallang.user.commomRepository.BicycleRepository;
