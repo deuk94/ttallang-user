@@ -135,6 +135,6 @@ public class BranchRestController {
     @GetMapping("/nearby-branch")
     public String getNearbyBranch(@RequestParam double latitude, @RequestParam double longitude) {
         String branchName = branchService.getNearbyBranchName(latitude, longitude);
-        return branchName != null ? branchName : "기타"; // "기타"로 기본값 처리
+        return branchName != null ? branchName : "기타";
     }
 }
