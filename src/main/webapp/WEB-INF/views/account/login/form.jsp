@@ -12,7 +12,7 @@
 <jsp:include page="../header/header.jsp" flush="true"/>
 <!-- 로그인 폼 -->
 <div class="login-container">
-  <div class="login-title">따릉이 KOSA BIKE</div>
+  <div class="login-title">딸랑이 KOSA BIKE</div>
   <form id="loginForm">
     <div class="mb-3">
       <label for="username" class="form-label">아이디</label>

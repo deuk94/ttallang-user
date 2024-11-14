@@ -1,9 +1,9 @@
-const phoneForm = document.querySelector("#phoneForm");
+const userNameCustomerPhoneForm = document.querySelector("#userNameCustomerPhoneForm");
 
-const helpPhoneNumber = document.querySelector("#helpPhoneNumber");
-const helpAuthNumber = document.querySelector("#helpAuthNumber");
+const helpText = document.querySelector("#helpText");
+const helpAuthNumberText = document.querySelector("#helpAuthNumberText");
 
-const customerPhoneInputGroup = document.querySelector("#customerPhoneInputGroup");
+const userName = document.querySelector("#userName");
 const customerPhone = document.querySelector("#customerPhone");
 
 const authInputGroup = document.querySelector("#authInputGroup");
@@ -11,19 +11,20 @@ const authInputGroup = document.querySelector("#authInputGroup");
 const sendSMS = document.querySelector("#sendSMS");
 const checkAuthNumber = document.querySelector("#checkAuthNumber");
 
+userName.addEventListener("input", validateUserName);
 customerPhone.addEventListener("input", validateCustomerPhone);
-phoneForm.addEventListener("submit", handlePhoneForm);
+userNameCustomerPhoneForm.addEventListener("submit", handleUserNameCustomerPhoneForm);
 
 let isSubmitted = false;
 
-function handlePhoneForm(event) {
+function handleUserNameCustomerPhoneForm(event) {
     event.preventDefault();
 
-    const formData = new FormData(phoneForm);
+    const formData = new FormData(userNameCustomerPhoneForm);
     const data = Object.fromEntries(formData);
 
-    if (validateCustomerPhone()) {
-        fetch(`/api/find/userName`, {
+    if (validateUserName() && validateCustomerPhone()) {
+        fetch(`/api/find/password`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -56,6 +57,17 @@ function handlePhoneForm(event) {
     }
 }
 
+function validateUserName() {
+    const userNameRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{6,}$/;
+    if (!userNameRegex.test(userName.value)) {
+        userName.classList.add("is-invalid");
+        return false;
+    } else {
+        userName.classList.remove("is-invalid");
+        return true;
+    }
+}
+
 function validateCustomerPhone() {
     const customerPhoneRegex = /^01[0-9]{8,9}$/;
     if (!customerPhoneRegex.test(customerPhone.value)) {
@@ -79,7 +91,7 @@ function handleAuthForm(event) {
     data[customerPhone.name] = customerPhone.value;
 
     if (isSubmitted) {
-        fetch(`/api/find/userName/auth`, {
+        fetch(`/api/find/username/auth`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -94,8 +106,7 @@ function handleAuthForm(event) {
                 return response.json();
             })
             .then(result => {
-                alert(`회원님의 아이디는 ${result.message} 입니다.`);
-                window.location.href = "/login/form";
+                window.location.href = `/api/find/username/${result.message}/changePassword`;
             })
             .catch(error => {
                 alert(error.message);
@@ -106,10 +117,12 @@ function handleAuthForm(event) {
 }
 
 function changeForm() {
-    sendSMS.classList.add("d-none");
-    helpPhoneNumber.classList.add("d-none");
-    customerPhoneInputGroup.classList.add("d-none");
-    helpAuthNumber.classList.remove("d-none");
+    helpText.classList.add("d-none");
+    helpAuthNumberText.classList.remove("d-none");
+
+    userNameCustomerPhoneForm.classList.add("d-none");
     authInputGroup.classList.remove("d-none");
+
+    sendSMS.classList.add("d-none");
     checkAuthNumber.classList.remove("d-none");
 }
