@@ -29,6 +29,11 @@ import java.util.Map;
 @Service
 public class SignupServiceImpl implements SignupService {
 
+    /*
+    이 클래스에는 private 메서드들이 있는데 그것들은 원래 컨트롤러에서 구현할려다가 컨트롤러 길이가 길어져서,
+    여기로 따로 뺀 로직들임. 서비스 클래스 내부에서만 사용함.
+    */
+
     // 의존성 주입.
     private final Map<String, CertInfo> sharedCertInfoMap;
     private final BCryptPasswordEncoder bCryptPasswordEncoder; // 암호화해주는놈.
@@ -124,7 +129,6 @@ public class SignupServiceImpl implements SignupService {
                     String state = randomStateToken.getRandomStateToken();
                     authUri = "https://nid.naver.com/oauth2.0/authorize";
                     clientId = naverClientId;
-                    scope = "account_email,name,birthday,birthyear,phone_number";
                     authorizationUrl = UriComponentsBuilder
                             .fromHttpUrl(authUri)
                             .queryParam("response_type", responseType)
