@@ -165,15 +165,19 @@ public class ReportService {
         rental.setReturnBranch(returnBranchName);
         rentalRepository.save(rental);
 
+        // 반납 시간에 따른 메시지 설정
+        if (shouldRedirectToPayment) {
+            result.put("msg", "신고 및 자전거 반납이 완료되었습니다. 이용 시간에 따른 결제가 필요합니다. 결제 페이지로 이동합니다.");
+            paymentsService.calculateAndSavePayment(rental.getRentalId(), customerId);
+        } else {
+            result.put("msg", "신고 및 자전거 반납이 성공적으로 완료되었습니다. 추가 결제는 필요하지 않습니다.");
+        }
+
         result.put("report", faultReport);
         result.put("code", 200);
-        result.put("msg", "신고 및 자전거 반납이 성공적으로 완료되었습니다.");
+//        result.put("msg", "신고 및 자전거 반납이 성공적으로 완료되었습니다.");
         result.put("redirectToPayment", shouldRedirectToPayment);
 
-        // 5분이 넘었을 때만 결제 계산
-        if (shouldRedirectToPayment) {
-            paymentsService.calculateAndSavePayment(rental.getRentalId(), customerId);
-        }
 
         return result;
     }
