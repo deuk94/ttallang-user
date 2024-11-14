@@ -105,7 +105,7 @@ public class SecurityConfig {
 
     // password 찾기 관련 state code 임시 저장.
     @Bean
-    public Map<String, String> sharedStateCodeMap() {
+    public Map<String, String> sharedStateMap() {
         return new ConcurrentHashMap<>();
     }
 }

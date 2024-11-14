@@ -88,10 +88,11 @@ function handleAuthForm(event) {
 
     const formData = new FormData(authForm);
     const data = Object.fromEntries(formData);
+    data[userName.name] = userName.value;
     data[customerPhone.name] = customerPhone.value;
 
     if (isSubmitted) {
-        fetch(`/api/find/username/auth`, {
+        fetch(`/api/find/password/auth`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -106,7 +107,7 @@ function handleAuthForm(event) {
                 return response.json();
             })
             .then(result => {
-                window.location.href = `/api/find/username/${result.message}/changePassword`;
+                window.location.href = `/find/changePassword?state=${result.message}`;
             })
             .catch(error => {
                 alert(error.message);

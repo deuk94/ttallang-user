@@ -21,9 +21,9 @@
   <div class="d-flex justify-content-center">
     <div class="card p-3 select-card">
       <h2 class="text-center mb-5">아이디/비밀번호 찾기</h2>
-      <div class="d-flex justify-content-between">
-        <a href="${pageContext.request.contextPath}/find/username/input" class="btn-find-id mb-3">아이디 찾기</a>
-        <a href="${pageContext.request.contextPath}/find/password/input" class="btn-find-pw mb-3">비밀번호 찾기</a>
+      <div class="d-flex justify-content-center mb-3">
+        <a href="${pageContext.request.contextPath}/find/username/input" class="btn-find-id me-3">아이디 찾기</a>
+        <a href="${pageContext.request.contextPath}/find/password/input" class="btn-find-pw">비밀번호 찾기</a>
       </div>
     </div>
   </div>
