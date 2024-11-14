@@ -63,8 +63,8 @@
         </div>
       </form>
       <div class="d-flex justify-content-center">
-        <button id="sendSMS" form="userNameCustomerPhoneForm" type="submit" class="btn btn-outline-secondary me-2">전송</button>
-        <button id="checkAuthNumber" form="authForm" type="submit" class="btn btn-outline-secondary me-2 d-none">확인</button>
+        <button id="sendSMS" form="userNameCustomerPhoneForm" type="submit" class="me-2">전송</button>
+        <button id="checkAuthNumber" form="authForm" type="submit" class="me-2 d-none">확인</button>
         <a href="${pageContext.request.contextPath}/login/form" class="btn-cancel">취소</a>
       </div>
     </div>

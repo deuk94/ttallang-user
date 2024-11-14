@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/find")
 public class FindRestController {
 
     private final FindService findService;
@@ -19,28 +19,28 @@ public class FindRestController {
         this.findService = findService;
     }
 
-    @PostMapping("/find/userName")
+    @PostMapping("/userName")
     public ResponseEntity<AccountResponse> findUserName(@RequestBody Map<String, String> requestBody) {
         return findService.findUserName(requestBody);
     }
 
-    @PostMapping("/find/password")
+    @PostMapping("/password")
     public ResponseEntity<AccountResponse> findPassword(@RequestBody Map<String, String> requestBody) {
         return findService.findPassword(requestBody);
     }
 
-    @PostMapping("/find/userName/auth")
+    @PostMapping("/userName/auth")
     public ResponseEntity<AccountResponse> checkUsernameAuthNumber(@RequestBody Map<String, String> requestBody) {
         return findService.checkAuthNumber(requestBody, "userName");
     }
 
-    @PostMapping("/find/password/auth")
+    @PostMapping("/password/auth")
     public ResponseEntity<AccountResponse> checkPasswordAuthNumber(@RequestBody Map<String, String> requestBody) {
         return findService.checkAuthNumber(requestBody, "password");
     }
 
-//    @GetMapping("/find/username/{stateCode}/changePassword")
-//    public ResponseEntity<AccountResponse> changePassword(@PathVariable String stateCode) {
-//        return findService.changePassword(stateCode);
-//    }
+    @PostMapping("/changePassword")
+    public ResponseEntity<AccountResponse> changePassword(@RequestBody Map<String, String> requestBody) {
+        return findService.changePassword(requestBody);
+    }
 }
