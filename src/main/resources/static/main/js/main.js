@@ -542,7 +542,7 @@ function showMyLocationOnMap(lat, lon) {
   // 파란색 원 설정
   var myLocationCircle = new kakao.maps.Circle({
     center: new kakao.maps.LatLng(lat, lon), // 내 위치
-    radius: 5, // 반지름 (작은 점으로 표시하기 위해 설정)
+    radius: 10, // 반지름 (작은 점으로 표시하기 위해 설정)
     strokeWeight: 0, // 테두리 두께 없음
     fillColor: '#0000ff', // 파란색
     fillOpacity: 0.8 // 불투명도
@@ -670,10 +670,30 @@ function updateRentalStatusLocation() {
 }
 
 
-// 초기 로드 시 현황판 업데이트
 $(document).ready(function() {
-  updateRentalStatusLocation(); // 페이지 로드 시 현황판에 초기 위치 정보 표시
+  updateRentalStatusLocation(); // 초기 현황판 업데이트
+
+  // "내 위치로 이동" 버튼 생성 및 설정
+  const locateMeButton = document.createElement('button');
+  locateMeButton.id = 'locateMeButton';
+  locateMeButton.onclick = moveToMyLocation;
+
+  const img = document.createElement('img');
+  img.src = '/images/location.png'; // 이미지 경로 확인
+  img.alt = '내 위치로 이동';
+  img.style.width = '100%';
+  img.style.height = '100%';
+  locateMeButton.appendChild(img);
+
+  // 지도 컨테이너에 버튼 추가
+  const mapElement = document.getElementById('map');
+  if (mapElement) {
+    mapElement.appendChild(locateMeButton);
+  }
 });
+
+
 
 // 페이지 로드 시 대여소 로드
 loadBranches();
+

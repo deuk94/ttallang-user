@@ -16,11 +16,6 @@
 <div id="map-container">
     <div id="map"></div>
 
-    <button id="locateMeButton" onclick="moveToMyLocation()">
-        <img src="${pageContext.request.contextPath}/images/location.png" alt="내 위치로 이동" style="width: 100%; height: 100%; border-radius: 50%; object-fit: contain;">
-    </button>
-
-
     <!-- 대여소 정보 팝업 -->
     <div class="popup" id="branchInfoPopup">
         <button class="close-btn" onclick="closePopup('branchInfoPopup')">X</button>
@@ -38,7 +33,6 @@
 
     <!-- 대여 현황판 팝업 -->
     <div class="popup" id="rentalStatusPopup" style="display: none;">
-<%--        <button class="close-btn" onclick="closePopup('rentalStatusPopup')">X</button>--%>
         <h3>자전거 대여 현황</h3>
         <p>자전거 이름: <span id="rentedBicycleName"></span></p>
         <p>대여 지점: <span id="rentalBranchName"></span></p>
@@ -54,7 +48,6 @@
         <button class="close-btn" onclick="closePopup('dynamicReportPopup')">X</button>
         <h3>신고하기</h3>
         <select id="reportCategorySelect1">
-            <!-- 카테고리 옵션 로딩됨 -->
         </select>
         <textarea id="reportDetails1" placeholder="신고 내용을 입력해주세요..."></textarea>
         <button class="report-submit" onclick="submitReport()">신고하기</button>

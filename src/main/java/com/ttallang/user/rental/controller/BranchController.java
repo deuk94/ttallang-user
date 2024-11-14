@@ -18,6 +18,6 @@ public class BranchController {
             System.out.println(e.getMessage());
             return "redirect:/login/form";
         }
-        return "main/mainPage"; // JSP 경로와 일치하도록 수정
+        return "main/mainPage";
     }
 }

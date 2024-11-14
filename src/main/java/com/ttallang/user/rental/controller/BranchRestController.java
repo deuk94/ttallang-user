@@ -131,7 +131,7 @@ public class BranchRestController {
         return reportService.reportAndReturn(loginId, bicycleId, categoryId, reportDetails, returnBranchName, returnLatitude, returnLongitude);
     }
 
-    // 근처 대여소 이름 가져오는 API 추가
+
     @GetMapping("/nearby-branch")
     public String getNearbyBranch(@RequestParam double latitude, @RequestParam double longitude) {
         String branchName = branchService.getNearbyBranchName(latitude, longitude);
