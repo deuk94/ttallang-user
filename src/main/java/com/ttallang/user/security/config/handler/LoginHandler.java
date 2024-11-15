@@ -63,9 +63,9 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
         switch (errorMessage) {
             case "자격 증명에 실패하였습니다." ->
                     accountResponse.setMessage("비밀번호를 확인해주세요.");
-            case "사용자 계정의 유효 기간이 만료 되었습니다." ->
+            case "사용자 계정의 유효 기간이 만료 되었습니다." -> // isAccountNonExpired 관련.
                     accountResponse.setMessage("탈퇴한 회원입니다.");
-            case "유효하지 않은 사용자입니다." ->
+            case "유효하지 않은 사용자입니다." -> // isEnabled 관련.
                     accountResponse.setMessage("존재하지 않는 회원입니다.");
             default ->
                     accountResponse.setMessage("로그인에 실패하였습니다.");
