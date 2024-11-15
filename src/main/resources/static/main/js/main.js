@@ -32,7 +32,6 @@ function closeAllPopups() {
   isBranchInfoPopupOpen = false;
 }
 
-
 // 대여소 외 지역 반납 팝업 표시 함수
 function showCustomReturnPopup() {
   $.ajax({
@@ -54,6 +53,7 @@ function showCustomReturnPopup() {
     }
   });
 }
+
 function loadRentalStatus() {
   $.ajax({
     url: '/api/map/rental/status',  // 대여 현황 정보 API
@@ -87,7 +87,6 @@ function loadRentalStatus() {
   });
 }
 
-
 function updateCurrentLocationOnStatusPopup() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -109,7 +108,6 @@ function updateCurrentLocationOnStatusPopup() {
     alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
   }
 }
-
 
 // 자전거 대여 함수
 function rentBike(bicycleId, rentalBranch) {
@@ -228,7 +226,6 @@ function returnBike() {
 // 현황판의 반납하기 버튼 클릭 이벤트
 document.getElementById("rentalStatusPopup").querySelector(".return-button").addEventListener("click", returnBike);
 
-
 // 대여소 반납 팝업 표시 함수
 function showReturnPopup(isCustomLocation) {
   document.getElementById("returnBranchName").innerText = selectedBranchName;
@@ -253,8 +250,6 @@ function showReturnPopup(isCustomLocation) {
     }
   });
 }
-
-
 
 // 카테고리 옵션 로딩 함수
 function loadReportCategories(selectId) {
@@ -327,8 +322,6 @@ function submitReport() {
   });
 }
 
-
-
 function submitReportAndReturn() {
   const categoryId = document.getElementById("reportCategorySelect2").value;
   const reportDetails = document.getElementById("reportDetails2").value;
@@ -393,11 +386,6 @@ function submitReportAndReturn() {
     }
   });
 }
-
-
-
-
-
 
 // 지도 외부 클릭 시 대여소 외 위치 반납 팝업 표시
 async function handleMapClickOutsideBranch(latitude, longitude) {
@@ -526,11 +514,13 @@ $(document).ready(async function() {
   }
 });
 
-
-
 // 전역 변수로 현재 위치(위도, 경도)를 관리
 let currentLatitude = 0;
 let currentLongitude = 0;
+
+// 현재 위치 원과 오버레이를 전역 변수로 관리
+let myLocationCircle = null;
+let infoOverlay = null;
 
 // 카카오 지도 초기화
 var container = document.getElementById('map');
@@ -539,8 +529,17 @@ var main = new kakao.maps.Map(container, options);
 
 // 내 위치를 파란색 원으로 표시하는 함수
 function showMyLocationOnMap(lat, lon) {
+  // 기존 원이 있으면 제거
+  if (myLocationCircle) {
+    myLocationCircle.setMap(null);
+  }
+  // 기존 오버레이가 있으면 제거
+  if (infoOverlay) {
+    infoOverlay.setMap(null);
+  }
+
   // 파란색 원 설정
-  var myLocationCircle = new kakao.maps.Circle({
+  myLocationCircle = new kakao.maps.Circle({
     center: new kakao.maps.LatLng(lat, lon), // 내 위치
     radius: 10, // 반지름 (작은 점으로 표시하기 위해 설정)
     strokeWeight: 0, // 테두리 두께 없음
@@ -552,12 +551,11 @@ function showMyLocationOnMap(lat, lon) {
   myLocationCircle.setMap(main);
 
   // "현재 위치"라는 정보 창 생성
-  var infoOverlay = new kakao.maps.CustomOverlay({
+  infoOverlay = new kakao.maps.CustomOverlay({
     position: new kakao.maps.LatLng(lat + 0.00005, lon), // 원의 위쪽으로 위치 조정
     content: '<div style="padding:2px 4px; font-size:11px; color: #000; background-color: #fff; border-radius: 3px; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);">현재 위치</div>',
     yAnchor: 1.5 // 위치 조정 (필요에 따라 값 조정)
   });
-
 
   // 지도에 정보 창 표시
   infoOverlay.setMap(main);
@@ -582,7 +580,6 @@ function moveToMyLocation() {
     alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
   }
 }
-
 
 // 내 위치 가져오기 및 지도에 표시
 if (navigator.geolocation) {
@@ -669,7 +666,6 @@ function updateRentalStatusLocation() {
   }
 }
 
-
 $(document).ready(function() {
   updateRentalStatusLocation(); // 초기 현황판 업데이트
 
@@ -692,8 +688,5 @@ $(document).ready(function() {
   }
 });
 
-
-
 // 페이지 로드 시 대여소 로드
 loadBranches();
-

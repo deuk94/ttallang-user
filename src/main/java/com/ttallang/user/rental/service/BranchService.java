@@ -26,21 +26,21 @@ public class BranchService {
         return branchRepository.findActiveBranches();
     }
 
-    // 특정 위치에서 사용 가능한 자전거 수 조회 (10미터 안)
+    // 특정 위치에서 사용 가능한 자전거 수 조회 (30미터 안)
     public int getAvailableBikesAtLocation(double latitude, double longitude) {
-        int distance = 10;  // 반경 10미터 설정
+        int distance = 30;
         return bicycleRepository.findByBikeCount(latitude, longitude, distance);
     }
 
-    // 특정 위치에서 사용 가능한 자전거 목록 조회 (10미터 안)
+    // 특정 위치에서 사용 가능한 자전거 목록 조회 (30미터 안)
     public List<Bicycle> getAvailableBikesList(double latitude, double longitude) {
-        int distance = 10;  // 반경 10미터 설정
+        int distance = 30;
         return bicycleRepository.findAvailableBike(latitude, longitude, distance);
     }
 
-    // 특정 위치에서 10미터 내 대여소 이름 조회
+    // 특정 위치에서 30미터 내 대여소 이름 조회
     public String getNearbyBranchName(double latitude, double longitude) {
-        double distance = 0.00009;
+        double distance = 0.00027;
         Optional<String> branchName = branchRepository.findNearbyBranchName(latitude, longitude, distance);
         return branchName.orElse("기타");
     }
