@@ -139,7 +139,7 @@ let isReturnInProgress = false;  // 반납이 진행 중인지 확인하는 변�
 // 자전거 반납 함수
 function returnBike() {
   if (isReturnInProgress) {
-    // 이미 반납이 진행 중이면 중복 실행 방지
+
     return;
   }
 
@@ -394,7 +394,7 @@ async function handleMapClickOutsideBranch(latitude, longitude) {
   if (isRented) {
     showCustomReturnPopup(); // 대여 중일 때만 반납 팝업 호출
   } else {
-    console.log("대여 중이 아닙니다."); // 대여 중이 아닐 때는 다른 동작 수행 가능
+    console.log("대여 중이 아닙니다.");
   }
 }
 
@@ -502,7 +502,7 @@ async function checkRentalStatus() {
 $(document).ready(async function() {
   const isRented = await checkRentalStatus();
   if (isRented) {
-    loadRentalStatus(); // 대여 중인 상태라면 대여 현황 팝업 표시
+    loadRentalStatus();
   }
 });
 
@@ -576,10 +576,10 @@ if (navigator.geolocation) {
   alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
 }
 
-// 대여소 마커 및 커스텀 오버레이 관리 배열
-let customOverlays = [];
+// 대여소 마커 관리 배열
+let branchMarkers = [];
 
-// 대여소 마커 및 커스텀 오버레이 표시 함수
+// 대여소 마커 표시 함수
 function loadBranches() {
   $.ajax({
     url: "/api/map/branches",
@@ -596,23 +596,7 @@ function loadBranches() {
           zIndex: 1
         });
 
-        // 커스텀 오버레이 생성
-        const customOverlayContent = `
-          <div style="padding:5px; font-size:12px; background-color:#fff; border:1px solid #333; border-radius:3px; white-space:nowrap; opacity:0.9;">
-            ${branch.branchName}
-          </div>`;
-
-        const customOverlay = new kakao.maps.CustomOverlay({
-          position: markerPosition,
-          content: customOverlayContent,
-          yAnchor: 1.5
-        });
-
-        if (main.getLevel() <= 6) {
-          customOverlay.setMap(main);
-        }
-
-        customOverlays.push(customOverlay);
+        branchMarkers.push(marker);
 
         // 마커 클릭 이벤트로 대여소 세부 정보 표시
         kakao.maps.event.addListener(marker, 'click', function() {
@@ -629,14 +613,6 @@ function loadBranches() {
     }
   });
 }
-
-// 지도 레벨 변경 시 오버레이 표시/숨김 제어
-kakao.maps.event.addListener(main, 'zoom_changed', function() {
-  const level = main.getLevel();
-  customOverlays.forEach(function(overlay) {
-    overlay.setMap(level <= 4 ? main : null);
-  });
-});
 
 // 지도 클릭 이벤트로 위치 업데이트
 kakao.maps.event.addListener(main, 'click', function(mouseEvent) {
@@ -678,5 +654,5 @@ $(document).ready(function() {
   document.getElementById('map').appendChild(locateMeButton);
 });
 
-// 대여소 마커 및 오버레이 로드
+// 대여소 마커 로드
 loadBranches();

@@ -132,13 +132,14 @@ public class ReportService {
         }
 
         Rental rental = activeRental.get();
-//        Duration rentalDuration = Duration.between(rental.getRentalStartDate(), LocalDateTime.now());
-//
-//        boolean shouldRedirectToPayment = rentalDuration.toMinutes() > 5;
 
-        // 테스트용 30초로 제한둠
+        // 5분안에 결제 확인.
         Duration rentalDuration = Duration.between(rental.getRentalStartDate(), LocalDateTime.now());
-        boolean shouldRedirectToPayment = rentalDuration.toSeconds() > 30;
+        boolean shouldRedirectToPayment = rentalDuration.toMinutes() > 5;
+
+//        // 테스트용 30초로 제한둠
+//        Duration rentalDuration = Duration.between(rental.getRentalStartDate(), LocalDateTime.now());
+//        boolean shouldRedirectToPayment = rentalDuration.toSeconds() > 30;
 
         // 신고 생성 및 저장
         FaultReport faultReport = new FaultReport();
