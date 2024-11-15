@@ -32,7 +32,6 @@ function closeAllPopups() {
   isBranchInfoPopupOpen = false;
 }
 
-
 // 대여소 외 지역 반납 팝업 표시 함수
 function showCustomReturnPopup() {
   $.ajax({
@@ -54,6 +53,7 @@ function showCustomReturnPopup() {
     }
   });
 }
+
 function loadRentalStatus() {
   $.ajax({
     url: '/api/map/rental/status',  // 대여 현황 정보 API
@@ -87,7 +87,6 @@ function loadRentalStatus() {
   });
 }
 
-
 function updateCurrentLocationOnStatusPopup() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -109,7 +108,6 @@ function updateCurrentLocationOnStatusPopup() {
     alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
   }
 }
-
 
 // 자전거 대여 함수
 function rentBike(bicycleId, rentalBranch) {
@@ -228,7 +226,6 @@ function returnBike() {
 // 현황판의 반납하기 버튼 클릭 이벤트
 document.getElementById("rentalStatusPopup").querySelector(".return-button").addEventListener("click", returnBike);
 
-
 // 대여소 반납 팝업 표시 함수
 function showReturnPopup(isCustomLocation) {
   document.getElementById("returnBranchName").innerText = selectedBranchName;
@@ -253,8 +250,6 @@ function showReturnPopup(isCustomLocation) {
     }
   });
 }
-
-
 
 // 카테고리 옵션 로딩 함수
 function loadReportCategories(selectId) {
@@ -327,8 +322,6 @@ function submitReport() {
   });
 }
 
-
-
 function submitReportAndReturn() {
   const categoryId = document.getElementById("reportCategorySelect2").value;
   const reportDetails = document.getElementById("reportDetails2").value;
@@ -393,11 +386,6 @@ function submitReportAndReturn() {
     }
   });
 }
-
-
-
-
-
 
 // 지도 외부 클릭 시 대여소 외 위치 반납 팝업 표시
 async function handleMapClickOutsideBranch(latitude, longitude) {
@@ -526,192 +514,32 @@ $(document).ready(async function() {
   }
 });
 
+// 전역 변수로 현재 위치(위도, 경도)를 관리
+let currentLatitude = 0;
+let currentLongitude = 0;
 
-
-// // 전역 변수로 현재 위치(위도, 경도)를 관리
-// let currentLatitude = 0;
-// let currentLongitude = 0;
-//
-//
-//
-// // 카카오 지도 초기화
-// var container = document.getElementById('map');
-// var options = { center: new kakao.maps.LatLng(37.583883601891, 126.9999880311), level: 3 };
-// var main = new kakao.maps.Map(container, options);
-//
-// // 내 위치를 파란색 원으로 표시하는 함수
-// function showMyLocationOnMap(lat, lon) {
-//   // 파란색 원 설정
-//   var myLocationCircle = new kakao.maps.Circle({
-//     center: new kakao.maps.LatLng(lat, lon), // 내 위치
-//     radius: 10, // 반지름 (작은 점으로 표시하기 위해 설정)
-//     strokeWeight: 0, // 테두리 두께 없음
-//     fillColor: '#0000ff', // 파란색
-//     fillOpacity: 0.8 // 불투명도
-//   });
-//
-//   // 지도에 원을 표시
-//   myLocationCircle.setMap(main);
-//
-//   // "현재 위치"라는 정보 창 생성
-//   var infoOverlay = new kakao.maps.CustomOverlay({
-//     position: new kakao.maps.LatLng(lat + 0.00005, lon), // 원의 위쪽으로 위치 조정
-//     content: '<div style="padding:2px 4px; font-size:11px; color: #000; background-color: #fff; border-radius: 3px; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);">현재 위치</div>',
-//     yAnchor: 1.5 // 위치 조정 (필요에 따라 값 조정)
-//   });
-//
-//
-//   // 지도에 정보 창 표시
-//   infoOverlay.setMap(main);
-//
-//   // 내 위치 중심으로 지도 이동
-//   main.setCenter(new kakao.maps.LatLng(lat, lon));
-// }
-//
-// // "내 위치로 이동" 버튼 기능 구현
-// function moveToMyLocation() {
-//   if (navigator.geolocation) {
-//     navigator.geolocation.getCurrentPosition(function(position) {
-//       currentLatitude = position.coords.latitude;
-//       currentLongitude = position.coords.longitude;
-//       var locPosition = new kakao.maps.LatLng(currentLatitude, currentLongitude);
-//       main.setCenter(locPosition);
-//       showMyLocationOnMap(currentLatitude, currentLongitude);
-//     }, function() {
-//       alert("위치 정보를 가져올 수 없습니다.");
-//     });
-//   } else {
-//     alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
-//   }
-// }
-//
-//
-// // 내 위치 가져오기 및 지도에 표시
-// if (navigator.geolocation) {
-//   navigator.geolocation.getCurrentPosition(function(position) {
-//     var lat = position.coords.latitude; // 현재 위치 위도
-//     var lon = position.coords.longitude; // 현재 위치 경도
-//
-//     currentLatitude = lat; // 전역 변수에 저장
-//     currentLongitude = lon;
-//
-//     // 내 위치를 파란색 작은 원으로 표시
-//     showMyLocationOnMap(lat, lon);
-//
-//     // 내 위치 정보를 현황판에 업데이트
-//     updateRentalStatusLocation();
-//
-//   }, function(error) {
-//     console.error("위치 정보를 가져오는 데 실패했습니다:", error);
-//     alert("위치 정보를 가져올 수 없습니다.");
-//   });
-// } else {
-//   alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
-// }
-//
-// // 마커 이미지 설정
-// var imageSrc = '/images/bicycling.png',
-//     imageSize = new kakao.maps.Size(50, 50),
-//     imageOption = { offset: new kakao.maps.Point(20, 20) };
-// var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
-//
-// // 대여소 마커 로드 함수
-// function loadBranches() {
-//   $.ajax({
-//     url: "/api/map/branches",
-//     method: "GET",
-//     success: function(data) {
-//       data.forEach(function(branch) {
-//         var marker = new kakao.maps.Marker({
-//           map: main,
-//           position: new kakao.maps.LatLng(branch.latitude, branch.longitude),
-//           image: markerImage
-//         });
-//
-//         kakao.maps.event.addListener(marker, 'click', function() {
-//           selectedBranchName = branch.branchName;
-//           selectedBranchLatitude = branch.latitude;
-//           selectedBranchLongitude = branch.longitude;
-//
-//           // 선택된 대여소 정보 확인
-//           console.log("Selected Branch Name:", selectedBranchName);
-//           console.log("Selected Branch Latitude:", selectedBranchLatitude);
-//           console.log("Selected Branch Longitude:", selectedBranchLongitude);
-//
-//           document.getElementById("branchName").innerText = selectedBranchName;
-//           handleBranchClick(branch.latitude, branch.longitude);
-//         });
-//       });
-//     },
-//     error: function(xhr) {
-//       console.error("대여소 데이터 불러오기 실패:", xhr);
-//     }
-//   });
-// }
-//
-// // 지도 클릭 이벤트로 모든 팝업 닫기 및 위치 업데이트
-// kakao.maps.event.addListener(main, 'click', function(mouseEvent) {
-//   closeAllPopups();
-//   const clickedLatLng = mouseEvent.latLng;
-//   currentLatitude = clickedLatLng.getLat();
-//   currentLongitude = clickedLatLng.getLng();
-//
-//   handleMapClickOutsideBranch(currentLatitude, currentLongitude);
-//   updateRentalStatusLocation(); // 현황판의 위치 업데이트
-// });
-//
-// // 현황판의 위도, 경도 업데이트 함수
-// function updateRentalStatusLocation() {
-//   const rentalLatitudeElement = document.getElementById("currentLatitude");
-//   const rentalLongitudeElement = document.getElementById("currentLongitude");
-//
-//   if (rentalLatitudeElement && rentalLongitudeElement) {
-//     rentalLatitudeElement.innerText = currentLatitude;
-//     rentalLongitudeElement.innerText = currentLongitude;
-//   }
-// }
-//
-//
-// $(document).ready(function() {
-//   updateRentalStatusLocation(); // 초기 현황판 업데이트
-//
-//   // "내 위치로 이동" 버튼 생성 및 설정
-//   const locateMeButton = document.createElement('button');
-//   locateMeButton.id = 'locateMeButton';
-//   locateMeButton.onclick = moveToMyLocation;
-//
-//   const img = document.createElement('img');
-//   img.src = '/images/location.png'; // 이미지 경로 확인
-//   img.alt = '내 위치로 이동';
-//   img.style.width = '100%';
-//   img.style.height = '100%';
-//   locateMeButton.appendChild(img);
-//
-//   // 지도 컨테이너에 버튼 추가
-//   const mapElement = document.getElementById('map');
-//   if (mapElement) {
-//     mapElement.appendChild(locateMeButton);
-//   }
-// });
-//
-//
-//
-// // 페이지 로드 시 대여소 로드
-// loadBranches();
-
-// 전역 변수로 현재 위치(위도, 경도)를 관리 (고정된 위치로 설정)
-let currentLatitude = 37.5838208;
-let currentLongitude = 126.9998188;
+// 현재 위치 원과 오버레이를 전역 변수로 관리
+let myLocationCircle = null;
+let infoOverlay = null;
 
 // 카카오 지도 초기화
 var container = document.getElementById('map');
-var options = { center: new kakao.maps.LatLng(currentLatitude, currentLongitude), level: 3 };
+var options = { center: new kakao.maps.LatLng(37.583883601891, 126.9999880311), level: 3 };
 var main = new kakao.maps.Map(container, options);
 
 // 내 위치를 파란색 원으로 표시하는 함수
 function showMyLocationOnMap(lat, lon) {
+  // 기존 원이 있으면 제거
+  if (myLocationCircle) {
+    myLocationCircle.setMap(null);
+  }
+  // 기존 오버레이가 있으면 제거
+  if (infoOverlay) {
+    infoOverlay.setMap(null);
+  }
+
   // 파란색 원 설정
-  var myLocationCircle = new kakao.maps.Circle({
+  myLocationCircle = new kakao.maps.Circle({
     center: new kakao.maps.LatLng(lat, lon), // 내 위치
     radius: 10, // 반지름 (작은 점으로 표시하기 위해 설정)
     strokeWeight: 0, // 테두리 두께 없음
@@ -723,10 +551,10 @@ function showMyLocationOnMap(lat, lon) {
   myLocationCircle.setMap(main);
 
   // "현재 위치"라는 정보 창 생성
-  var infoOverlay = new kakao.maps.CustomOverlay({
-    position: new kakao.maps.LatLng(lat + 0.00005, lon),
+  infoOverlay = new kakao.maps.CustomOverlay({
+    position: new kakao.maps.LatLng(lat + 0.00005, lon), // 원의 위쪽으로 위치 조정
     content: '<div style="padding:2px 4px; font-size:11px; color: #000; background-color: #fff; border-radius: 3px; box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);">현재 위치</div>',
-    yAnchor: 1.5
+    yAnchor: 1.5 // 위치 조정 (필요에 따라 값 조정)
   });
 
   // 지도에 정보 창 표시
@@ -736,15 +564,45 @@ function showMyLocationOnMap(lat, lon) {
   main.setCenter(new kakao.maps.LatLng(lat, lon));
 }
 
-// "내 위치로 이동" 버튼 기능 구현 (고정 위치로 이동)
+// "내 위치로 이동" 버튼 기능 구현
 function moveToMyLocation() {
-  var locPosition = new kakao.maps.LatLng(currentLatitude, currentLongitude);
-  main.setCenter(locPosition);
-  showMyLocationOnMap(currentLatitude, currentLongitude);
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      currentLatitude = position.coords.latitude;
+      currentLongitude = position.coords.longitude;
+      var locPosition = new kakao.maps.LatLng(currentLatitude, currentLongitude);
+      main.setCenter(locPosition);
+      showMyLocationOnMap(currentLatitude, currentLongitude);
+    }, function() {
+      alert("위치 정보를 가져올 수 없습니다.");
+    });
+  } else {
+    alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
+  }
 }
 
-// 초기 로드 시 고정된 위치 표시
-showMyLocationOnMap(currentLatitude, currentLongitude);
+// 내 위치 가져오기 및 지도에 표시
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(function(position) {
+    var lat = position.coords.latitude; // 현재 위치 위도
+    var lon = position.coords.longitude; // 현재 위치 경도
+
+    currentLatitude = lat; // 전역 변수에 저장
+    currentLongitude = lon;
+
+    // 내 위치를 파란색 작은 원으로 표시
+    showMyLocationOnMap(lat, lon);
+
+    // 내 위치 정보를 현황판에 업데이트
+    updateRentalStatusLocation();
+
+  }, function(error) {
+    console.error("위치 정보를 가져오는 데 실패했습니다:", error);
+    alert("위치 정보를 가져올 수 없습니다.");
+  });
+} else {
+  alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
+}
 
 // 마커 이미지 설정
 var imageSrc = '/images/bicycling.png',
@@ -770,6 +628,11 @@ function loadBranches() {
           selectedBranchLatitude = branch.latitude;
           selectedBranchLongitude = branch.longitude;
 
+          // 선택된 대여소 정보 확인
+          console.log("Selected Branch Name:", selectedBranchName);
+          console.log("Selected Branch Latitude:", selectedBranchLatitude);
+          console.log("Selected Branch Longitude:", selectedBranchLongitude);
+
           document.getElementById("branchName").innerText = selectedBranchName;
           handleBranchClick(branch.latitude, branch.longitude);
         });
@@ -789,7 +652,7 @@ kakao.maps.event.addListener(main, 'click', function(mouseEvent) {
   currentLongitude = clickedLatLng.getLng();
 
   handleMapClickOutsideBranch(currentLatitude, currentLongitude);
-  updateRentalStatusLocation();
+  updateRentalStatusLocation(); // 현황판의 위치 업데이트
 });
 
 // 현황판의 위도, 경도 업데이트 함수
@@ -812,7 +675,7 @@ $(document).ready(function() {
   locateMeButton.onclick = moveToMyLocation;
 
   const img = document.createElement('img');
-  img.src = '/images/location.png';
+  img.src = '/images/location.png'; // 이미지 경로 확인
   img.alt = '내 위치로 이동';
   img.style.width = '100%';
   img.style.height = '100%';
