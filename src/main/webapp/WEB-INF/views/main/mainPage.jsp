@@ -20,7 +20,7 @@
     <div class="popup" id="branchInfoPopup">
         <button class="close-btn" onclick="closePopup('branchInfoPopup')">X</button>
         <div class="popup-header">
-            <h3 id="branchName">선택된 지점 이름</h3>
+            <h3 id="branchName">선택된 대여소 이름</h3>
         </div>
         <div class="popup-content">
             <p class="bike-info">

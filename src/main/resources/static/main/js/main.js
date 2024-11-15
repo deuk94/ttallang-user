@@ -139,7 +139,7 @@ let isReturnInProgress = false;  // 반납이 진행 중인지 확인하는 변�
 // 자전거 반납 함수
 function returnBike() {
   if (isReturnInProgress) {
-    // 이미 반납이 진행 중이면 중복 실행 방지
+
     return;
   }
 
@@ -394,7 +394,7 @@ async function handleMapClickOutsideBranch(latitude, longitude) {
   if (isRented) {
     showCustomReturnPopup(); // 대여 중일 때만 반납 팝업 호출
   } else {
-    console.log("대여 중이 아닙니다."); // 대여 중이 아닐 때는 다른 동작 수행 가능
+    console.log("대여 중이 아닙니다.");
   }
 }
 
@@ -502,7 +502,7 @@ async function checkRentalStatus() {
 $(document).ready(async function() {
   const isRented = await checkRentalStatus();
   if (isRented) {
-    loadRentalStatus(); // 대여 중인 상태라면 대여 현황 팝업 표시
+    loadRentalStatus();
   }
 });
 
