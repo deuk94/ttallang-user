@@ -8,7 +8,7 @@ import com.ttallang.user.commonModel.Bicycle;
 
 public interface BicycleRepository extends JpaRepository<Bicycle, Integer> {
 
-// 대여소 반경 10미터 이내 대여 가능 자전거 수
+    // 대여소 반경 30미터 이내 대여 가능 자전거 수
     @Query("SELECT COUNT(b) FROM Bicycle b " +
         "WHERE b.rentalStatus = '1' " +
         "AND b.bicycleStatus = '1' " +
@@ -17,8 +17,6 @@ public interface BicycleRepository extends JpaRepository<Bicycle, Integer> {
     int findByBikeCount(@Param("latitude") double latitude,
         @Param("longitude") double longitude,
         @Param("distance") double distance);
-
-
 
     // 대여소에 있는 대여 가능 자전거 리스트 조회
     @Query("SELECT b FROM Bicycle b " +

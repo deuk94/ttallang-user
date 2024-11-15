@@ -13,12 +13,11 @@ public interface BranchRepository extends JpaRepository<Branch, Integer> {
     @Query("SELECT b FROM Branch b WHERE b.branchStatus = '1'")
     List<Branch> findActiveBranches();
 
-    // 특정 위치에서 10미터 내에 있는 대여소 이름 조회
+    // 특정 위치에서 30미터 내에 있는 대여소 이름 조회
     @Query("SELECT b.branchName FROM Branch b " +
         "WHERE b.branchStatus = '1' " +
         "AND SQRT(POWER(b.latitude - :latitude, 2) + POWER(b.longitude - :longitude, 2)) < :radius")
     Optional<String> findNearbyBranchName(@Param("latitude") double latitude,
         @Param("longitude") double longitude,
-        @Param("radius") double radius); // radius는 0.00009로 설정
-
+        @Param("radius") double radius);
 }
