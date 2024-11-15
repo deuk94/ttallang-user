@@ -100,7 +100,7 @@
 <!-- 외부 및 main.js 파일 포함 -->
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b4a025b0f93d9847f6948dcc823656aa"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="${pageContext.request.contextPath}../main/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/main/js/main.js"></script>
 
 </body>
 </html>
