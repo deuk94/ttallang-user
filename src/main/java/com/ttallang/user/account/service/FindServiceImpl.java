@@ -102,15 +102,11 @@ public class FindServiceImpl implements FindService {
         try {
             if (findType.equals("userName")) {
                 sharedMap = sharedUserNameAuthNumberMap;
-                System.out.println("11111");
-                System.out.println(customerPhone);
                 rolesUser = findByCustomerPhone(customerPhone);
                 message = rolesUser.getUserName(); // 이미 맵에서 userName을 받고 있는데 한 번 더 찾을 필요가 있는지 모르겠음.
             } else if (findType.equals("password")) {
                 assert userName != null; // null이면 안됨.
                 sharedMap = sharedPasswordAuthNumberMap;
-                System.out.println("22222");
-                System.out.println(userName);
                 System.out.println(customerPhone);
                 rolesUser = findByUserNameAndCustomerPhone(userName, customerPhone);
                 target = rolesUser.getUserName();
@@ -199,7 +195,6 @@ public class FindServiceImpl implements FindService {
         String userName = requestBody.get("userName");
         String customerPhone = requestBody.get("customerPhone");
         RolesUser rolesUser;
-        System.out.println(findType);
         try {
             if (findType.equals("userName")) {
                 rolesUser = this.findByCustomerPhone(customerPhone);
@@ -211,7 +206,6 @@ public class FindServiceImpl implements FindService {
                 accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
                 return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            System.out.println(rolesUser.toString());
             if (rolesUser != null) { // 유저가 있긴 함.
                 Roles roles = rolesRepository.findByUserName(rolesUser.getUserName());
                 String userStatus = roles.getUserStatus();
