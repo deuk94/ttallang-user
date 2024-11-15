@@ -17,8 +17,12 @@ import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 
@@ -31,7 +35,9 @@ public class FindServiceImpl implements FindService {
     private final RolesRepository rolesRepository;
     private final Map<String, String> sharedUserNameAuthNumberMap;
     private final Map<String, String> sharedPasswordAuthNumberMap;
-    private final Map<String, String> sharedStateCodeMap;
+    private final Map<String, String> sharedStateMap;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder; // 암호화해주는놈.
+
     private DefaultMessageService messageService;
 
     // 민감 정보 변수화.
@@ -55,13 +61,15 @@ public class FindServiceImpl implements FindService {
             RolesRepository rolesRepository,
             Map<String, String> sharedUserNameAuthNumberMap,
             Map<String, String> sharedPasswordAuthNumberMap,
-            Map<String, String> sharedStateCodeMap
+            Map<String, String> sharedStateMap,
+            BCryptPasswordEncoder bCryptPasswordEncoder
     ) {
         this.userRepository = userRepository;
         this.rolesRepository = rolesRepository;
         this.sharedUserNameAuthNumberMap = sharedUserNameAuthNumberMap;
         this.sharedPasswordAuthNumberMap = sharedPasswordAuthNumberMap;
-        this.sharedStateCodeMap = sharedStateCodeMap;
+        this.sharedStateMap = sharedStateMap;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @PostConstruct
@@ -89,21 +97,27 @@ public class FindServiceImpl implements FindService {
         Map<String, String> sharedMap;
         RolesUser rolesUser;
         String message;
+        String target = null;
+        String state = null;;
         try {
             if (findType.equals("userName")) {
                 sharedMap = sharedUserNameAuthNumberMap;
+                System.out.println("11111");
+                System.out.println(customerPhone);
                 rolesUser = findByCustomerPhone(customerPhone);
-                message = rolesUser.getUserName(); // 이미 맵에서 userName을 받고 있는데 한 번 더 찾을 필요가 있을까?
+                message = rolesUser.getUserName(); // 이미 맵에서 userName을 받고 있는데 한 번 더 찾을 필요가 있는지 모르겠음.
             } else if (findType.equals("password")) {
                 assert userName != null; // null이면 안됨.
                 sharedMap = sharedPasswordAuthNumberMap;
+                System.out.println("22222");
+                System.out.println(userName);
+                System.out.println(customerPhone);
                 rolesUser = findByUserNameAndCustomerPhone(userName, customerPhone);
-                String target = rolesUser.getUserName();
+                target = rolesUser.getUserName();
                 // 패스워드의 경우는 클라이언트 측에서 메세지를 받아들이고 처리하는 로직이 아이디 처리 쪽과 다르다.
                 RandomStateToken randomStateToken = new RandomStateToken(target);
-                String state = randomStateToken.getRandomStateToken();
+                state = randomStateToken.getRandomStateToken();
                 message = state;
-                sharedStateCodeMap.putIfAbsent(target, state);
             } else {
                 accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
                 return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -112,6 +126,9 @@ public class FindServiceImpl implements FindService {
             String authNumber2 = sharedMap.get(customerPhone); // 공유메모리에 저장돼있던 대조용 인증번호.
             if (authNumber1.equals(authNumber2)) { // 인증번호가 일치한다면,
                 accountResponse.setMessage(message);
+                if (target != null && state != null) {
+                    sharedStateMap.putIfAbsent(target, state); // state를 등록한다.
+                }
                 sharedMap.remove(customerPhone); // 임시 인증정보를 지운다.
                 return new ResponseEntity<>(accountResponse, HttpStatus.OK); // 200.
             } else { // 인증 번호가 다름.
@@ -124,24 +141,55 @@ public class FindServiceImpl implements FindService {
         }
     };
 
-//    @Override
-//    public ResponseEntity<AccountResponse> changePassword(String stateCode) {
-//        AccountResponse accountResponse = new AccountResponse("guest", stateCode);
-//        String[] stateParts = stateCode.split(":");
-//        String target = stateParts[1];
-//        byte[] decodedBytes = Base64.getUrlDecoder().decode(target);
-//        String decodedUserName = new String(decodedBytes);
-//        String originalState = sharedStateCodeMap.get(decodedUserName);
-//        if (originalState != null) { // 유효한 인증이면서,
-//            if (originalState.equals(stateCode)) { // 상태 코드도 일치하면,
-//
-//            } else {
-//
-//            }
-//        } else {
-//
-//        }
-//    }
+    @Override
+    public String renderPasswordChangePage(String state, Model model) {
+        try {
+            String[] stateParts = state.split(":");
+            String target = stateParts[1];
+            byte[] decodedBytes = Base64.getUrlDecoder().decode(target);
+            String decodedUserName = new String(decodedBytes);
+            String originalState = sharedStateMap.get(decodedUserName);
+            if (originalState != null) { // 유효한 인증이면서,
+                if (originalState.equals(state)) { // 검증 코드도 일치하면,
+                    sharedStateMap.remove(decodedUserName); // 다른 접근을 하지 못하도록 state 바로 지워버림.
+                    model.addAttribute("userName", decodedUserName);
+                    return "account/find/changePassword";
+                } else { // 검증 코드 불일치는 사용자가 임의의 값으로 접근한 경우임.
+                    String encodedMessage = URLEncoder.encode("잘못된 접근입니다!!!", StandardCharsets.UTF_8);
+                    return "redirect:/login/form?error="+encodedMessage;
+                }
+            } else { // 맵에 값이 없다는 것은 유효하지 않다는 뜻.
+                String encodedMessage = URLEncoder.encode("검증 값이 유효하지 않습니다.", StandardCharsets.UTF_8);
+                return "redirect:/login/form?error="+encodedMessage;
+            }
+        } catch (IllegalArgumentException e) { // 임의 값을 넣었을 때 디코딩 에러가 난 경우.
+            String encodedMessage = URLEncoder.encode("잘못된 접근입니다!!!", StandardCharsets.UTF_8);
+            return "redirect:/login/form?error="+encodedMessage;
+        } catch (Exception e) { // 나도 모르는 서버 에러가 난 경우.
+            String encodedMessage = URLEncoder.encode("서버 에러가 발생하였습니다.\n관리자에게 문의해주세요.", StandardCharsets.UTF_8);
+            return "redirect:/login/form?error="+encodedMessage;
+        }
+    }
+
+    @Override
+    public ResponseEntity<AccountResponse> changePassword(Map<String, String> requestBody) {
+        AccountResponse accountResponse = new AccountResponse("guest", null);
+        try {
+            String userName = requestBody.get("userName");
+            String rawPassword = requestBody.get("userPassword");
+
+            String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+            Roles roles = rolesRepository.findByUserName(userName);
+            roles.setUserPassword(encPassword);
+            rolesRepository.save(roles);
+
+            accountResponse.setMessage("성공적으로 변경되었습니다.");
+            return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            accountResponse.setMessage("변경 도중 에러가 발생하였습니다.");
+            return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     // 아래부턴 서비스에서 내부적으로만 사용하는 메서드들. 외부에서 접근할 수 없음.
 
@@ -151,16 +199,19 @@ public class FindServiceImpl implements FindService {
         String userName = requestBody.get("userName");
         String customerPhone = requestBody.get("customerPhone");
         RolesUser rolesUser;
+        System.out.println(findType);
         try {
             if (findType.equals("userName")) {
                 rolesUser = this.findByCustomerPhone(customerPhone);
             } else if (findType.equals("password")) {
                 assert userName != null;
+                System.out.println("들어옴");
                 rolesUser = this.findByUserNameAndCustomerPhone(userName, customerPhone);
             } else {
                 accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
                 return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            System.out.println(rolesUser.toString());
             if (rolesUser != null) { // 유저가 있긴 함.
                 Roles roles = rolesRepository.findByUserName(rolesUser.getUserName());
                 String userStatus = roles.getUserStatus();

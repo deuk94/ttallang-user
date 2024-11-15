@@ -11,7 +11,7 @@
 <html lang="ko">
 <head>
   <title>패스워드 변경</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/account/css/findPassword.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/account/css/changePassword.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
@@ -23,6 +23,7 @@
       <h2 class="text-center my-4">패스워드 변경</h2>
       <p id="helpText" class="mt-2 mb-4">비밀번호를 새롭게 설정해주세요.</p>
       <form id="changePasswordForm" class="m-0" novalidate>
+        <input type="hidden" id="userName" name="userName" value="${userName}">
         <div class="mb-3">
           <label for="userPassword" class="form-label">비밀번호</label>
           <input type="password" id="userPassword" name="userPassword" class="form-control" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$">
@@ -38,9 +39,9 @@
           </div>
         </div>
       </form>
-      <div class="d-flex justify-content-center mt-5">
-        <button id="form-submit" form="changePasswordForm" type="submit" class="btn-submit me-3">변경</button>
-        <a id="btn-cancel" href="${pageContext.request.contextPath}/login/form" class="btn-cancel">취소</a>
+      <div class="d-flex justify-content-center m-0">
+        <button id="formSubmit" form="changePasswordForm" type="submit" class="btn-submit me-3">변경</button>
+        <a id="formSubmitCancel" href="${pageContext.request.contextPath}/login/form" class="btn-cancel">취소</a>
       </div>
     </div>
   </div>

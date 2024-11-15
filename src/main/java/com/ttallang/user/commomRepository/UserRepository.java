@@ -43,8 +43,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "from Roles r " +
             "join User u " +
             "on r.userId = u.userId " +
-            "where u.customerPhone = :customerPhone " +
-            "and r.userName = :userName")
-    RolesUser findByUserNameAndCustomerPhone(@Param("customerPhone") String customerPhone, @Param("userName") String userName);
+            "where r.userName = :userName and u.customerPhone = :customerPhone")
+    RolesUser findByUserNameAndCustomerPhone(@Param("userName") String userName, @Param("customerPhone") String customerPhone);
 }
 
