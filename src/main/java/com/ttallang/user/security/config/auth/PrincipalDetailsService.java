@@ -31,6 +31,8 @@ public class PrincipalDetailsService implements UserDetailsService {
         if (roles == null) { // 이 경우는 유저 정보가 아예 없는 경우.
             return new PrincipalDetails(
                     // 시큐리티 콘피그에서 유저 로그인 핸들러를 통해 로그인 실패하는 것을 관리하기 위해 가짜 객체를 만들어줬음.
+                    // 이 가짜 객체의 userStatus 필드값을 통해서 PrincipalDetails 의 isEnabled 메서드를 통해
+                    // 유저 객체의 유효 여부를 판단하게 된다.
                     new Roles(0, "", "", "", "-1"),
                     new User(0, 0, "", "", "", "")
             );
