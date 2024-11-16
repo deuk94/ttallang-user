@@ -29,7 +29,8 @@ public class PaymentService {
     // 결제 금액 수정
     public Payment updatePaymentAmount(int rentalId, int paymentId) {
         Rental rental = rentalRepository.findById(rentalId).orElse(null);
-        long minutes = Duration.between(rental.getRentalStartDate(), rental.getRentalEndDate()).toMinutes();
+        long minutes = Duration.between(rental.getRentalStartDate(), rental.getRentalEndDate())
+            .toMinutes();
         int paymentAmount = 500 + (int) (minutes * 150);
         if (rental.getReturnBranch().equals("기타")) {
             paymentAmount += 20000;
