@@ -25,7 +25,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     JoinPayment getByPayment(@Param("customerId") int customerId);
 
     // 포트원(결제 정보)
-    @Query("SELECT new com.ttallang.user.payment.model.JoinPortOne("+
+    @Query("SELECT new com.ttallang.user.payment.model.JoinPortOne(" +
         "u.customerName, u.customerPhone,u.email) " +
         "FROM Payment p " +
         "JOIN User u ON p.customerId = u.customerId " +

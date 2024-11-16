@@ -21,9 +21,11 @@ public interface RentalRepository extends JpaRepository<Rental, Integer> {
 
     List<Rental> findByCustomerIdAndRentalEndDateIsNull(int customerId);
 
-    @Query("SELECT new com.ttallang.user.rental.model.UseRental(b.bicycleId, b.bicycleName, r.rentalBranch, r.rentalStartDate) " +
-        "FROM Rental r JOIN Bicycle b ON b.bicycleId = r.bicycleId " +
-        "WHERE r.customerId = :customerId AND r.rentalEndDate IS NULL AND b.rentalStatus = '0' ")
+    @Query(
+        "SELECT new com.ttallang.user.rental.model.UseRental(b.bicycleId, b.bicycleName, r.rentalBranch, r.rentalStartDate) "
+            +
+            "FROM Rental r JOIN Bicycle b ON b.bicycleId = r.bicycleId " +
+            "WHERE r.customerId = :customerId AND r.rentalEndDate IS NULL AND b.rentalStatus = '0' ")
     UseRental findCustomerIdAndRentalStatus(@Param("customerId") int customerId);
 
     // 새로운 메서드: 대여 중인 자전거 조회 (rentalEndDate가 NULL일 경우)
