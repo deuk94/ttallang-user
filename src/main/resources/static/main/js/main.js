@@ -565,7 +565,7 @@ function showMyLocationOnMap(lat, lon) {
   }
 
   const myLocationImageSrc = '/images/mylocation.png';
-  const myLocationImageSize = new kakao.maps.Size(30, 30);
+  const myLocationImageSize = new kakao.maps.Size(40, 40);
   const myLocationImageOption = { offset: new kakao.maps.Point(12, 24) };
 
   const myLocationImage = new kakao.maps.MarkerImage(myLocationImageSrc, myLocationImageSize, myLocationImageOption);
@@ -621,7 +621,7 @@ function loadBranches() {
     success: function(data) {
       data.forEach(function(branch) {
         const markerPosition = new kakao.maps.LatLng(branch.latitude, branch.longitude);
-        const markerImage = new kakao.maps.MarkerImage('/images/bicycling.png', new kakao.maps.Size(50, 50), { offset: new kakao.maps.Point(25, 25) });
+        const markerImage = new kakao.maps.MarkerImage('/images/bicycling.png', new kakao.maps.Size(40, 40), { offset: new kakao.maps.Point(25, 25) });
 
         const marker = new kakao.maps.Marker({
           position: markerPosition,
@@ -684,10 +684,10 @@ $(document).ready(function() {
   locateMeButton.onclick = moveToMyLocation;
 
   const img = document.createElement('img');
-  img.src = '/images/location.png';
+  img.src = '/images/gps.png';
   img.alt = '내 위치로 이동';
-  img.style.width = '100%';
-  img.style.height = '100%';
+  img.style.width = '35px';
+  img.style.height = '35px';
   locateMeButton.appendChild(img);
 
   document.getElementById('map').appendChild(locateMeButton);
