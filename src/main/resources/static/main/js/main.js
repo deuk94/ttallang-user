@@ -166,18 +166,12 @@ function returnBikeFromCustomLocation() {
 }
 
 
-function returnBikeFromStatus() {
-  if (isReturnInProgress) return;
-
-  isReturnInProgress = true;
-
-  const returnLatitude = currentLatitude;
-  const returnLongitude = currentLongitude;
-
-  // 현황판에서 반납 처리
-  processReturn(returnLatitude, returnLongitude, "기타", false);
-}
 function processReturn(latitude, longitude, branchName, isCustomLocation) {
+  console.log("Process Return - Input Parameters:");
+  console.log("Latitude:", latitude, "Longitude:", longitude);
+  console.log("Branch Name:", branchName);
+  console.log("Is Custom Location:", isCustomLocation);
+
   $.ajax({
     url: "/api/map/nearby-branch",
     type: "GET",
@@ -191,7 +185,7 @@ function processReturn(latitude, longitude, branchName, isCustomLocation) {
         data: {
           returnLatitude: latitude,
           returnLongitude: longitude,
-          isCustomLocation: isCustomLocation,
+          isCustomLocation: finalBranchName === "기타",
           returnBranchName: finalBranchName,
         },
         success: function () {
@@ -216,7 +210,7 @@ function processReturn(latitude, longitude, branchName, isCustomLocation) {
           returnLatitude: latitude,
           returnLongitude: longitude,
           isCustomLocation: true,
-          returnBranchName: branchName,
+          returnBranchName: "기타",
         },
         success: function () {
           alert("반납이 성공적으로 완료되었습니다.");
@@ -233,38 +227,17 @@ function processReturn(latitude, longitude, branchName, isCustomLocation) {
     },
   });
 }
-// 현황판 반납 버튼 이벤트
-document.getElementById("rentalStatusPopup")
-.querySelector(".return-button")
-.addEventListener("click", returnBikeFromStatus);
+function returnBikeFromStatus() {
+  if (isReturnInProgress) return;
 
-// 대여소 반납 팝업 버튼 이벤트
-document.getElementById("returnPopup")
-.querySelector(".return-button")
-.addEventListener("click", returnBikeFromBranch);
+  isReturnInProgress = true;
 
-// 대여소 외 반납 팝업 버튼 이벤트
-document.getElementById("customReturnPopup")
-.querySelector(".return-button")
-.addEventListener("click", returnBikeFromCustomLocation);
+  const returnLatitude = currentLatitude;
+  const returnLongitude = currentLongitude;
 
-// 현황판 반납 버튼 이벤트
-document.getElementById("rentalStatusPopup").querySelector(".return-button").addEventListener("click", function () {
-  returnBike(false); // GPS 기반 현황판 반납
-});
+  processReturn(returnLatitude, returnLongitude, "기타", false);
+}
 
-// 대여소 외 반납 팝업 버튼 이벤트
-document.getElementById("customReturnPopup").querySelector(".return-button").addEventListener("click", function () {
-  returnBike(true); // 커스텀 위치 반납
-});
-
-document.getElementById("rentalStatusPopup").querySelector(".report-button").addEventListener("click", function () {
-  // 신고 팝업 열기
-  openReportPopup();
-
-  // 현황판 팝업 닫기
-  closePopup("rentalStatusPopup");
-});
 
 // 대여소 반납 팝업 표시 함수
 function showReturnPopup() {
@@ -396,8 +369,9 @@ function submitReportAndReturn(isCustomLocation = false) {
         type: "POST",
         data: requestData,
         success: function (response) {
-          alert(response.msg || "반납이 완료되었습니다.");
-          closeAllPopups();
+          alert(response.msg || "신고 및 반납이 완료되었습니다.");
+          closeAllPopups(); // 모든 팝업 닫기
+          closePopup('rentalStatusPopup'); // 현황판 팝업 닫기
           if (response.redirectToPayment) {
             window.location.href = "/pay/payment";
           }
@@ -425,8 +399,9 @@ function submitReportAndReturn(isCustomLocation = false) {
         type: "POST",
         data: fallbackRequestData,
         success: function (response) {
-          alert(response.msg || "반납이 완료되었습니다.");
-          closeAllPopups();
+          alert(response.msg || "신고 및 반납이 완료되었습니다.");
+          closeAllPopups(); // 모든 팝업 닫기
+          closePopup('rentalStatusPopup'); // 현황판 팝업 닫기
           if (response.redirectToPayment) {
             window.location.href = "/pay/payment";
           }
@@ -438,6 +413,7 @@ function submitReportAndReturn(isCustomLocation = false) {
     },
   });
 }
+
 // 현황판 반납 및 신고 이벤트 리스너
 document.getElementById("rentalStatusPopup").querySelector(".report-button").addEventListener("click", function () {
   document.getElementById("currentLatitude").innerText = initialLatitude;

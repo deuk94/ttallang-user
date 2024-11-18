@@ -24,7 +24,8 @@ public class RentalsService {
     private final PaymentsService paymentsService;
 
     @Autowired
-    public RentalsService(BicycleRepository bicycleRepository, RentalRepository rentalRepository, PaymentRepository paymentRepository,
+    public RentalsService(BicycleRepository bicycleRepository, RentalRepository rentalRepository,
+        PaymentRepository paymentRepository,
         PaymentsService paymentsService) {
         this.bicycleRepository = bicycleRepository;
         this.rentalRepository = rentalRepository;
@@ -85,7 +86,8 @@ public class RentalsService {
     }
 
     // 자전거 반납
-    public Rental returnBicycle(double returnLatitude, double returnLongitude, boolean isCustomLocation, String returnBranchName, int customerId) {
+    public Rental returnBicycle(double returnLatitude, double returnLongitude,
+        boolean isCustomLocation, String returnBranchName, int customerId) {
 
         // 반납할 대여 내역 조회
         Rental rental = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId)
@@ -143,7 +145,8 @@ public class RentalsService {
             .orElse(null);
 
         if (currentRental != null) {
-            Optional<Bicycle> rentedBicycle = bicycleRepository.findById(currentRental.getBicycleId());
+            Optional<Bicycle> rentedBicycle = bicycleRepository.findById(
+                currentRental.getBicycleId());
             if (rentedBicycle.isPresent()) {
                 rentalStatus.put("bicycleName", rentedBicycle.get().getBicycleName());
                 rentalStatus.put("rentalBranch", currentRental.getRentalBranch());
@@ -162,8 +165,9 @@ public class RentalsService {
         }
         return rentalStatus;
     }
-    // 현황판 반납 기능에 결제 로직을 포함한 새로운 메서드
-    public Map<String, Object> completeReturn(double returnLatitude, double returnLongitude, boolean isCustomLocation, String returnBranchName, int customerId) {
+
+    public Map<String, Object> completeReturn(double returnLatitude, double returnLongitude,
+        boolean isCustomLocation, String returnBranchName, int customerId) {
         Map<String, Object> result = new HashMap<>();
 
         // 반납할 대여 내역 조회
@@ -179,16 +183,17 @@ public class RentalsService {
 
         Bicycle bicycle = bicycleRepository.findById(rental.getBicycleId())
             .orElseThrow(() -> new IllegalArgumentException("자전거를 찾을 수 없습니다."));
-        bicycle.setRentalStatus("1");
+
+        bicycle.setRentalStatus("1"); // 대여 상태 해제
         bicycle.setLatitude(returnLatitude);
         bicycle.setLongitude(returnLongitude);
 
-        if (isCustomLocation) {
-            bicycle.setBicycleStatus("0");
+        // '기타' 처리 시 자전거 상태 업데이트
+        if (isCustomLocation || "기타".equals(returnBranchName)) {
+            bicycle.setBicycleStatus("0"); // 상태를 '기타'로 설정
         }
 
         bicycleRepository.save(bicycle);
-        bicycleRepository.flush();
 
         // 결제 처리 로직
         paymentsService.calculateAndSavePayment(rental.getRentalId(), customerId);
@@ -198,7 +203,4 @@ public class RentalsService {
         result.put("msg", "반납 및 결제 처리 완료.");
         return result;
     }
-
-
-
 }
