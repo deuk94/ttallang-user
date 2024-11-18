@@ -449,23 +449,6 @@ if (navigator.geolocation) {
   console.warn("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
 }
 
-// 지도 외부 클릭 시 대여소 외 위치 반납 팝업 표시
-async function handleMapClickOutsideBranch(latitude, longitude) {
-  selectedReturnLatitude = latitude;
-  selectedReturnLongitude = longitude;
-
-  if (isBranchInfoPopupOpen) {
-    closePopup('branchInfoPopup');
-  }
-
-  const isRented = await checkRentalStatus();
-  if (isRented) {
-    showCustomReturnPopup(latitude, longitude);
-  } else {
-    console.log("대여 중이 아닙니다.");
-  }
-}
-
 // 대여소 클릭 이벤트 처리
 async function handleBranchClick(latitude, longitude) {
   closePopup('customReturnPopup'); // 대여소 외 팝업 닫기
