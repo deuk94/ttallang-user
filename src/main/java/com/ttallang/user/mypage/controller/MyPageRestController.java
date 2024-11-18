@@ -37,40 +37,45 @@ public class MyPageRestController {
 
     // 회원 정보 조회
     @GetMapping("/modify")
-    public JoinUser getUserById(){
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public JoinUser getUserById() {
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         return userService.getByUserId(loginId);
     }
 
     // 회원 정보 수정
     @PutMapping("/modify")
-    public User updateUser(@RequestBody User updateUser){
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public User updateUser(@RequestBody User updateUser) {
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         return userService.updateUser(loginId, updateUser);
     }
 
     // 회원 탈퇴
     @PatchMapping("/modify")
-    public Roles deleteUser(){
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public Roles deleteUser() {
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getUserId();
         return userService.deleteUser(loginId);
     }
 
     // 이용 내역
     @GetMapping("/rental")
-    public List<JoinBicycle> getRental(){
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public List<JoinBicycle> getRental() {
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         return rentalService.getByRental(loginId);
     }
 
     // 신고 내역
     @GetMapping("/faultReport")
-    public List<JoinFault> getFaultReport(){
-        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public List<JoinFault> getFaultReport() {
+        PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         return faultReportService.findByFaultReport(loginId);
     }
