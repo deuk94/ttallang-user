@@ -37,8 +37,12 @@
         <p>자전거 이름: <span id="rentedBicycleName"></span></p>
         <p>대여 지점: <span id="rentalBranchName"></span></p>
         <p>대여 시작 시간: <span id="rentalStartTime"></span></p>
+        <div style="display: none;">
+            <p>위도: <span id="currentLatitude"></span></p>
+            <p>경도: <span id="currentLongitude"></span></p>
+        </div>
         <div class="button-container">
-            <button class="return-button" onclick="returnBike()">반납하기</button>
+            <button class="return-button" onclick="returnBikeFromStatus()">반납하기</button>
             <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
         </div>
     </div>
@@ -57,13 +61,13 @@
     <div class="popup" id="customReturnPopup" style="display: none;">
         <button class="close-btn" onclick="closePopup('customReturnPopup')">X</button>
         <h3>대여소가 아닌 장소입니다.</h3>
-        <p>반납 위치: <span id="customReturnLocation">기타</span></p>
+        <p id="customReturnLocation" style="display: none;">반납 위치: <span>기타</span></p>
         <p>현재 대여중인 자전거: <span id="customBicycleName"></span></p>
         <p>대여 지점: <span id="customRentalBranch"></span></p>
         <p>대여 시작 시간: <span id="customRentalStartDate"></span></p>
         <p>그래도 반납하시겠습니까?</p>
         <div class="button-container">
-            <button class="return-button" onclick="returnBike(true)">반납하기</button>
+            <button class="return-button" onclick="returnBikeFromCustomLocation()">반납하기</button>
             <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
         </div>
     </div>
@@ -77,7 +81,7 @@
         <p>대여 지점: <span id="rentalBranch"></span></p>
         <p>대여 시작 시간: <span id="rentalStartDate"></span></p>
         <div class="button-container">
-            <button class="return-button" onclick="returnBike(false)">반납하기</button>
+            <button class="return-button" onclick="returnBikeFromBranch()">반납하기</button>
             <button class="report-button" onclick="openReportAndReturnPopup(); closePopup('customReturnPopup');">신고하기</button>
         </div>
     </div>
