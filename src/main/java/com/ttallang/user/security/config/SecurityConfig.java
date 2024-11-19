@@ -4,6 +4,8 @@ package com.ttallang.user.security.config;
 import com.ttallang.user.security.config.filter.NgrokRedirectFilter;
 import com.ttallang.user.security.config.handler.LoginHandler;
 import com.ttallang.user.account.model.CertInfo;
+import com.ttallang.user.security.config.handler.SessionHandler;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Map;
@@ -27,10 +30,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SecurityConfig {
 
     private final LoginHandler loginHandler;
+    private final SessionHandler sessionHandler;
     private final NgrokRedirectFilter ngrokRedirectFilter;
 
-    public SecurityConfig(LoginHandler loginHandler, NgrokRedirectFilter ngrokRedirectFilter) {
+    public SecurityConfig(
+            LoginHandler loginHandler,
+            NgrokRedirectFilter ngrokRedirectFilter,
+            SessionHandler sessionHandler
+    ) {
         this.loginHandler = loginHandler;
+        this.sessionHandler = sessionHandler;
         this.ngrokRedirectFilter = ngrokRedirectFilter;
     }
 
@@ -45,7 +54,14 @@ public class SecurityConfig {
                 .addFilterBefore(ngrokRedirectFilter, SecurityContextPersistenceFilter.class
                 ).cors(AbstractHttpConfigurer::disable
                 ).csrf(AbstractHttpConfigurer::disable
-                ).authorizeHttpRequests(auth -> auth
+                ).sessionManagement(session -> session
+                        .sessionFixation()
+                        .changeSessionId()
+                        .maximumSessions(1)
+                        .expiredSessionStrategy(sessionHandler)
+                        .maxSessionsPreventsLogin(false)
+                        .sessionRegistry(sessionRegistry()))
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/**", "/map/**", "/pay/**", "/myPage/**", "api/pay/**", "api/myPage/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
@@ -82,6 +98,11 @@ public class SecurityConfig {
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public static ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
+        return new ServletListenerRegistrationBean<>(new HttpSessionEventPublisher());
     }
 
     // 유저 인증 정보를 임시로 저장하는 곳.
