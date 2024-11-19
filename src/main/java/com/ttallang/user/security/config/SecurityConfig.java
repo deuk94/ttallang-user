@@ -43,6 +43,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .addFilterBefore(ngrokRedirectFilter, SecurityContextPersistenceFilter.class
+                ).cors(AbstractHttpConfigurer::disable
                 ).csrf(AbstractHttpConfigurer::disable
                 ).authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/**", "/map/**", "/pay/**", "/myPage/**", "api/pay/**", "api/myPage/**").hasAnyRole("USER", "ADMIN")
@@ -63,7 +64,6 @@ public class SecurityConfig {
                         .permitAll()
                 );
 
-        // Configure exception handling
         http.exceptionHandling(exceptionHandling -> exceptionHandling
             .authenticationEntryPoint(authenticationEntryPoint())
         );
