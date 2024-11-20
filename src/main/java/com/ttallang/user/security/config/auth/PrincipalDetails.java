@@ -89,4 +89,17 @@ public class PrincipalDetails implements UserDetails {
         }
         return paymentStatus;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PrincipalDetails) {
+            return roles.getUserName().equals(((PrincipalDetails) obj).roles.getUserName());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return roles.getUserName().hashCode();
+    }
 }
