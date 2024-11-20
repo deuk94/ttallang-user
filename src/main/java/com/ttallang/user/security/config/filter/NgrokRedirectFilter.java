@@ -17,7 +17,7 @@ import java.io.IOException;
 @Component  // 빈에서 관리하기.
 public class NgrokRedirectFilter extends OncePerRequestFilter {
 
-    @Value("${base.url.localhost}")
+    //@Value("${base.url.localhost}")
     private String localHost;
 
     // 만약 ngrok으로 리다이렉트 된다면 이 필터가 로컬호스트로 돌려놓을것임.
