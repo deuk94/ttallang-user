@@ -78,6 +78,11 @@ td {
   background-color: #dc3545;
 }
 
+a {
+  text-decoration: none;
+  color: #fbfbfb;
+}
+
 .cancel:hover {
   background-color: #c82333;
 }
