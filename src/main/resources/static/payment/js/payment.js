@@ -4,7 +4,7 @@ let amount, email, userName, phoneNumber;
 $(document).ready(function () {
   updatePaymentAmount();
   selectUser();
-
+  // 결제 정보 조회
   $.ajax({
     url: '/api/pay/payment',
     method: 'GET',
@@ -53,9 +53,7 @@ function validatePayment() {
 function requestPay() {
   let IMP = window.IMP;
   IMP.init("imp56011821");
-
   let merchant_uid = "order_" + new Date().getTime();
-
   IMP.request_pay({
     pg: "html5_inicis",
     pay_method: "card",
