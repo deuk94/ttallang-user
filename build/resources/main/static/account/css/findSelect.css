@@ -1,0 +1,26 @@
+/* 카드 스타일 */
+.card {
+    margin: 10rem 0;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.select-card {
+    width: 30rem;
+}
+
+.btn-find-id,
+.btn-find-pw {
+    background-color: #001f54;
+    height: 45px;
+    width: 150px;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    text-wrap: pretty;
+    word-break: keep-all;
+}

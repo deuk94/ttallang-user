@@ -1,0 +1,72 @@
+/* 카드 스타일 */
+a {
+  text-decoration: none;
+}
+
+.card {
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 입력 필드 스타일 */
+.form-control:focus {
+  box-shadow: none;
+  border-color: #001f54;
+}
+
+/* 버튼 스타일 */
+.btn-primary {
+  background-color: #001f54;
+  border: none;
+}
+
+.btn-outline-secondary, .btn-outline-danger {
+  border-width: 2px;
+}
+
+#checkExist {
+  background-color: #001f54;
+  color: #ffffff;
+}
+
+/* 유효성 검사 메시지 */
+#existId, #notExistId {
+  font-size: 0.9em;
+}
+
+#existId {
+  color: #dc3545; /* 빨간색 */
+}
+
+#notExistId {
+  color: #28a745; /* 초록색 */
+}
+
+/* disabled 처럼 보이게 하는 스타일. */
+.readonly-input {
+  background-color: #e9ecef;
+  color: #6c757d;
+  border: 1px solid #ced4da;
+  cursor: not-allowed;
+}
+
+.btn-submit,
+.btn-cancel {
+  background-color: #001f54;
+  height: 45px;
+  width: 180px;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+
+#btn-cancel {
+  text-decoration: none;
+}

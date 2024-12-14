@@ -1,0 +1,74 @@
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 20px;
+  padding-top: 60px;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  width: 83%; /* 테이블과 동일한 폭으로 설정 */
+  margin: 0 auto 30px auto; /* 중앙 정렬 */
+}
+
+.menu div {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.menu div a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.menu .active {
+  background-color: #0d1a33;
+  color: white;
+}
+
+table {
+  width: 80%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: white;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.delete-btn {
+  background-color: #0d1a33;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
