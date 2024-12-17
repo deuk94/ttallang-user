@@ -4,10 +4,8 @@ FROM openjdk:17-jdk-slim
 LABEL maintainer="JGD"
 # 도커 내 디렉토리 설정
 WORKDIR /app/user
-# 소스 코드 복사
+## 소스 코드 복사
 COPY . .
-# Gradle 실행 권한 추가
-RUN chmod +x ./gradlew
 # Gradle 클린 빌드 수행
 RUN ./gradlew clean build -x test
 # 프로젝트 war빌드 파일 복사
