@@ -4,6 +4,8 @@ FROM openjdk:17-jdk-slim
 LABEL maintainer="JGD"
 # 도커 내 디렉토리 설정
 WORKDIR /app/user
+# Gradle 실행 권한 부여
+RUN chmod +x ./gradlew
 ## 소스 코드 복사
 COPY . .
 # Gradle 클린 빌드 수행
