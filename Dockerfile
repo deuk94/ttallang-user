@@ -4,10 +4,10 @@ FROM openjdk:17-jdk-slim
 LABEL maintainer="JGD"
 # 도커 내 디렉토리 설정
 WORKDIR /app/user
-## Gradle 클린 빌드 수행
-#RUN ./gradlew clean build -x test
 # 프로젝트 war빌드 파일 복사
 COPY build/libs/user-0.0.1-SNAPSHOT.war app.war
+# 프로젝트 propertise 파일 복사
+COPY src/main/resources/application.properties /app/config/application.properties
 ## java시간대를 서울 기준으로 환경 설정
 ENV JAVA_OPTS="-Duser.timezone=Asia/Seoul"
 # 도커 시간대 서울 기준으로 변경
@@ -16,4 +16,4 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
 # 외부에서 사용할 포트 번호 지정
 EXPOSE 8080
 # 컨테이너 동작 시 자동으로 실행 할 서비스나 스크립트
-ENTRYPOINT ["java", "-jar", "app.war"]
+ENTRYPOINT ["java", "-jar", "app.war", "--spring.config.location=file:/app/config/application.properties"]
