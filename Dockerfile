@@ -7,7 +7,7 @@ WORKDIR /app/user
 # 프로젝트 war빌드 파일 복사
 COPY build/libs/user-0.0.1-SNAPSHOT.war app.war
 # 프로젝트 propertise 파일 복사
-COPY src/main/resources/application.properties /app/config/application.properties
+COPY application.properties /app/config/application.properties
 ## java시간대를 서울 기준으로 환경 설정
 ENV JAVA_OPTS="-Duser.timezone=Asia/Seoul"
 # 도커 시간대 서울 기준으로 변경
