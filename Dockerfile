@@ -6,8 +6,8 @@ LABEL maintainer="JGD"
 WORKDIR /app/user
 ## 소스 코드 복사
 #COPY . .
-## Gradle 클린 빌드 수행
-#RUN ./gradlew clean build -x test
+# Gradle 클린 빌드 수행
+RUN ./gradlew clean build -x test
 # 프로젝트 war빌드 파일 복사
 COPY build/libs/user-0.0.1-SNAPSHOT.war app.war
 ## java시간대를 서울 기준으로 환경 설정
