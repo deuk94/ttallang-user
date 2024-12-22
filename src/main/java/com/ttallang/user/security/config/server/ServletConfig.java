@@ -8,8 +8,10 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("!dev")
 public class ServletConfig {
     // 시큐리티 콘피그에서도 처리할 수 있긴 하다.
     // 근데 스프링 시큐리티 레벨에서 처리하는 것보다 톰캣 레벨에서 리다이렉트 처리해주는 것이 성능 오버헤드가 더 적다...

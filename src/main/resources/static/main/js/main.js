@@ -304,7 +304,7 @@ function openReportAndReturnPopup() {
 
 // 대여소 외 반납 팝업에서 "신고하기" 버튼 클릭 시 호출되는 함수
 document.getElementById("customReturnPopup").querySelector(".report-button").addEventListener("click", openReportAndReturnPopup);
-
+a
 // 대여소 반납 팝업에서 "신고하기" 버튼 클릭 시 호출되는 함수
 document.getElementById("returnPopup").querySelector(".report-button").addEventListener("click", openReportAndReturnPopup);
 

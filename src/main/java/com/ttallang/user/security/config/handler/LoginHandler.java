@@ -3,6 +3,8 @@ package com.ttallang.user.security.config.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ttallang.user.security.config.auth.PrincipalDetails;
 import com.ttallang.user.account.model.AccountResponse;
+import com.ttallang.user.security.jwt.TokenUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,12 @@ import java.io.IOException;
 
 @Component
 public class LoginHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
+    private TokenUtil tokenUtil; // JWT 처리 클래스
+
+    public LoginHandler(TokenUtil tokenUtil) {
+        this.tokenUtil = tokenUtil;
+    }
+
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
@@ -33,6 +41,15 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
         } else if (role.equals("ROLE_USER")) {
             PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             accountResponse.setRole("user");
+
+            String accessToken = tokenUtil.generateToken(pds.getUsername());
+            Cookie cookie = new Cookie("access_token", accessToken);
+            cookie.setHttpOnly(true); // 클라이언트 측에서 접근 못하게 막음.
+            cookie.setSecure(true); // https 로만 쿠키 전송, http 에서는 안될 수 있음.
+            cookie.setPath("/"); // 모든 경로에서 유효.
+
+            response.addCookie(cookie); // 쿠키 추가.
+
             if (pds.getPaymentStatus().equals("1")) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 accountResponse.setMessage("유저 로그인 성공.");
