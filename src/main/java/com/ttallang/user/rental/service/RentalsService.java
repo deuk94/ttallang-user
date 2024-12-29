@@ -9,6 +9,8 @@ import com.ttallang.user.commomRepository.PaymentRepository;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,41 +36,21 @@ public class RentalsService {
     }
 
     // 자전거 대여
-    public Map<String, Object> rentBicycle(int bicycleId, String rentalBranch, int customerId) {
-        Map<String, Object> result = new HashMap<>();
+    public ResponseEntity<?> rentBicycle(int bicycleId, String rentalBranch, int customerId) {
         // 결제 상태 확인 - 미결제 상태가 있을 경우 예외 발생
         if (!paymentRepository.findByCustomerIdAndPaymentStatus(customerId, "0").isEmpty()) {
-            result.put("rental", null);
-            result.put("code", 403);
-            result.put("msg", "결제되지 않은 자전거가 있습니다. 결제를 완료해 주세요.");
-            return result;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("NoPay");
         }
 
         // 대여 중인 자전거가 있는지 확인
-        if (!rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId).isEmpty()) {
-            result.put("rental", null);
-            result.put("code", 403);
-            result.put("msg", "이미 대여 중인 자전거가 있습니다. 반납 후 새로운 대여가 가능합니다.");
-            return result;
+        if (rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId) != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("renting");
         }
-
-        // 자전거 대여 상태 확인
+        // 자전거 대여 조회
         Bicycle bicycle = bicycleRepository.findById(bicycleId)
-            .orElseThrow(() -> {
-                result.put("msg", "자전거를 찾을 수 없습니다.");
-                result.put("code", 404);
-                result.put("rental", null);
-                return null;
-            });
+            .orElseThrow();
 
-        if (!"1".equals(bicycle.getRentalStatus()) || !"1".equals(bicycle.getBicycleStatus())) {
-            result.put("rental", null);
-            result.put("code", 400);
-            result.put("msg", "이 자전거는 대여할 수 없는 상태입니다.");
-            return result;
-        }
-
-        // 자전거 대여 가능 상태로 설정 및 저장
+        // 대여중 상태 변경
         bicycle.setRentalStatus("0");
         bicycleRepository.save(bicycle);
 
@@ -78,22 +60,16 @@ public class RentalsService {
         rental.setCustomerId(customerId);
         rental.setRentalBranch(rentalBranch);
         rental.setRentalStartDate(LocalDateTime.now());
-        result.put("rental", rental);
-        result.put("code", 200);
-        result.put("msg", "렌탈 성공.");
-        rentalRepository.save(rental);
-        return result;
+        Rental saveRental = rentalRepository.save(rental);
+        return ResponseEntity.ok(saveRental);
     }
 
     // 자전거 반납
     public Rental returnBicycle(double returnLatitude, double returnLongitude,
-        boolean isCustomLocation, String returnBranchName, int customerId) {
+        String returnBranchName, int customerId) {
 
         // 반납할 대여 내역 조회
-        Rental rental = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId)
-            .stream()
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("반납할 대여 내역이 없습니다."));
+        Rental rental = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId);
 
         // 자전거 상태 업데이트 및 반납 처리
         rental.setReturnBranch(returnBranchName);
@@ -106,7 +82,7 @@ public class RentalsService {
         bicycle.setLatitude(returnLatitude);
         bicycle.setLongitude(returnLongitude);
 
-        if (isCustomLocation) {
+        if (returnBranchName.equals("기타")) {
             bicycle.setBicycleStatus("0");
         }
 
@@ -125,82 +101,35 @@ public class RentalsService {
     }
 
     // 현재 대여 중인 자전거 반환
-    public Optional<Bicycle> getCurrentRentalByCustomerId(int customerId) {
+    public Optional<Integer> getCurrentRentalByCustomerId(int customerId) {
 
-        List<Rental> rentals = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId);
-        if (!rentals.isEmpty()) {
-            int bicycleId = rentals.get(0).getBicycleId();
-            return bicycleRepository.findById(bicycleId);
+        Rental rentals = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId);
+        if (rentals != null) {
+            return Optional.of(rentals.getBicycleId());
         }
         return Optional.empty();
     }
 
     // 현황판을 위한 메서드
-    public Map<String, Object> getRentalStatusForCustomer(int customerId) {
+    public ResponseEntity<?> getRentalStatusForCustomer(int customerId) {
         Map<String, Object> rentalStatus = new HashMap<>();
-
-        Rental currentRental = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId)
-            .stream()
-            .findFirst()
-            .orElse(null);
-
+        Rental currentRental = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId);
         if (currentRental != null) {
             Optional<Bicycle> rentedBicycle = bicycleRepository.findById(
                 currentRental.getBicycleId());
             if (rentedBicycle.isPresent()) {
+                rentalStatus.put("bicycleId", rentedBicycle.get().getBicycleId());
                 rentalStatus.put("bicycleName", rentedBicycle.get().getBicycleName());
                 rentalStatus.put("rentalBranch", currentRental.getRentalBranch());
                 rentalStatus.put("rentalStartDate", currentRental.getRentalStartDate());
                 rentalStatus.put("currentLatitude", rentedBicycle.get().getLatitude());
                 rentalStatus.put("currentLongitude", rentedBicycle.get().getLongitude());
-                rentalStatus.put("code", 200);
-                rentalStatus.put("msg", "대여 현황 조회 성공");
             } else {
-                rentalStatus.put("code", 404);
-                rentalStatus.put("msg", "대여 중인 자전거 정보를 찾을 수 없습니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("NoBicycle");
             }
         } else {
-            rentalStatus.put("code", 404);
-            rentalStatus.put("msg", "대여 중인 자전거가 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("NoRental");
         }
-        return rentalStatus;
-    }
-
-    public Map<String, Object> completeReturn(double returnLatitude, double returnLongitude,
-        boolean isCustomLocation, String returnBranchName, int customerId) {
-        Map<String, Object> result = new HashMap<>();
-
-        // 반납할 대여 내역 조회
-        Rental rental = rentalRepository.findByCustomerIdAndRentalEndDateIsNull(customerId)
-            .stream()
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("반납할 대여 내역이 없습니다."));
-
-        // 자전거 상태 업데이트 및 반납 처리
-        rental.setReturnBranch(returnBranchName);
-        rental.setRentalEndDate(LocalDateTime.now());
-        rentalRepository.save(rental);
-
-        Bicycle bicycle = bicycleRepository.findById(rental.getBicycleId())
-            .orElseThrow(() -> new IllegalArgumentException("자전거를 찾을 수 없습니다."));
-
-        bicycle.setRentalStatus("1"); // 대여 상태 해제
-        bicycle.setLatitude(returnLatitude);
-        bicycle.setLongitude(returnLongitude);
-
-        // '기타' 처리 시 자전거 상태 업데이트
-        if (isCustomLocation || "기타".equals(returnBranchName)) {
-            bicycle.setBicycleStatus("0"); // 상태를 '기타'로 설정
-        }
-
-        bicycleRepository.save(bicycle);
-
-        // 결제 처리 로직
-        paymentsService.calculateAndSavePayment(rental.getRentalId(), customerId);
-
-        result.put("rental", rental);
-        result.put("code", 200);
-        result.put("msg", "반납 및 결제 처리 완료.");
-        return result;
+        return ResponseEntity.ok(rentalStatus);
     }
 }

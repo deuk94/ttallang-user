@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Slf4j
 @Controller
-public class BranchController {
+public class RentalController {
 
     @GetMapping("/main")
     public String userMainPage(Model model) {
