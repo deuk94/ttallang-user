@@ -88,19 +88,23 @@ header nav a {
   color: #666;
   margin-bottom: 10px;
 }
-
 .close-btn {
+  width: 10px;
+  height: 10px;
   position: absolute;
-  top: 2px;
-  right: 2px;
-  background-color: transparent;
+  top: 10px; /* 팝업의 위쪽 여백 */
+  right: 10px; /* 팝업의 오른쪽 여백 */
+  background: transparent;
   border: none;
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 16px;
   cursor: pointer;
-  line-height: 1;
+  color: #333;
+  z-index: 2000;
 }
 
+.close-btn:hover {
+  color: #000;
+}
 /* branchInfoPopup 및 reportPopup의 최대 높이 설정 */
 #branchInfoPopup, #reportPopup {
   max-height: 250px; /* 팝업의 최대 높이 설정 */
@@ -123,23 +127,6 @@ header nav a {
 .bicycle-item span {
   flex-grow: 1;
 }
-
-.bicycle-item .button-group button {
-  padding: 8px 12px;
-  background-color: #001f54; /* 새로운 배경색 */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-}
-
-.bicycle-item .button-group button:hover {
-  background-color: #003d82; /* 호버 시 색상 */
-}
-
-
 /* 신고 팝업 스타일 */
 .report-popup {
   position: fixed; /* 화면 고정 위치로 설정 */
@@ -181,32 +168,6 @@ header nav a {
 
 .report-popup .report-options a:hover {
   background-color: #003d82;
-}
-
-/* 위치 신고 및 고장 신고 팝업 스타일 */
-#locationReportPopup, #brokenReportPopup {
-  position: fixed; /* 화면 고정 위치로 설정 */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 400px;
-  padding: 20px;
-  background-color: #fafafa;
-  border: 1px solid #ddd;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  display: none; /* 기본적으로 팝업 숨김 */
-  z-index: 3000; /* 다른 요소 위에 표시 */
-  font-family: Arial, sans-serif;
-}
-
-#locationReportPopup h3, #brokenReportPopup h3 {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-  margin-bottom: 15px;
 }
 #rentalStatusPopup {
   position: absolute; /* 고정 위치 설정 */
@@ -291,35 +252,6 @@ button.report-submit:hover {
   background-color: #003d82; /* 호버 시 색상 */
 }
 
-/* 지도 컨트롤 버튼 스타일 */
-.btn-container {
-  position: absolute;
-  bottom: 40px; /* 하단으로 위치 조정 */
-  right: 10px;
-  z-index: 1001;
-}
-
-.zoom-container {
-  position: absolute;
-  top: 60px; /* 스카이뷰 버튼 바로 아래에 위치 */
-  right: 10px; /* 우측으로 약간 간격 */
-  z-index: 1001;
-}
-
-.zoom-container .btn {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  cursor: pointer;
-  margin: 5px;
-  font-size: 16px;
-  border-radius: 4px;
-}
-
-.zoom-container .btn:hover {
-  background-color: #f1f1f1;
-}
-
 .btn {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -342,3 +274,52 @@ button.report-submit:hover {
   border: 1px solid #333;
 }
 
+button{
+  width: 100%;
+  padding: 10px;
+  background-color: #001f54; /* 새로운 배경색 */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.bicycle-list {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.bicycle-list th,
+.bicycle-list td {
+  text-align: left;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.bicycle-list td {
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+.bicycle-list th {
+  font-weight: bold;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+}
+
+.action-button {
+  background-color: #001f54;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.action-button:hover {
+  background-color: #003d82;
+}
