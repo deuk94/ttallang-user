@@ -452,6 +452,7 @@ public class SignupServiceImpl implements SignupService {
         }
     }
 
+    // 유저 정보 자동입력 메서드.
     public String fillOutSignupForm(Map<String, Object> responseBody, String SNSType, CertInfo certInfo, Model model) {
         switch (SNSType) {
             case "payco" -> {
@@ -471,6 +472,7 @@ public class SignupServiceImpl implements SignupService {
                 model.addAttribute("email", email);
                 model.addAttribute("birthday", member.get("birthday"));
             }
+            // 카카오 API를 통해 정보를 받아옴.
             case "kakao" -> {
                 certInfo.setTargetIdType("user_id");
                 Long userId = (Long) responseBody.get("id");

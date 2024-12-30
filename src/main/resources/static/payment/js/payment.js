@@ -99,6 +99,10 @@ function updatePaymentAmount() {
     method: 'PATCH',
     success: function (data) {
       amount = data.paymentAmount; // 업데이트된 금액 저장
+      if (amount == null) {
+        alert("결제 정보를 확인할 수 없습니다.");
+        window.location.href = "/main"
+      }
       $('#paymentAmount').text(formatCurrency(amount));
     }
   });

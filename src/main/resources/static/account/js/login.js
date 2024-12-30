@@ -18,6 +18,7 @@ function handleLoginForm(event) {
 
         // 비동기 처리.
         fetch("/api/login", {
+            credentials: "include",
             method: "POST",
             headers: {
                 // application/json 으로 보내면 안됨.
@@ -35,14 +36,12 @@ function handleLoginForm(event) {
                 throw new Error(result.message);
             }
             return response.json();
-        })
-            .then(result => { // 이 data는 response.json()의 실제값.
+        }).then(() => { // response.json()의 실제값.
                 window.location.href = "/main";
-            })
-            .catch(error => {
+        }).catch(error => {
                 errorMessage.textContent = error.message;
                 errorMessage.classList.remove("d-none");
-            });
+        });
     }
 }
 
