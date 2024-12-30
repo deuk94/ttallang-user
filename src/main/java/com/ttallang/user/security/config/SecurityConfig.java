@@ -59,7 +59,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/**", "/map/**", "/pay/**", "/myPage/**", "/api/pay/**", "/api/myPage/**")
+                        .requestMatchers("/main", "/main/**", "/user/**", "/map/**", "/api/map/**", "/pay/**", "/myPage/**", "/api/pay/**", "/api/myPage/**")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin/**")
                         .hasRole("ADMIN")
@@ -73,11 +73,9 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout")) // 로그아웃 요청 URL.
                         .logoutSuccessUrl("/login/form") // 로그아웃 후 이동할 URL.
-                        .permitAll()
-                );
-
-        http.exceptionHandling(exceptionHandling -> exceptionHandling
-            .authenticationEntryPoint(authenticationEntryPoint())
+                        .permitAll())
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(authenticationEntryPoint())
         );
 
         return http.build();
@@ -86,7 +84,6 @@ public class SecurityConfig {
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, authException) -> {
-            String uri = request.getRequestURI();
             response.sendRedirect("/login/form");
         };
     }

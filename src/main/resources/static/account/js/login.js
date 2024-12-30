@@ -18,6 +18,7 @@ function handleLoginForm(event) {
 
         // 비동기 처리.
         fetch("/api/login", {
+            credentials: "include",
             method: "POST",
             headers: {
                 // application/json 으로 보내면 안됨.
