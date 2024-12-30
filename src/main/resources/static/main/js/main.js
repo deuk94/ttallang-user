@@ -28,6 +28,7 @@ function closePopup(popupId) {
   let popup = document.getElementById(popupId);
   if (popup) {
     popup.style.display = 'none';
+    $(document).off("click");
   }
 }
 // 모든 팝업 닫기 함수
@@ -313,7 +314,7 @@ function openReportPopup(bicycleId, latitude, longitude) {
   // 기존 이벤트 제거 후 새 이벤트 등록
   const reportButton = document.querySelector(".report-submit");
   reportButton.replaceWith(reportButton.cloneNode(true));
-  document.querySelector(".report-submit").addEventListener("click", function () {
+  $(document).one("click", ".report-submit", function () {
     submitReport(bicycleId, latitude, longitude);
   });
 }
