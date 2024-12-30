@@ -318,6 +318,7 @@ function openReportPopup(bicycleId, latitude, longitude) {
     submitReport(bicycleId, latitude, longitude);
   });
 }
+
 function submitReport(bicycleId ,latitude, longitude) {
   const categoryId = document.getElementById("reportCategorySelect").value;
   const reportDetails = document.getElementById("reportDetails").value;
