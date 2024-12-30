@@ -7,15 +7,16 @@ import com.ttallang.user.security.jwt.TokenUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class LoginHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
     private TokenUtil tokenUtil; // JWT 처리 클래스
@@ -39,7 +40,7 @@ public class LoginHandler implements AuthenticationSuccessHandler, Authenticatio
             accountResponse.setMessage("관리자 로그인 성공.");
             new ObjectMapper().writeValue(response.getWriter(), accountResponse);
         } else if (role.equals("ROLE_USER")) {
-            PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            PrincipalDetails pds = (PrincipalDetails) authentication.getPrincipal();
             accountResponse.setRole("user");
 
             String accessToken = tokenUtil.generateToken(pds.getUsername());

@@ -102,7 +102,7 @@
 <%@ include file="../footer/footer.jsp" %>
 
 <!-- 외부 및 main.js 파일 포함 -->
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=40dcc4dae6de01cd9ed29123fcc4d775"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c3cadbf250c68d1a844dcde41241cb11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="${pageContext.request.contextPath}/main/js/main.js"></script>
 

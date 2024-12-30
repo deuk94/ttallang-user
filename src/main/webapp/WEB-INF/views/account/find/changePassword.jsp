@@ -24,6 +24,7 @@
       <p id="helpText" class="mt-2 mb-4">비밀번호를 새롭게 설정해주세요.</p>
       <form id="changePasswordForm" class="m-0" novalidate>
         <input type="hidden" id="userName" name="userName" value="${userName}">
+        <input type="hidden" id="state" name="state" value="${state}">
         <div class="mb-3">
           <label for="userPassword" class="form-label">비밀번호</label>
           <input type="password" id="userPassword" name="userPassword" class="form-control" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$">
