@@ -26,12 +26,6 @@ public class BranchService {
         return branchRepository.findActiveBranches();
     }
 
-    // 특정 위치에서 사용 가능한 자전거 수 조회 (30미터 안)
-    public int getAvailableBikesAtLocation(double latitude, double longitude) {
-        int distance = 30;
-        return bicycleRepository.findByBikeCount(latitude, longitude, distance);
-    }
-
     // 특정 위치에서 사용 가능한 자전거 목록 조회 (30미터 안)
     public List<Bicycle> getAvailableBikesList(double latitude, double longitude) {
         int distance = 30;
