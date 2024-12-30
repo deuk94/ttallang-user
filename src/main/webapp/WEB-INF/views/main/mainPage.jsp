@@ -47,11 +47,10 @@
 
     <!-- 신고하기 팝업 -->
     <div class="report-popup" id="reportPopup" style="display: none;">
-        <button class="close-btn" onclick="closePopup('reportPopup')">X</button>
+        <button class="close-btn" onclick="closePopup('reportPopup');">X</button>
         <h3>신고하기</h3>
         <select id="reportCategorySelect">
         </select>
-        <br>
         <textarea id="reportDetails" placeholder="신고 내용을 입력해주세요..."></textarea>
         <button class="report-submit">신고하기</button>
     </div>

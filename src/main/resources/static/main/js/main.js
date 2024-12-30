@@ -176,7 +176,11 @@ function loadRentalStatus() {
       $('#rentalStartTime').text(response.rentalStartDate.replace("T", " "));
       $('#rentalBranchName').text(rentalBranchName);
       document.getElementById("rentalStatusPopup").style.display = 'block';
-      $(document).on("click", ".report-button", function () {
+
+      // 기존 이벤트 제거 후 새 이벤트 등록
+      const reportButton = document.querySelector(".report-button");
+      reportButton.replaceWith(reportButton.cloneNode(true));
+      document.querySelector(".report-button").addEventListener("click", function () {
         ReportAndReturn(bicycleId);
       });
     },
@@ -195,7 +199,6 @@ function loadRentalStatus() {
 
 //현황판에서 반납하기 버튼을 눌렀을때
 function returnBikeFromStatus() {
-  alert("현황판 반납.")
   let returnLatitude = -1;
   let returnLongitude = -1;
   if (navigator.geolocation) {
@@ -303,14 +306,16 @@ function loadReportCategories(selectId) {
 }
 function openReportPopup(bicycleId, latitude, longitude) {
   closePopup('branchInfoPopup');
-  closePopup('rentalStatusPopup');
   loadReportCategories('reportCategorySelect');
   document.getElementById("reportDetails").value = "";
   document.getElementById("reportPopup").style.display = 'block';
-  $(document).on("click", ".report-submit", function () {
+
+  // 기존 이벤트 제거 후 새 이벤트 등록
+  const reportButton = document.querySelector(".report-submit");
+  reportButton.replaceWith(reportButton.cloneNode(true));
+  document.querySelector(".report-submit").addEventListener("click", function () {
     submitReport(bicycleId, latitude, longitude);
   });
-
 }
 function submitReport(bicycleId ,latitude, longitude) {
   const categoryId = document.getElementById("reportCategorySelect").value;
