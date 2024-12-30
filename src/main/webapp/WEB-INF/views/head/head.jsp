@@ -30,6 +30,10 @@
     color: black;
   }
 
+  #logoutButton {
+      cursor: pointer;
+  }
+
   .brand-name {
     font-size: 35px; /* 글자 크기를 원하는 크기로 설정 */
     font-weight: bold; /* 굵은 글씨 */
@@ -51,7 +55,8 @@
     </nav>
     <div>
         <span>환영합니다 ${username}님!</span>
-        | <a href="${pageContext.request.contextPath}/api/logout">로그아웃</a>
+        | <a id="logoutButton">로그아웃</a>
         | <a href="${pageContext.request.contextPath}/myPage/userModify">마이페이지</a>
     </div>
 </header>
+<script src="${pageContext.request.contextPath}/account/js/logout.js"></script>

@@ -5,11 +5,17 @@ import com.ttallang.user.payment.model.JoinPayment;
 import com.ttallang.user.payment.model.JoinPortOne;
 import com.ttallang.user.payment.service.PaymentService;
 import com.ttallang.user.security.config.auth.PrincipalDetails;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/pay")
@@ -25,9 +31,13 @@ public class PaymentRestController {
     @PatchMapping("/updateAmount")
     public Payment updatePaymentAmount() {
         PrincipalDetails pds = (PrincipalDetails) SecurityContextHolder.getContext()
-            .getAuthentication().getPrincipal();
+                .getAuthentication().getPrincipal();
         int loginId = pds.getCustomerID();
         Payment payment = paymentService.getPayment(loginId);
+        if (payment == null) {
+            payment = new Payment(0, 0, 0, null, null, null);
+            return payment;
+        }
         int rentalId = payment.getRentalId();
         int paymentId = payment.getPaymentId();
         return paymentService.updatePaymentAmount(rentalId, paymentId);

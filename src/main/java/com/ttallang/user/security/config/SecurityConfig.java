@@ -1,6 +1,7 @@
 package com.ttallang.user.security.config;
 
 import com.ttallang.user.security.config.filter.NgrokRedirectFilter;
+import com.ttallang.user.security.config.handler.JwtLogoutHandler;
 import com.ttallang.user.security.config.handler.LoginHandler;
 import com.ttallang.user.account.model.CertInfo;
 import com.ttallang.user.security.jwt.TokenAuthenticationFilter;
@@ -31,15 +32,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SecurityConfig {
 
     private final LoginHandler loginHandler;
+    private final JwtLogoutHandler jwtLogoutHandler;
     private final NgrokRedirectFilter ngrokRedirectFilter;
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     public SecurityConfig(
             LoginHandler loginHandler,
+            JwtLogoutHandler jwtLogoutHandler,
             NgrokRedirectFilter ngrokRedirectFilter,
             TokenAuthenticationFilter tokenAuthenticationFilter
     ) {
         this.loginHandler = loginHandler;
+        this.jwtLogoutHandler = jwtLogoutHandler;
         this.ngrokRedirectFilter = ngrokRedirectFilter;
         this.tokenAuthenticationFilter = tokenAuthenticationFilter;
     }
@@ -59,7 +63,20 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/main", "/main/**", "/user/**", "/map/**", "/api/map/**", "/pay/**", "/myPage/**", "/api/pay/**", "/api/myPage/**")
+                        .requestMatchers(
+                                // 메인 페이지.
+                                "/main",
+                                "/main/**",
+                                "/map/**",
+                                "/api/map/**",
+                                // 사용자 계정 관련.
+                                "/user/**",
+                                // 결제 관련.
+                                "/pay/**",
+                                "/api/pay/**",
+                                // 마이 페이지 관련.
+                                "/myPage/**",
+                                "/api/myPage/**")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin/**")
                         .hasRole("ADMIN")
@@ -72,6 +89,7 @@ public class SecurityConfig {
                         .permitAll())
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout")) // 로그아웃 요청 URL.
+                        .logoutSuccessHandler(jwtLogoutHandler)
                         .logoutSuccessUrl("/login/form") // 로그아웃 후 이동할 URL.
                         .permitAll())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -83,6 +101,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
+        // 어떤 특정 메서드에서 예외 처리가 안되있는 경우 필터 검사 결과로 인해 여기가 아니라 jwt.TokenAuthenticationFilter의 100번째 라인으로 이동될 수 있음.
         return (request, response, authException) -> {
             response.sendRedirect("/login/form");
         };

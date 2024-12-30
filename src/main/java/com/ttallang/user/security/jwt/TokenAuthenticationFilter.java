@@ -53,6 +53,25 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 if (tokenUtil.validateToken(accessToken, request, response)) { // 유효한 토큰인 경우에만,
                     String username = tokenUtil.getUsernameFromToken(accessToken);
                     log.info("username={}", username);
+
+                    StringBuilder details = new StringBuilder();
+                    details.append("Headers: \n");
+
+                    // 어느 URI에서 보냈는지
+                    String requestUri = request.getRequestURI();
+                    String fullUrl = request.getRequestURL().toString();
+                    String httpMethod = request.getMethod();
+
+                    details.append("Request URI: ").append(requestUri).append("\n");
+                    details.append("Full URL: ").append(fullUrl).append("\n");
+                    details.append("HTTP Method: ").append(httpMethod).append("\n");
+
+                    request.getHeaderNames().asIterator().forEachRemaining(headerName ->
+                            details.append(headerName).append(": ").append(request.getHeader(headerName)).append("\n")
+                    );
+
+                    System.out.println(details.toString());
+
                     /*
                      * 원래는 token 안에 권한 정보가 있어야 함.
                      * 그 권한 정보를 토큰에서 추출해서 그걸 컨텍스트홀더에 저장해놓고 필요한 처리를 하는 것.
@@ -67,11 +86,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     }
                 } // 액세스 토큰이 유효하지 않은 경우는 아래의 예외로 처리됨.
                 filterChain.doFilter(request, response);
-            } catch (IOException ioException) {
-                String encodedMessage = URLEncoder.encode("토큰이 만료되었습니다.", StandardCharsets.UTF_8);
-                response.sendRedirect("/login/form?error="+encodedMessage);
+            } catch (IOException ioException) { // 기한 만료의 경우,
+                if (!currentUrl.contains("/image") && !currentUrl.contains("/js") && !currentUrl.contains("/css") && !currentUrl.contains("/login/form")) {
+                    if (currentUrl.equals("/api/login")) {
+                        filterChain.doFilter(request, response); // 로그인을 새로 하려는 경우 계속 진행.
+                    } else {
+                        String encodedMessage = URLEncoder.encode("토큰이 만료되었습니다.", StandardCharsets.UTF_8);
+                        response.sendRedirect("/login/form?error="+encodedMessage);
+                    }
+                } else {
+                    filterChain.doFilter(request, response); // 로그인 페이지라면 예외 발생시키지 않고 그냥 진행.
+                }
             } catch (Exception e) {
-                String encodedMessage = URLEncoder.encode("토큰 검증 과정에서 예외가 발생했습니다.", StandardCharsets.UTF_8);
+                // 어떤 특정 메서드에서 예외 처리가 안되있는 경우 필터 검사 결과로 인해 여기 예외 처리 항목으로 이동될 수 있음.
+                log.error("Exception={}", e.getMessage());
+                String encodedMessage = URLEncoder.encode("기타 필터링 과정에서 예외가 발생했습니다.", StandardCharsets.UTF_8);
                 response.sendRedirect("/login/form?error="+encodedMessage);
             }
         } else { // 액세스 토큰이 없는 경우.
