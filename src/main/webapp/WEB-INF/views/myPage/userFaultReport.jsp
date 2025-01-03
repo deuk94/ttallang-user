@@ -23,7 +23,7 @@
         <th>신고 내용</th>
         <th>신고 날짜</th>
         <th>처리 상태</th>
-        <th>삭제</th>
+        <th>삭 제</th>
     </tr>
     </thead>
     <tbody></tbody>
