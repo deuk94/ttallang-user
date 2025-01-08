@@ -1,5 +1,6 @@
 package com.ttallang.user.security.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -23,8 +24,9 @@ public class TokenUtil {
     private String SECRET_KEY;
 
     // 액세스토큰 30분으로 설정함.
-    private final int EXPIRE_TIME = 60 * 30 * 1000;
+    private final int EXPIRE_TIME = 60 * 60 * 1000;
 
+    // 토큰을 만드는 메서드.
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -34,6 +36,7 @@ public class TokenUtil {
                 .compact();
     }
 
+    // 토큰으로부터 username 찾는 메서드.
     public String getUsernameFromToken(String token) {
         return Jwts
                 .parser()
@@ -43,6 +46,28 @@ public class TokenUtil {
                 .getSubject();
     }
 
+    // 토큰을 갱신하는 메서드 (만료 여부 확인은 안 함.)
+    public String updateToken(String token) throws Exception {
+        // 토큰의 기존 정보들 추출.
+        Claims claims = Jwts
+                .parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+
+        String username = claims.getSubject();
+        Date newExpirationTime = new Date(System.currentTimeMillis() + EXPIRE_TIME);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(newExpirationTime) // 새로 갱신된 만료 시간.
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+
+    // 토큰을 검증하는 메서드.
     public boolean validateToken(
             String token,
             HttpServletRequest request,
@@ -71,6 +96,17 @@ public class TokenUtil {
         }
     }
 
+    // 토큰을 쿠키에 추가해주는 메서드.
+    public void setTokenAsCookie(HttpServletResponse response, String accessToken) {
+        Cookie cookie = new Cookie("access_token", accessToken);
+        cookie.setHttpOnly(true); // 클라이언트 측에서 접근 못하게 막음.
+        cookie.setSecure(true); // https 로만 쿠키 전송, http 에서는 안될 수 있음.
+        cookie.setPath("/"); // 모든 경로에서 유효.
+
+        response.addCookie(cookie); // 쿠키 추가.
+    }
+
+    // 요청으로부터 토큰을 추출하는 메서드.
     public String extractAccessTokenFromRequest(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length > 0) {

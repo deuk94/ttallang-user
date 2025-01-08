@@ -34,7 +34,9 @@
       <div id="naverCert">
         <img class="btn-naver" src="${pageContext.request.contextPath}/account/images/naverLogin.png" alt="네이버 아이콘">
       </div>
-      <div id="paycoCert" class="btn-base btn-payco">PAYCO 로그인</div>
+      <div id="googleCert">
+        <img class="btn-google" src="${pageContext.request.contextPath}/account/images/googleLogin.svg" alt="구글 아이콘">
+      </div>
     </div>
   </div>
 </div>
@@ -56,7 +58,7 @@
       cert("/api/oauth2/naver");
   });
   paycoCert.addEventListener("click",() => {
-      cert("/api/oauth2/payco");
+      cert("/api/oauth2/google");
   });
 </script>
 </html>

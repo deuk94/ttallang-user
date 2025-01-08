@@ -73,6 +73,12 @@ public class SignupServiceImpl implements SignupService {
 
     @Value("${naver.clientSecret}")
     private String naverClientSecret;
+
+    @Value("${google.clientId}")
+    private String googleClientId;
+
+    @Value("${google.clientSecret}")
+    private String googleClientSecret;
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
@@ -96,6 +102,24 @@ public class SignupServiceImpl implements SignupService {
                     authUri = "https://id.payco.com/oauth2.0/authorize";
                     clientId = paycoClientId;
                     scope = "email,mobile,name,birthdayMMdd";
+                    authorizationUrl = UriComponentsBuilder
+                            .fromHttpUrl(authUri)
+                            .queryParam("response_type", responseType)
+                            .queryParam("client_id", clientId)
+                            .queryParam("serviceProviderCode", "FRIENDS")
+                            .queryParam("redirect_uri", redirectUri)
+                            .queryParam("userLocale", "ko_KR")
+                            .queryParam("scope", scope)
+                            .queryParam("state", state)
+                            .encode()
+                            .toUriString();
+                }
+                case "google" -> { // 구글 인증.
+                    RandomStateToken randomStateToken = new RandomStateToken("google");
+                    String state = randomStateToken.getRandomStateToken();
+                    authUri = "https://accounts.google.com/o/oauth2/auth";
+                    clientId = googleClientId;
+                    scope = "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
                     authorizationUrl = UriComponentsBuilder
                             .fromHttpUrl(authUri)
                             .queryParam("response_type", responseType)
