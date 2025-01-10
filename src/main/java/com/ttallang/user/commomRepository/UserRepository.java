@@ -11,8 +11,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
-
-
     // 회원 정보 조회
     @Query("SELECT new com.ttallang.user.mypage.model.JoinUser(" +
         "r.userName, u.customerName, r.userPassword, " +
@@ -30,7 +28,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "where p.customerId = :customerId AND p.paymentStatus = '0' ")
     NotPaymentUser findNotPaymentUser(@Param("customerId") int customerId);
 
-    List<User> findByCustomerPhoneOrEmail(String customerPhone, String email);
+    List<User> findByEmailOrCustomerPhone(String email, String customerPhone);
 
     @Query("select new com.ttallang.user.account.model.RolesUser(r.userName, u.customerPhone) " +
             "from Roles r " +

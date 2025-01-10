@@ -46,18 +46,22 @@
 <script>
   const kakaoCert = document.querySelector("#kakaoCert");
   const naverCert = document.querySelector("#naverCert");
-  const paycoCert = document.querySelector("#paycoCert");
+  // const paycoCert = document.querySelector("#paycoCert");
+  const googleCert = document.querySelector("#googleCert");
   async function cert(uri) {
       const response = await fetch(uri);
       window.location.href = await response.text(); // SNS의 로그인 창을 연다.
   }
-  kakaoCert.addEventListener("click",() => {
+  kakaoCert.addEventListener("click", () => {
       cert("/api/oauth2/kakao");
   });
-  naverCert.addEventListener("click",() => {
+  naverCert.addEventListener("click", () => {
       cert("/api/oauth2/naver");
   });
-  paycoCert.addEventListener("click",() => {
+  // paycoCert.addEventListener("click", () => {
+  //     cert("/api/oauth2/payco");
+  // });
+  googleCert.addEventListener("click", () => {
       cert("/api/oauth2/google");
   });
 </script>

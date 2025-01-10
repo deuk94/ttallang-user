@@ -4,17 +4,10 @@ import com.ttallang.user.account.model.AccountResponse;
 import com.ttallang.user.commomRepository.RolesRepository;
 import com.ttallang.user.commomRepository.UserRepository;
 import com.ttallang.user.commonModel.Roles;
-import com.ttallang.user.security.config.token.RandomAuthNumber;
 import com.ttallang.user.account.model.RolesUser;
+import com.ttallang.user.security.config.token.RandomAuthNumber;
 import com.ttallang.user.security.config.token.RandomStateToken;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import net.nurigo.sdk.NurigoApp;
-import net.nurigo.sdk.message.model.Message;
-import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
-import net.nurigo.sdk.message.response.SingleMessageSentResponse;
-import net.nurigo.sdk.message.service.DefaultMessageService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,24 +30,7 @@ public class FindServiceImpl implements FindService {
     private final Map<String, String> sharedPasswordAuthNumberMap;
     private final Map<String, String> sharedStateMap;
     private final BCryptPasswordEncoder bCryptPasswordEncoder; // 암호화해주는놈.
-
-    private DefaultMessageService messageService;
-
-    // 민감 정보 변수화.
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
-    @Value("${coolsms.key}")
-    private String coolsmsKey;
-
-    @Value("${coolsms.secret}")
-    private String coolsmsSecret;
-
-    @Value("${coolsms.sender}")
-    private String coolsmsSender;
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
+    private final PhoneAuthService phoneAuthService;
 
     public FindServiceImpl(
             UserRepository userRepository,
@@ -62,7 +38,8 @@ public class FindServiceImpl implements FindService {
             Map<String, String> sharedUserNameAuthNumberMap,
             Map<String, String> sharedPasswordAuthNumberMap,
             Map<String, String> sharedStateMap,
-            BCryptPasswordEncoder bCryptPasswordEncoder
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            PhoneAuthService phoneAuthService
     ) {
         this.userRepository = userRepository;
         this.rolesRepository = rolesRepository;
@@ -70,72 +47,96 @@ public class FindServiceImpl implements FindService {
         this.sharedPasswordAuthNumberMap = sharedPasswordAuthNumberMap;
         this.sharedStateMap = sharedStateMap;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
-
-    @PostConstruct
-    public void init() {
-        this.messageService = NurigoApp.INSTANCE.initialize(coolsmsKey, coolsmsSecret, "https://api.coolsms.co.kr");
+        this.phoneAuthService = phoneAuthService;
     }
 
     @Override
     public ResponseEntity<AccountResponse> findUserName(Map<String, String> requestBody) {
-        return this.getResponseEntity(requestBody, "userName");
+        String customerPhone = requestBody.get("customerPhone");
+        RolesUser rolesUser = this.findByCustomerPhone(customerPhone);
+        if (rolesUser == null) {
+            return new ResponseEntity<>(new AccountResponse("guest", "일치하는 유저 정보가 없습니다."), HttpStatus.BAD_REQUEST);
+
+        }
+        return this.getResponseEntity(customerPhone, rolesUser, sharedUserNameAuthNumberMap);
     };
 
     @Override
     public ResponseEntity<AccountResponse> findPassword(Map<String, String> requestBody) {
-        return this.getResponseEntity(requestBody, "password");
+        String userName = requestBody.get("userName");
+        String customerPhone = requestBody.get("customerPhone");
+        RolesUser rolesUser = this.findByUserNameAndCustomerPhone(userName, customerPhone);
+        if (rolesUser == null) {
+            return new ResponseEntity<>(new AccountResponse("guest", "일치하는 유저 정보가 없습니다."), HttpStatus.BAD_REQUEST);
+        }
+        return this.getResponseEntity(customerPhone, rolesUser, sharedPasswordAuthNumberMap);
+    }
+
+    // 인증용 공유메모리에 대조용 인증번호를 저장하고 성공 여부를 알려주는 메서드.
+    @Override
+    public boolean isAuthNumberStoredInSharedMapForFind(String to, String authNumber, Map<String, String> sharedMap) {
+        String nullAuthNumber; // null 이어야 함
+        nullAuthNumber = sharedMap.putIfAbsent(to, authNumber);
+        log.info("nullAuthNumber={} | return={}", nullAuthNumber, nullAuthNumber == null);
+        // 저장 결과가 null 이 아니라면 이미 저장된 값이 있는것이므로 인증정보 추가 실패이고 그렇지 않으면 성공.
+        return nullAuthNumber == null; // 어쨌든 null 이어야 성공한것임.
     }
 
     @Override
-    // 사용자로부터 입력받은 인증 번호를 서버측과 대조하여 결과를 반환하는 메서드.
-    public ResponseEntity<AccountResponse> checkAuthNumber(Map<String, String> requestBody, String findType) {
-        AccountResponse accountResponse = new AccountResponse("guest", "인증 번호가 다릅니다.");
-        String userName = requestBody.get("userName");
-        String customerPhone = requestBody.get("customerPhone");
-        String authNumber1 = requestBody.get("authNumber"); // 입력받은 인증번호.
-        Map<String, String> sharedMap;
-        RolesUser rolesUser;
-        String message;
-        String target = null;
-        String state = null;;
+    public ResponseEntity<AccountResponse> getUserNameByCustomerPhone(Map<String, String> requestBody) {
+        AccountResponse accountResponse = new AccountResponse("guest", null);
+
         try {
-            if (findType.equals("userName")) {
-                sharedMap = sharedUserNameAuthNumberMap;
-                rolesUser = findByCustomerPhone(customerPhone);
-                message = rolesUser.getUserName();
-            } else if (findType.equals("password")) {
-                assert userName != null; // null이면 안됨.
-                sharedMap = sharedPasswordAuthNumberMap;
-                System.out.println(customerPhone);
-                rolesUser = findByUserNameAndCustomerPhone(userName, customerPhone);
-                target = rolesUser.getUserName();
-                // 패스워드의 경우는 클라이언트 측에서 메세지를 받아들이고 처리하는 로직이 아이디 처리 쪽과 다르다.
-                RandomStateToken randomStateToken = new RandomStateToken(target);
-                state = randomStateToken.getRandomStateToken();
-                message = state;
-            } else {
-                accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
-                return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            assert sharedMap != null; // null 값이 아님을 보장 후,
-            String authNumber2 = sharedMap.get(customerPhone); // 공유메모리에 저장돼있던 대조용 인증번호.
-            if (authNumber1.equals(authNumber2)) { // 인증번호가 일치한다면,
+            if (phoneAuthService.isCorrectAuthNumber(requestBody, sharedUserNameAuthNumberMap)) { // 인증번호가 일치한다면,
+                String customerPhone = requestBody.get("customerPhone");
+                RolesUser rolesUser = findByCustomerPhone(customerPhone);
+                String message = rolesUser.getUserName(); // 클라이언트에게 전달될 결과 메세지. 이것이 곧 찾으려는 UID 임.
+                sharedUserNameAuthNumberMap.remove(customerPhone); // 임시 인증정보를 지운다.
+
                 accountResponse.setMessage(message);
-                if (target != null && state != null) {
-                    sharedStateMap.putIfAbsent(target, state); // state를 등록한다.
-                }
-                sharedMap.remove(customerPhone); // 임시 인증정보를 지운다.
-                return new ResponseEntity<>(accountResponse, HttpStatus.OK); // 200.
-            } else { // 인증 번호가 다름.
-                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST); // 400.
+                return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+            } else {
+                accountResponse.setMessage("인증 번호가 다릅니다.");
+                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
+            log.error("SMS username 인증 에러: {}", e.getMessage());
+
             accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
-            log.error("SMS 인증 에러: {}", e.getMessage());
-            return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR); // 500.
+            return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
+
+    @Override
+    public ResponseEntity<AccountResponse> getPasswordByUserNameAndCustomerPhone(Map<String, String> requestBody) {
+        AccountResponse accountResponse = new AccountResponse("guest", null);
+
+        try {
+            if (phoneAuthService.isCorrectAuthNumber(requestBody, sharedPasswordAuthNumberMap)) { // 인증번호가 일치한다면,
+                String userName = requestBody.get("userName");
+                String customerPhone = requestBody.get("customerPhone");
+                RolesUser rolesUser = findByUserNameAndCustomerPhone(userName, customerPhone);
+                String target = rolesUser.getUserName(); // 패스워드는 전체적으로 처리하는 로직이 아이디 쪽과 다르다. 그래서 message 가 아님.
+
+                RandomStateToken randomStateToken = new RandomStateToken(target);
+                String state = randomStateToken.getRandomStateToken();
+
+                sharedStateMap.putIfAbsent(target, state); // state 를 등록한다. password 찾기의 경우 나중에 sharedStateMap 를 다시 참조해서 state 값을 검증해야 함.
+                sharedPasswordAuthNumberMap.remove(customerPhone); // 임시 인증정보를 지운다.
+
+                accountResponse.setMessage(state); // 클라이언트에게 전달될 검증값. 나중에 클라이언트로부터 받게 되는 state 가 올바르면 비밀번호 변경 가능.
+                return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+            } else {
+                accountResponse.setMessage("인증 번호가 다릅니다.");
+                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            log.error("SMS password 인증 에러: {}", e.getMessage());
+
+            accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
+            return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @Override
     public String renderPasswordChangePage(String state, Model model) {
@@ -147,7 +148,7 @@ public class FindServiceImpl implements FindService {
             String originalState = sharedStateMap.get(decodedUserName);
             if (originalState != null) { // 유효한 인증이면서,
                 if (originalState.equals(state)) { // 검증 코드도 일치하면,
-                    sharedStateMap.remove(decodedUserName); // 다른 접근을 하지 못하도록 state 바로 지워버림.
+                    sharedStateMap.remove(decodedUserName); // state 한 번 사용하고 다른 접근을 다시 하지 못하도록 state 바로 지워버림.
                     model.addAttribute("userName", decodedUserName);
                     model.addAttribute("state", target);
                     return "account/find/changePassword";
@@ -173,7 +174,7 @@ public class FindServiceImpl implements FindService {
         AccountResponse accountResponse = new AccountResponse("guest", null);
         try {
             String state = requestBody.get("state");
-            System.out.println(state);
+            log.info("state={}", state);
             String userName = requestBody.get("userName");
             String rawPassword = requestBody.get("userPassword");
 
@@ -197,97 +198,44 @@ public class FindServiceImpl implements FindService {
         }
     }
 
-    // 아래부턴 서비스에서 내부적으로만 사용하는 메서드들. 외부에서 접근할 수 없음.
-
     // 사용자에게 인증 번호를 보내기 시도하고 성공 여부를 응답하는 메서드.
-    private ResponseEntity<AccountResponse> getResponseEntity(Map<String, String> requestBody, String findType) {
+    // 인증 번호를 보내는 것은 sendSMS 메서드가 수행하고 아래 메서드는 유저를 찾는 것에 목적을 두었음.
+    @Override
+    public ResponseEntity<AccountResponse> getResponseEntity(String customerPhone, RolesUser rolesUser, Map<String, String> sharedMap) {
         AccountResponse accountResponse = new AccountResponse("guest", null);
-        String userName = requestBody.get("userName");
-        String customerPhone = requestBody.get("customerPhone");
-        RolesUser rolesUser;
         try {
-            if (findType.equals("userName")) {
-                rolesUser = this.findByCustomerPhone(customerPhone);
-            } else if (findType.equals("password")) {
-                assert userName != null;
-                System.out.println("들어옴");
-                rolesUser = this.findByUserNameAndCustomerPhone(userName, customerPhone);
-            } else {
-                accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
-                return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            if (rolesUser != null) { // 유저가 있긴 함.
-                Roles roles = rolesRepository.findByUserName(rolesUser.getUserName());
-                String userStatus = roles.getUserStatus();
-                if (userStatus.equals("0")) { // 이미 탈퇴한 유저임.
-                    accountResponse.setMessage("탈퇴한 유저입니다.");
-                    sharedPasswordAuthNumberMap.remove(customerPhone); // 탈퇴 유저이기 때문에 인증정보를 지운다.
-                    return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
-                } else if (userStatus.equals("1")) {
-                    int sendSMSResult = this.sendSMS(customerPhone, findType);
-                    if (sendSMSResult == 0) { // 보내기 시도.
-                        accountResponse.setMessage("이미 인증이 진행중입니다.");
-                        return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
-                    } else if (sendSMSResult == -1) {
+            Roles roles = rolesRepository.findByUserName(rolesUser.getUserName());
+            String userStatus = roles.getUserStatus();
+            if (userStatus.equals("0")) { // 이미 탈퇴한 유저임.
+                accountResponse.setMessage("탈퇴한 유저입니다.");
+                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
+            } else if (userStatus.equals("1")) {
+                RandomAuthNumber randomAuthNumber = new RandomAuthNumber();
+                String authNumber = randomAuthNumber.getRandomAuthNumber();
+                // 인증번호 저장먼저 하고 그 다음 보내기.
+                if (this.isAuthNumberStoredInSharedMapForFind(customerPhone, authNumber, sharedMap)) { // 인증번호 저장 성공한 경우.
+                    if (phoneAuthService.isSMSSentSuccess(customerPhone, authNumber)) { // 여기서 인증번호를 보냄. true | false.
+                        accountResponse.setMessage("전송 성공.");
+                        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+                    } else { // 보내기 실패.
                         accountResponse.setMessage("서버 에러로 인하여 인증이 취소되었습니다.\n관리자에게 문의해주세요.");
                         // 잔액 부족으로 인한 인증 취소일 가능성이 높음.
-                        sharedPasswordAuthNumberMap.remove(customerPhone); // 서버측 에러로 인한 인증 취소.
+                        sharedMap.remove(customerPhone); // 서버측 에러로 인한 인증 취소라서 저장했던 인증번호를 지워버림.
                         return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
                     }
-                } else { // 탈퇴도 아니고 활성화도 아니고???
-                    accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
-                    sharedPasswordAuthNumberMap.remove(customerPhone); // 조건문 오류로 인한 인증 취소.
-                    return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+                } else {
+                    accountResponse.setMessage("이미 인증이 진행중입니다.\n인증 번호를 다시 확인해주세요.");
+                    return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
                 }
-            } else { // 유저가 없음.
-                accountResponse.setMessage("일치하는 유저 정보가 없습니다.");
-                sharedPasswordAuthNumberMap.remove(customerPhone); // 일치하는 유저 정보가 없어서 인증이 의미없으므로 인증정보를 지운다.
-                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
+            } else { // 탈퇴도 아니고 활성화도 아니고???
+                accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
+                return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
             accountResponse.setMessage("인증 도중 에러가 발생하였습니다.");
             log.error("유저 정보 찾기 에러: {}", e.getMessage());
-            sharedPasswordAuthNumberMap.remove(customerPhone); // 에러로 인한 인증 취소.
+            sharedMap.remove(customerPhone); // 에러로 인한 인증 취소가 되서 혹시 남아있을지 모를 인증번호 정보를 지움.
             return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        accountResponse.setMessage("전송 성공.");
-        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
-    }
-
-    // 실질적으로 사용자에게 인증 번호를 보내는 메서드.
-    private int sendSMS(String to, String findType) {
-        try {
-            RandomAuthNumber randomAuthNumber = new RandomAuthNumber();
-            String authNumber = randomAuthNumber.getRandomAuthNumber();
-            // 진행중인 인증정보를 공유메모리에 저장 시도하여 이미 진행중인 인증인지 판단한다.
-            // 이 때 진행중인 인증의 종류를 파악하여 접근하는 공유메모리가 달라짐.
-            String alreadyNumber = null;
-            if (findType.equals("userName")) { // 아이디 찾기.
-                alreadyNumber = sharedUserNameAuthNumberMap.putIfAbsent(to, authNumber);
-            } else if (findType.equals("password")) { // 비밀번호 찾기.
-                alreadyNumber = sharedPasswordAuthNumberMap.putIfAbsent(to, authNumber);
-            } else {
-                // 있을 수 없는 일이긴 하지만 일단 분기시켜놓음.
-                return -1; // 서버측 에러로 처리.
-            }
-            if (alreadyNumber != null) { // 저장 결과가 null 이 아니라면 이미 저장된 값이 있는것이므로 인증정보 추가 실패.
-                System.out.println("추가 실패");
-                return 0; // false;
-            }
-            // 만약 저장 성공하였다면 새로운 인증이므로 진행한다.
-            Message message = new Message();
-
-            // 형식에 맞게 만들어서 보내기.
-            message.setFrom(coolsmsSender); // 발신자 번호 설정.
-            message.setTo(to); // 수신자 번호 설정.
-            message.setText("[딸랑이] 인증번호는 [" + authNumber + "] 입니다."); // 메시지 내용 설정.
-
-            SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message)); // 메시지 발송 요청을 하는 것으로 메세지가 보내진다.
-            System.out.println(response); // 응답이 200이 와야함.
-            return 1; // true;
-        } catch (Exception e) {
-            log.error("error={}", e.getMessage());
-            return -1; // false 이긴 한데 추가 실패한 경우와 구분하려고 함.
         }
     }
 

@@ -1,5 +1,8 @@
+import { phoneAuthComplete } from './signupPhoneAuth.js';
+
 const userName = document.querySelector("#userName");
 const checkExistButton = document.querySelector("#checkExist");
+const phoneAuthButton = document.querySelector("#phoneAuth");
 const userPassword = document.querySelector("#userPassword");
 const confirmPassword = document.querySelector("#confirmPassword");
 const customerPhone = document.querySelector("#customerPhone");
@@ -13,11 +16,19 @@ const form = document.querySelector("#signupForm");
 
 let isExist = true;
 
-// 폼 처리 관련
+// 폼 처리 관련.
 form.addEventListener("submit", handleSignupForm);
 
-// 아이디 중복 검사 버튼
+// 아이디 중복 검사 버튼.
 checkExistButton.addEventListener("click", handleCheckButton);
+
+// 휴대폰 번호 인증 버튼.
+phoneAuthButton.addEventListener("click", handlePhoneAuthButton);
+
+function handlePhoneAuthButton(event) {
+    event.preventDefault();
+
+}
 
 // 중복검사 버튼.
 function handleCheckButton(event) {
@@ -54,7 +65,7 @@ function handleCheckButton(event) {
     }
 }
 
-// 유효성 검사 이벤트 등록
+// 유효성 검사 이벤트 등록.
 userName.addEventListener("input", (event) => {
     validateUserName(event);
 });
@@ -121,6 +132,7 @@ function validateUserName(event) {
     }
 }
 
+// 유효성 검사 조각 : 패스워드
 function validateUserPassword() {
     const userPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     if (!userPasswordRegex.test(userPassword.value)) {
@@ -132,6 +144,7 @@ function validateUserPassword() {
     }
 }
 
+// 유효성 검사 조각 : 패스워드 확인
 function validateConfirmPassword() {
     if (userPassword.value !== confirmPassword.value) {
         confirmPassword.classList.add("is-invalid");
@@ -142,6 +155,7 @@ function validateConfirmPassword() {
     }
 }
 
+// 유효성 검사 조각 : 이메일
 function validateEmail() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(userEmail.value)) {
@@ -153,7 +167,7 @@ function validateEmail() {
     }
 }
 
-
+// 유효성 검사 조각 : 생년월일
 function validateBirthday() {
     const birthdayRegex = /^(19|20)\d\d(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/;
     if (!birthdayRegex.test(userBirthday.value)) {
@@ -165,6 +179,7 @@ function validateBirthday() {
     }
 }
 
+// 유효성 검사 조각 : 휴대폰번호
 function validateCustomerPhone() {
     const customerPhoneRegex = /^01[0-9]{8,9}$/;
     if (!customerPhoneRegex.test(customerPhone.value)) {
@@ -176,6 +191,7 @@ function validateCustomerPhone() {
     }
 }
 
+// 유효성 검사 모음.
 function validateForm(event) {
     const complete =
         !isExist &&
@@ -184,12 +200,15 @@ function validateForm(event) {
         validateConfirmPassword() &&
         validateEmail() &&
         validateBirthday() &&
-        validateCustomerPhone();
+        validateCustomerPhone() &&
+        phoneAuthComplete;
     if (complete) {
         return true;
     } else {
         if (isExist) {
             alert("아이디 중복 검사를 해주세요!");
+        } else if (!phoneAuthComplete) {
+            alert("휴대폰 인증을 완료해주세요!");
         } else {
             alert("올바른 정보를 입력해주세요!");
         }

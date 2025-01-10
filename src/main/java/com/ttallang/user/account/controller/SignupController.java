@@ -39,7 +39,7 @@ public class SignupController { // 리턴 타입이 JSP 페이지인 컨트롤�
         return "account/signup/form";
     }
 
-    @GetMapping("/oauth2/callback")
+    @GetMapping("/oauth2/callback") // 여기서 getAuthorizationUrl 이후의 나머지 작업들을 모두 포함함 (processSNSCert 는 SignupServiceImpl 의 라인 363부터 시작.)
     public String callback(@RequestParam Map<String, String> params, Model model) {
         Map<String, Object> responseBody = signupService.processSNSCert(params);
         if (responseBody.get("cancel") != null) {

@@ -8,11 +8,13 @@ import com.ttallang.user.security.config.token.RandomStateToken;
 import com.ttallang.user.account.model.CertInfo;
 import com.ttallang.user.account.model.AccountResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -20,10 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -115,18 +114,17 @@ public class SignupServiceImpl implements SignupService {
                             .toUriString();
                 }
                 case "google" -> { // 구글 인증.
+                    // 문서 찾기 힘들었다...https://developers.google.com/identity/protocols/oauth2/web-server?hl=ko#httprest_3
                     RandomStateToken randomStateToken = new RandomStateToken("google");
                     String state = randomStateToken.getRandomStateToken();
-                    authUri = "https://accounts.google.com/o/oauth2/auth";
+                    authUri = "https://accounts.google.com/o/oauth2/v2/auth";
                     clientId = googleClientId;
                     scope = "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
                     authorizationUrl = UriComponentsBuilder
                             .fromHttpUrl(authUri)
                             .queryParam("response_type", responseType)
                             .queryParam("client_id", clientId)
-                            .queryParam("serviceProviderCode", "FRIENDS")
                             .queryParam("redirect_uri", redirectUri)
-                            .queryParam("userLocale", "ko_KR")
                             .queryParam("scope", scope)
                             .queryParam("state", state)
                             .encode()
@@ -182,8 +180,7 @@ public class SignupServiceImpl implements SignupService {
             authorizationCodeMap.put("cancel", "true");
             return authorizationCodeMap;
         }
-        log.info("code 받기 성공={}", code);
-        log.info("state 받기 성공={}", state);
+        log.info("code={} | state={}", code, state); // 인가코드 받기 성공.
         String[] stateParts = state.split(":");
         String stateTextPart = stateParts[1];
         byte[] decodedBytes = Base64.getUrlDecoder().decode(stateTextPart);
@@ -196,6 +193,8 @@ public class SignupServiceImpl implements SignupService {
             SNSType = "kakao";
         } else if (decodedState.contains("naver")) {
             SNSType = "naver";
+        } else if (decodedState.contains("google")) {
+            SNSType = "google";
         } else {
             throw new RuntimeException("SNS 타입이 지정되지 않았습니다.");
         }
@@ -209,6 +208,7 @@ public class SignupServiceImpl implements SignupService {
     private ResponseEntity<Map<String, Object>> getAccessToken(Map<String, String> authorizationCodeMap) {
         RestTemplate restTemplate = new RestTemplate();
         String grantType = "authorization_code";
+        String tokenURL;
         String state = null;
         String tokenUri = null;
         String clientId = null;
@@ -218,7 +218,7 @@ public class SignupServiceImpl implements SignupService {
 
         String code = authorizationCodeMap.get("code");
         String SNSType = authorizationCodeMap.get("SNSType");
-        System.out.println(authorizationCodeMap);
+        log.info("authorizationCodeMap={}", authorizationCodeMap);
 
         try {
             switch (SNSType) {
@@ -247,21 +247,40 @@ public class SignupServiceImpl implements SignupService {
                     clientId = naverClientId;
                     clientSecret = naverClientSecret;
                 }
+                case "google" -> {
+                    headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+                    RandomStateToken randomStateToken = new RandomStateToken("google");
+                    state = randomStateToken.getRandomStateToken();
+                    tokenUri = "https://oauth2.googleapis.com/token";
+                    httpMethod = HttpMethod.POST;
+                    clientId = googleClientId;
+                    clientSecret = googleClientSecret;
+                }
                 default -> throw new RuntimeException("토큰 요청 정보가 올바르지 않습니다.");
             }
 
-            assert tokenUri != null;
-            assert clientId != null;
-            assert clientSecret != null;
-            String tokenURL = UriComponentsBuilder
-                    .fromHttpUrl(tokenUri)
-                    .queryParam("grant_type", grantType)
-                    .queryParam("client_id", clientId)
-                    .queryParam("client_secret", clientSecret)
-                    .queryParam("code", code)
-                    .queryParam("state", state)
-                    .encode()
-                    .toUriString();
+            if (SNSType.equals("google")) {
+                tokenURL = UriComponentsBuilder
+                        .fromHttpUrl(tokenUri)
+                        .queryParam("grant_type", grantType)
+                        .queryParam("client_id", clientId)
+                        .queryParam("client_secret", clientSecret)
+                        .queryParam("redirect_uri", redirectUri)
+                        .queryParam("code", code)
+                        .queryParam("state", state)
+                        .encode()
+                        .toUriString();
+            } else {
+                tokenURL = UriComponentsBuilder
+                        .fromHttpUrl(tokenUri)
+                        .queryParam("grant_type", grantType)
+                        .queryParam("client_id", clientId)
+                        .queryParam("client_secret", clientSecret)
+                        .queryParam("code", code)
+                        .queryParam("state", state)
+                        .encode()
+                        .toUriString();
+            }
 
             assert httpMethod != null;
             HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -273,21 +292,25 @@ public class SignupServiceImpl implements SignupService {
             );
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                log.info("액세스 토큰 얻어오기 성공...");
                 try {
-                    assert response.getBody() != null;
-                    String accessToken = (String) response.getBody().get("access_token");
+                    Map<String, Object> responseBody = response.getBody();
+                    assert responseBody != null;
+                    log.info("응답 받기 성공... | responseBody={}", responseBody);
+                    String accessToken = (String) responseBody.get("access_token");
+                    log.info("액세스 토큰 얻어오기 성공... | accessToken={}", accessToken);
                     if (SNSType.equals("payco")) {
                         CertInfo certInfo = new CertInfo(accessToken, clientId, clientSecret, "PACYO");
                         sharedCertInfoMap.put(accessToken, certInfo);
                     } else if (SNSType.equals("kakao")) {
                         CertInfo certInfo = new CertInfo(accessToken, "KAKAO");
                         sharedCertInfoMap.put(accessToken, certInfo);
+                    } else if (SNSType.equals("google")) {
+                        CertInfo certInfo = new CertInfo(accessToken, clientSecret, "GOOGLE");
+                        sharedCertInfoMap.put(accessToken, certInfo);
                     } else {
                         CertInfo certInfo = new CertInfo("delete", accessToken, clientId, clientSecret, "NAVER");
                         sharedCertInfoMap.put(accessToken, certInfo);
                     }
-
                 } catch (RestClientException e) {
                     log.error("응답 객체의 본문이 NULL 임: {}", e.getMessage());
                 }
@@ -330,6 +353,11 @@ public class SignupServiceImpl implements SignupService {
                 headers = new HttpHeaders();
                 headers.add("Authorization", "Bearer " + accessToken);
                 userInfoUri = "https://openapi.naver.com/v1/nid/me";
+            }
+            case "google" -> {
+                headers = new HttpHeaders();
+                headers.add("Authorization", "Bearer " + accessToken);
+                userInfoUri = "https://www.googleapis.com/oauth2/v3/userinfo";
             }
         }
 
@@ -375,7 +403,7 @@ public class SignupServiceImpl implements SignupService {
         String SNSType = authorizationCodeMap.get("SNSType");
         
         try {
-            // 인증 코드로 토큰 받기
+            // 인증 코드로 토큰 받기.
             ResponseEntity<Map<String, Object>> accessTokenResponse = this.getAccessToken(authorizationCodeMap);
             accessTokenResponseBody = accessTokenResponse.getBody();
             assert accessTokenResponseBody != null;
@@ -386,6 +414,12 @@ public class SignupServiceImpl implements SignupService {
         }
 
         String accessToken = (String) accessTokenResponseBody.get("access_token");
+        if (accessToken == null) {
+            log.info("Token case google...");
+            accessToken = (String) accessTokenResponseBody.get("token"); // google 은 이름이 다름.
+        }
+
+        assert accessToken != null;
         log.info("토큰 받기 성공={}", accessToken);
         
         try {
@@ -463,6 +497,22 @@ public class SignupServiceImpl implements SignupService {
                         new ParameterizedTypeReference<Map<String, Object>>() {}
                 );
             }
+            case "GOOGLE" -> {
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("content-type", "application/x-www-form-urlencoded");
+                unlinkURL = UriComponentsBuilder
+                        .fromHttpUrl("https://oauth2.googleapis.com/revoke")
+                        .queryParam("token", certInfo.getAccessToken())
+                        .encode()
+                        .toUriString();
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+                response = restTemplate.exchange(
+                        unlinkURL,
+                        HttpMethod.POST,
+                        entity,
+                        new ParameterizedTypeReference<Map<String, Object>>() {}
+                );
+            }
         }
         try {
             assert response != null;
@@ -535,6 +585,17 @@ public class SignupServiceImpl implements SignupService {
                 String replacedBirthday = birthday.replace("-", "");
                 model.addAttribute("birthday", response.get("birthyear") + replacedBirthday);
             }
+            case "google" -> {
+                this.unlinkUserCert(certInfo);
+                // 유저 중복 검사.
+                String email = (String) responseBody.get("email");
+                if (this.isExistingCustomers(email, null)) { // 중복 유저가 존재하는 경우.
+                    String encodedMessage = URLEncoder.encode("이미 해당 정보로 가입한 유저가 있습니다.", StandardCharsets.UTF_8);
+                    return "redirect:/login/form?error="+encodedMessage;
+                };
+                model.addAttribute("customerName", responseBody.get("given_name"));
+                model.addAttribute("email", email);
+            }
             default -> {
                 String encodedMessage = URLEncoder.encode("SNS 타입이 지정되지 않았습니다.", StandardCharsets.UTF_8);
                 return "redirect:/login/form?error="+encodedMessage;
@@ -557,76 +618,91 @@ public class SignupServiceImpl implements SignupService {
         return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 
-    // 중복 유저 존재 여부 확인.
+    // 이메일 혹은 휴대폰번호로 검색해서 중복되는 유저의 존재 여부 확인.
     private boolean isExistingCustomers(String email, String customerPhone) {
-        System.out.println(customerPhone);
-        System.out.println(email);
-        List<User> userList = userRepository.findByCustomerPhoneOrEmail(customerPhone, email);
-        log.info("userList={}", userList);
+        log.info("중복유저 검사... email={} | customerPhone={} ", email, customerPhone);
+        List<User> userList = userRepository.findByEmailOrCustomerPhone(email, customerPhone);
+        log.info("중복 유저 리스트... userList={}", userList);
         return !(userList.isEmpty());
     }
 
     // 일반 회원 가입.
     @Override
+    @Transactional
     public ResponseEntity<AccountResponse> signupCustomer(Map<String, String> userData) {
-        AccountResponse accountResponse = new AccountResponse("guest", "회원가입 성공.");
+        AccountResponse accountResponse = new AccountResponse("guest", null);
         String email = userData.get("email");
         String customerPhone = userData.get("customerPhone");
-        if (this.isExistingCustomers(email, customerPhone)) { // 중복 유저가 존재하는 경우.
+
+        // 중복 유저가 존재하는 경우.
+        if (this.isExistingCustomers(email, customerPhone)) {
             accountResponse.setMessage("이미 해당 정보(휴대폰 번호 혹은 이메일)로 가입한 유저가 있습니다.");
-            System.out.println(email+" : "+customerPhone);
+            log.error("회원가입 실패... email={} | customerPhone={}", email, customerPhone);
             return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
-        };
+        }
+
         try {
             // 유저 상세 데이터 기록.
             Roles roles = this.recordRoles(userData);
-            this.recordUser(userData, roles); // DB 기록 종료.
+            this.recordUser(userData, roles);
+            // DB 기록 종료.
         } catch (Exception e) {
-            accountResponse.setMessage("회원가입 실패,"+e.getMessage());
-            log.error("회원가입에 실패했습니다. 원인={}", e.getMessage());
+            accountResponse.setMessage("회원가입 실패: "+e.getMessage());
+            log.error("회원가입 실패... Exception={}", e.getMessage());
             return new ResponseEntity<>(accountResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        accountResponse.setMessage("회원가입 성공.");
         return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 
     private Roles recordRoles(Map<String, String> userData) {
-        // 유저 권한 테이블 기록.
-        log.info("userData={}", userData);
-        Roles roles = new Roles();
+        try {
+            // 유저 권한 테이블 기록.
+            log.info("userData={}", userData);
+            Roles roles = new Roles();
 
-        String userName = userData.get("userName");
-        roles.setUserName(userName);
+            String userName = userData.get("userName");
+            roles.setUserName(userName);
 
-        roles.setUserRole("ROLE_USER");
+            roles.setUserRole("ROLE_USER");
 
-        String rawPassword = userData.get("userPassword");
-        String encPassword = bCryptPasswordEncoder.encode(rawPassword);
-        roles.setUserPassword(encPassword);
+            String rawPassword = userData.get("userPassword");
+            String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+            roles.setUserPassword(encPassword);
 
-        roles.setUserStatus("1");
+            roles.setUserStatus("1");
 
-        rolesRepository.save(roles);
-        return roles;
+            rolesRepository.save(roles);
+            return roles;
+        } catch (Exception e) {
+            log.error("유저 권한 테이블 기록 실패... Exception={}", e.getMessage());
+            return null;
+        }
     };
 
-    private void recordUser(Map<String, String> userData, Roles roles) {
-        User user = new User();
+    private void recordUser(Map<String, String> userData, Roles roles) throws Exception {
+        try {
+            User user = new User();
 
-        int userId = roles.getUserId();
-        user.setUserId(userId);
+            int userId = roles.getUserId();
+            user.setUserId(userId);
 
-        String customerName = userData.get("customerName");
-        user.setCustomerName(customerName);
+            String customerName = userData.get("customerName");
+            user.setCustomerName(customerName);
 
-        String customerPhone = userData.get("customerPhone");
-        user.setCustomerPhone(customerPhone);
+            String customerPhone = userData.get("customerPhone");
+            user.setCustomerPhone(customerPhone);
 
-        String email = userData.get("email");
-        user.setEmail(email);
+            String email = userData.get("email");
+            user.setEmail(email);
 
-        String birthday = userData.get("birthday");
-        user.setBirthday(birthday);
+            String birthday = userData.get("birthday");
+            user.setBirthday(birthday);
 
-        userRepository.save(user);
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error("유저 세부 정보 기록 실패... Exception={}", e.getMessage());
+            throw new Exception("유저 세부 정보 기록 실패.");
+        }
     }
 }

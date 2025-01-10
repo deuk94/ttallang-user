@@ -5,6 +5,7 @@ import com.ttallang.user.security.config.handler.JwtLogoutHandler;
 import com.ttallang.user.security.config.handler.LoginHandler;
 import com.ttallang.user.account.model.CertInfo;
 import com.ttallang.user.security.jwt.TokenAuthenticationFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -103,6 +105,8 @@ public class SecurityConfig {
     public AuthenticationEntryPoint authenticationEntryPoint() {
         // 어떤 특정 메서드에서 예외 처리가 안되있는 경우 필터 검사 결과로 인해 여기가 아니라 jwt.TokenAuthenticationFilter의 100번째 라인으로 이동될 수 있음.
         return (request, response, authException) -> {
+            String currentUrl = request.getRequestURI();
+            log.info("SecurityConfig 109 Line | currentUrl={} | authException={}", currentUrl, authException.getMessage());
             response.sendRedirect("/login/form");
         };
     }
@@ -124,6 +128,12 @@ public class SecurityConfig {
     }
 
     // SMS 인증 관련 임시 저장소 목록.
+    // 공통 휴대폰 인증 관련.
+    @Bean
+    public Map<String, String> sharedPhoneAuthNumberMap() {
+        return new ConcurrentHashMap<>();
+    }
+
     // userName 찾기 관련.
     @Bean
     public Map<String, String> sharedUserNameAuthNumberMap() {

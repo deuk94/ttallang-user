@@ -29,7 +29,7 @@ public class SignupRestController { // 리턴 타입이 JSON인 컨트롤러.
             log.error("로그인창에 진입할 수 없습니다. 원인={}", e.getMessage());
             return ResponseEntity.ok("/login/form");
         }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response); // 성공했다면 콜백 url 로 가서 나머지 작업을 함.
     }
 
     @GetMapping("/signup/form/checkExisting/{userName}")
@@ -39,6 +39,11 @@ public class SignupRestController { // 리턴 타입이 JSON인 컨트롤러.
 
     @PostMapping("/signup")
     public ResponseEntity<AccountResponse> signup(@RequestBody Map<String, String> userData) {
-        return signupService.signupCustomer(userData);
+        try {
+            return signupService.signupCustomer(userData);
+        } catch (Exception e) { // 트랜잭션 어노테이션이 달려있으면 그 메서드 안에서는 try catch 로 안잡히고 자동으로 던져지는 것 같다...
+            log.error("회원가입 실패... Exception={}", e.getMessage());
+            return new ResponseEntity<>(new AccountResponse("guest", "회원가입 실패."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

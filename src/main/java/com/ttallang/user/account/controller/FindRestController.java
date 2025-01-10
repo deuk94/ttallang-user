@@ -31,12 +31,12 @@ public class FindRestController {
 
     @PostMapping("/userName/auth")
     public ResponseEntity<AccountResponse> checkUsernameAuthNumber(@RequestBody Map<String, String> requestBody) {
-        return findService.checkAuthNumber(requestBody, "userName");
+        return findService.getUserNameByCustomerPhone(requestBody);
     }
 
     @PostMapping("/password/auth")
     public ResponseEntity<AccountResponse> checkPasswordAuthNumber(@RequestBody Map<String, String> requestBody) {
-        return findService.checkAuthNumber(requestBody, "password");
+        return findService.getPasswordByUserNameAndCustomerPhone(requestBody);
     }
 
     @PostMapping("/changePassword")
