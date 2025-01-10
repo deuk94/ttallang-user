@@ -19,7 +19,7 @@
 						<label for="userName" class="form-label">아이디</label>
 						<div class="input-group">
 							<input type="text" id="userName" name="userName" class="form-control" required pattern="^[A-Za-z0-9]{6,}$">
-							<button id="checkExist" class="btn btn-outline-secondary ms-2">중복 검사</button>
+							<button id="checkExist" class="btn ms-2">중복 검사</button>
 							<div class="invalid-feedback">
 								아이디는 영문/숫자 조합으로 6자 이상이어야 합니다.
 							</div>
@@ -63,19 +63,29 @@
 					</div>
 					<div class="mb-3">
 						<label for="customerPhone" class="form-label">휴대폰 번호</label>
-						<input
-								type="tel"
-								id="customerPhone"
-								name="customerPhone"
-								class="form-control ${not empty customerPhone ? 'readonly-input' : ''}"
-								value="${not empty customerPhone ? customerPhone : ''}" ${not empty customerPhone ? 'readonly' : ''}
-								pattern="^01[0-9]{8,9}$"
-								placeholder="'-'는 제외하고 입력해주세요."
-								maxlength="11"
-								required
-						/>
-						<div class="invalid-feedback">
-							유효한 휴대폰 번호를 입력해주세요. (ex. 01011112222)
+						<div class="input-group">
+							<input
+									type="tel"
+									id="customerPhone"
+									name="customerPhone"
+									class="form-control ${not empty customerPhone ? 'readonly-input' : ''}"
+									value="${not empty customerPhone ? customerPhone : ''}" ${not empty customerPhone ? 'readonly' : ''}
+									pattern="^01[0-9]{8,9}$"
+									placeholder="'-'는 제외하고 입력해주세요."
+									maxlength="11"
+									required
+							/>
+							<button id="phoneAuth" class="btn ms-2">휴대폰 인증</button>
+							<div class="invalid-feedback">
+								유효한 휴대폰 번호를 입력해주세요. (ex. 01011112222)
+							</div>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label id="helpAuthNumber" for="authNumber" class="form-label d-none">인증 번호를 입력 후 <span>확인</span> 버튼을 눌러주세요.</label>
+						<div class="input-group">
+							<input type="text" id="authNumber" name="authNumber" class="form-control d-none" maxlength="4" pattern="\d{4}" required>
+							<button id="checkAuthNumberButton" class="btn ms-2 d-none">확인</button>
 						</div>
 					</div>
 					<div class="mb-3">
@@ -119,6 +129,7 @@
 	</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script src="${pageContext.request.contextPath}/account/js/signup.js"></script>
+<script type="module" src="${pageContext.request.contextPath}/account/js/signup.js"></script>
+<script type="module" src="${pageContext.request.contextPath}/account/js/signupPhoneAuth.js"></script>
 </body>
 </html>

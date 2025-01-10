@@ -59,4 +59,18 @@ public class CertInfo {
         this.targetIdType = null;
         this.targetId = null;
     }
+
+    public CertInfo( // 구글 버전.
+         String accessToken,
+         String clientSecret,
+         String serviceProvider
+    ) {
+        this.grantType = null;
+        this.accessToken = accessToken;
+        this.clientId = null;
+        this.clientSecret = clientSecret;
+        this.serviceProvider = serviceProvider;
+        this.targetIdType = null;
+        this.targetId = null;
+    }
 }

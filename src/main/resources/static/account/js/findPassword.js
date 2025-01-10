@@ -45,7 +45,7 @@ function handleUserNameCustomerPhoneForm(event) {
                 changeForm();
             })
             .catch(error => {
-                if (error.message === "이미 인증이 진행중입니다.") {
+                if (error.message === "이미 인증이 진행중입니다.\n인증 번호를 다시 확인해주세요.") {
                     // 이미 전송함.
                     isSubmitted = true;
                     changeForm();
@@ -107,7 +107,7 @@ function handleAuthForm(event) {
                 return response.json();
             })
             .then(result => {
-                window.location.href = `/find/changePassword?state=${result.message}`;
+                window.location.href = `/find/changePassword?state=${result.message}`; // 서버로부터 state 값을 전달받은 것을 여기에 넣고 사용한다. 그러면 서버가 state 값을 검증하게 됨.
             })
             .catch(error => {
                 alert(error.message);

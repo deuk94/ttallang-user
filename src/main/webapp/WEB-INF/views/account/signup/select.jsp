@@ -34,7 +34,9 @@
       <div id="naverCert">
         <img class="btn-naver" src="${pageContext.request.contextPath}/account/images/naverLogin.png" alt="네이버 아이콘">
       </div>
-      <div id="paycoCert" class="btn-base btn-payco">PAYCO 로그인</div>
+      <div id="googleCert">
+        <img class="btn-google" src="${pageContext.request.contextPath}/account/images/googleLogin.svg" alt="구글 아이콘">
+      </div>
     </div>
   </div>
 </div>
@@ -44,19 +46,23 @@
 <script>
   const kakaoCert = document.querySelector("#kakaoCert");
   const naverCert = document.querySelector("#naverCert");
-  const paycoCert = document.querySelector("#paycoCert");
+  // const paycoCert = document.querySelector("#paycoCert");
+  const googleCert = document.querySelector("#googleCert");
   async function cert(uri) {
       const response = await fetch(uri);
       window.location.href = await response.text(); // SNS의 로그인 창을 연다.
   }
-  kakaoCert.addEventListener("click",() => {
+  kakaoCert.addEventListener("click", () => {
       cert("/api/oauth2/kakao");
   });
-  naverCert.addEventListener("click",() => {
+  naverCert.addEventListener("click", () => {
       cert("/api/oauth2/naver");
   });
-  paycoCert.addEventListener("click",() => {
-      cert("/api/oauth2/payco");
+  // paycoCert.addEventListener("click", () => {
+  //     cert("/api/oauth2/payco");
+  // });
+  googleCert.addEventListener("click", () => {
+      cert("/api/oauth2/google");
   });
 </script>
 </html>

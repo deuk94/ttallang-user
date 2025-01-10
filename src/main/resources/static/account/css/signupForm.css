@@ -14,17 +14,7 @@ a {
   border-color: #001f54;
 }
 
-/* 버튼 스타일 */
-.btn-primary {
-  background-color: #001f54;
-  border: none;
-}
-
-.btn-outline-secondary, .btn-outline-danger {
-  border-width: 2px;
-}
-
-#checkExist {
+#checkExist, #PhoneAuth, #checkAuthNumberButton {
   background-color: #001f54;
   color: #ffffff;
 }
@@ -69,4 +59,8 @@ a {
 
 #btn-cancel {
   text-decoration: none;
+}
+
+#authNumber {
+  width: 3rem;
 }

@@ -1,13 +1,9 @@
 const phoneForm = document.querySelector("#phoneForm");
-
 const helpPhoneNumber = document.querySelector("#helpPhoneNumber");
 const helpAuthNumber = document.querySelector("#helpAuthNumber");
-
 const customerPhoneInputGroup = document.querySelector("#customerPhoneInputGroup");
 const customerPhone = document.querySelector("#customerPhone");
-
 const authInputGroup = document.querySelector("#authInputGroup");
-
 const sendSMS = document.querySelector("#sendSMS");
 const checkAuthNumber = document.querySelector("#checkAuthNumber");
 
@@ -44,7 +40,7 @@ function handlePhoneForm(event) {
                 changeForm();
             })
             .catch(error => {
-                if (error.message === "이미 인증이 진행중입니다.") {
+                if (error.message === "이미 인증이 진행중입니다.\n인증 번호를 다시 확인해주세요.") {
                     // 이미 전송함.
                     isSubmitted = true;
                     changeForm();
